@@ -2,7 +2,7 @@ package org.grenki.gsql
 
 import org.grenki.gsql.context.Context
 import org.grenki.gsql.context.gtype.Type
-import org.grenki.gsql.visitor.Visitor
+import org.grenki.gsql.visitor.MainVisitor
 
 import org.antlr.v4.runtime.{CharStreams, CommonTokenStream}
 
@@ -40,7 +40,7 @@ object Main {
 
     val context = new Context[Type]()
 
-    new Visitor(context, tokenStream).visit(parser.programm())
+    new MainVisitor(context, tokenStream).visit(parser.programm())
     println(context.vars)
   }
 }
