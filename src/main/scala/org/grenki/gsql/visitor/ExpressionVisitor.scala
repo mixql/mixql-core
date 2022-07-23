@@ -1,7 +1,7 @@
-package org.grenki.gsql
-package visitor
+package org.grenki.gsql.visitor
 
-import context.`type`.{Type, string, void}
+import org.grenki.gsql.context.gtype.{Type, string, void}
+import org.grenki.gsql.sqlParser
 
 trait ExpressionVisitor extends BaseVisitor {
   override def visitExpr_concat(ctx: sqlParser.Expr_concatContext): Type =

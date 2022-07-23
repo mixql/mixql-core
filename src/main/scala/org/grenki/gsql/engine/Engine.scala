@@ -1,5 +1,4 @@
-package org.grenki.gsql
-package engine
+package org.grenki.gsql.engine
 
 class Engine {
   def execute (stmt: String) =

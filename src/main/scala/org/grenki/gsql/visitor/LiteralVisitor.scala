@@ -1,7 +1,7 @@
-package org.grenki.gsql
-package visitor
+package org.grenki.gsql.visitor
 
-import context.`type`._
+import org.grenki.gsql.context.gtype._
+import org.grenki.gsql.sqlParser
 
 import org.antlr.v4.runtime.misc.Interval
 

@@ -1,8 +1,8 @@
 package org.grenki.gsql
 
-import context.Context
-import context.`type`.Type
-import visitor.Visitor
+import org.grenki.gsql.context.Context
+import org.grenki.gsql.context.gtype.Type
+import org.grenki.gsql.visitor.Visitor
 
 import org.antlr.v4.runtime.{CharStreams, CommonTokenStream}
 

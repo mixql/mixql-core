@@ -1,7 +1,6 @@
-package org.grenki.gsql
-package context
+package org.grenki.gsql.context
 
-import engine.Engine
+import org.grenki.gsql.engine.Engine
 
 import scala.collection.mutable.{Map => MutMap}
 

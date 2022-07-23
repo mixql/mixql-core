@@ -1,8 +1,7 @@
-package org.grenki.gsql
-package visitor
+package org.grenki.gsql.visitor
 
-import context.`type`.{Type, int, void}
-
+import org.grenki.gsql.context.gtype.{Type, int, void}
+import org.grenki.gsql.sqlParser
 import scala.language.implicitConversions
 
 trait ControlStmtsVisitor extends BaseVisitor {

@@ -1,8 +1,8 @@
-package org.grenki.gsql
-package visitor
+package org.grenki.gsql.visitor
 
-import context.Context
-import context.`type`.{Type, string, void}
+import org.grenki.gsql.context.Context
+import org.grenki.gsql.context.gtype.{Type, string, void}
+import org.grenki.gsql.sqlParser
 
 import org.antlr.v4.runtime.TokenStream
 import org.antlr.v4.runtime.misc.Interval
