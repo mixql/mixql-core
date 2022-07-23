@@ -7,5 +7,8 @@ lazy val root = (project in file(".")).enablePlugins(Antlr4Plugin)
   .settings(
     organization := "org.grenki",
     name := "gsql",
-    version := "0.1.0-SNAPSHOT"
+    version := "0.1.0-SNAPSHOT",
+    libraryDependencies ++= Seq(
+      "org.scalatest" %% "scalatest" % "3.1.1" % Test
+    )
   )

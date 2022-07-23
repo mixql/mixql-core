@@ -24,9 +24,12 @@ hs_err_pid*
 
 # End of https://www.toptal.com/developers/gitignore/api/sbt,scala
 
+# idea generated
 .idea
 .bsp
+# vs code generated
 .vscode
 .metals
 metals.sbt
 .bloop
+.antlr

@@ -4,6 +4,10 @@ import org.grenki.gsql.engine.Engine
 
 import scala.collection.mutable.{Map => MutMap}
 
+/**
+  * 
+  *
+  */
 class Context[Type] {
   val engine = new Engine()
   val vars: MutMap[String, Type] = MutMap[String, Type]()
