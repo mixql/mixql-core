@@ -1,6 +1,6 @@
 grammar types;
 
-import tokens;
+import token;
 
 expr:;//core.g4
 ident:;//core.g4

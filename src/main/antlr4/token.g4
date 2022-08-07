@@ -1,4 +1,4 @@
-lexer grammar tokens;
+lexer grammar token;
 
 T_ACTION          : A C T I O N ;
 T_ADD2            : A D D ;
@@ -374,6 +374,9 @@ T_STDEV                : S T D E V ;
 T_SYSDATE              : S Y S D A T E ;
 T_VARIANCE             : V A R I A N C E ;
 T_USER                 : U S E R;
+
+T_ESCAPED_DOLLAR: '\\$';
+T_ESCAPED_BACK_SLASH: '\\\\';
 
 T_ADD          : '+' ;
 T_COLON        : ':' ;

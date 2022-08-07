@@ -6,6 +6,7 @@ import org.grenki.gsql.sqlBaseVisitor
 
 import org.antlr.v4.runtime.TokenStream
 import org.antlr.v4.runtime.tree.TerminalNode
+import org.grenki.gsql.sqlLexer
 
 trait BaseVisitor extends sqlBaseVisitor[Type] {
   val context: Context[Type]
@@ -18,8 +19,13 @@ trait BaseVisitor extends sqlBaseVisitor[Type] {
     }
   }
 
-  override def visitTerminal(node: TerminalNode): Type =
-    string(node.getText)
+  override def visitTerminal(node: TerminalNode): Type = {
+    node.getSymbol().getType() match {
+      case sqlLexer.T_ESCAPED_BACK_SLASH => string("\\")
+      case sqlLexer.T_ESCAPED_DOLLAR => string("$")
+      case _ => string(node.getText)
+    }        
+  }
 
   override def defaultResult(): Type = void
 
