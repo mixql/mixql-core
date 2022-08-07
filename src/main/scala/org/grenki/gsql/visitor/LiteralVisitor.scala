@@ -34,4 +34,7 @@ trait LiteralVisitor extends BaseVisitor {
       bool(true)
     else
       throw new IllegalArgumentException("unknown bool literal")
+
+  override def visitLiteral_null(ctx: sqlParser.Literal_nullContext): Type = 
+    void
 }
