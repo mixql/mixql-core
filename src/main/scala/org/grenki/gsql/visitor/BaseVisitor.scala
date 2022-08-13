@@ -8,6 +8,8 @@ import org.antlr.v4.runtime.TokenStream
 import org.antlr.v4.runtime.tree.TerminalNode
 import org.grenki.gsql.sqlLexer
 
+import scala.language.implicitConversions
+
 trait BaseVisitor extends sqlBaseVisitor[Type] {
   val context: Context[Type]
   val tokenStream: TokenStream

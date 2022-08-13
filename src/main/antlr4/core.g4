@@ -43,7 +43,7 @@ expr: // TODO other expressions if needed
     | T_NOT expr                                        #expr_not
     | expr T_PIPE expr                                  #expr_concat
     | T_INTERVAL expr interval_item                     #expr_interval // TODO do we need it?
-    | case_r                                            #expr_case // TODO do we need it?
+    | case_r                                            #expr_case 
     | ident '%' (T_ISOPEN | T_FOUND | T_NOTFOUND)       #expr_found // TODO do we need it?
     | spec_func                                         #expr_spec_func // TODO what functions to add?
     | func                                              #expr_func
@@ -67,7 +67,7 @@ compare_operator:
     | T_GREATER
     | T_GREATEREQUAL
     | T_EQUAL2
-    | T_NOTEQUAL2
+//    | T_NOTEQUAL2
     ;
 
 /** functions with special syntax*/

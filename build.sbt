@@ -9,6 +9,11 @@ lazy val root = (project in file(".")).enablePlugins(Antlr4Plugin)
     name := "gsql",
     version := "0.1.0-SNAPSHOT",
     libraryDependencies ++= Seq(
+      "org.antlr" % "antlr4-runtime" % "4.8-1",
       "org.scalatest" %% "scalatest" % "3.1.1" % Test
+    ),
+    scalacOptions ++= Seq (
+      "-feature",
+      "-deprecation"
     )
   )

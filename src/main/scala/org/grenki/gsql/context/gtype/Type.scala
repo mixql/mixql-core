@@ -17,7 +17,7 @@ abstract class Type {
 }
 
 case object void extends Type {
-  override def toString: String = "nullmm"
+  override def toString: String = "null"
 
   override def +(other: Type): Type = other
 }
