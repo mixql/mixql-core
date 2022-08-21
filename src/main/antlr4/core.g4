@@ -113,13 +113,17 @@ literal:
      ;
 
 string:                                   // String literal (single or double quoted)
-      T_S_QUOTE any T_S_QUOTE               //# single_quotedString
-    | T_D_QUOTE any T_D_QUOTE               //# double_quotedString
-    | T_B_QUOTE any T_B_QUOTE               //# slash_quotedString
+      T_S_QUOTE (var|interpolation_exp|any_char)* T_S_QUOTE               //# single_quotedString
+    | T_D_QUOTE (var|interpolation_exp|any_char)* T_D_QUOTE               //# double_quotedString
+    | T_B_QUOTE (var|interpolation_exp|any_char)* T_B_QUOTE               //# slash_quotedString
 //       L_S_STRING                          # single_quotedString
 //     | L_D_STRING                          # double_quotedString
 //     | L_B_STRING                          # slash_quotedString
      ;
+
+any_char
+   : ~(T_S_QUOTE | T_D_QUOTE | T_B_QUOTE) .*?
+   ;
 
 int_number: sign=('-' | '+')? L_INT;
 

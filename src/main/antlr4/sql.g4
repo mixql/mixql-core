@@ -6,7 +6,7 @@ import core;
 package org.grenki.gsql;
 }
 
-programm: statment* EOF;
+program: statment* EOF;
 
 /** overwrite */
 block: statment*?;
