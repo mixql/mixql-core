@@ -21,81 +21,6 @@ class ParserTest extends AnyFunSuite {
     assert(any_coma_text == "somecodetorun;")
   }
 
-  test("Test parsing `assigment` statment") {
-    val code = """
-                |set x = 10;
-                |set y = $x + 12;
-                """.stripMargin
-    val lexer = new sqlLexer(CharStreams.fromString(code))
-    val parser = new sqlParser(new CommonTokenStream(lexer))
-    val stmts = parser.programm().statment()
-    assert(stmts.size == 2)
-    val assign_stmt1 = stmts.get(0).assigment_stmt
-    assert(assign_stmt1 != null)
-    assert(assign_stmt1.expr != null)
-    val assign_stmt2 = stmts.get(1).assigment_stmt
-    assert(assign_stmt2 != null)
-    assert(assign_stmt2.expr != null)
-  }  
-
-  test("Test parsing `if` statment") {
-    val code = """
-                |if $a < 11 then
-                |  some code to run 1;
-                |ELSIF $a > 12 then
-                |  some code to run 2;
-                |else
-                |  some code to run 3;
-                |end if
-                """.stripMargin
-    val lexer = new sqlLexer(CharStreams.fromString(code))
-    val parser = new sqlParser(new CommonTokenStream(lexer))
-    val stmts = parser.programm().statment
-    assert(stmts.size == 1)
-    val if_stmt = stmts.get(0).if_stmt
-    assert(if_stmt != null)
-    assert(if_stmt.block != null)
-    assert(if_stmt.elseif_block != null)
-    assert(if_stmt.elseif_block.size == 1)
-    assert(if_stmt.else_block != null)
-  }
-
-  test("Test parsing `while` statment") {
-    val code = """
-                |while $x < 5 do
-                |  print($x);
-                |  set x = $x + 1;
-                |end
-                """.stripMargin
-    val lexer = new sqlLexer(CharStreams.fromString(code))
-    val parser = new sqlParser(new CommonTokenStream(lexer))
-    val stmts = parser.programm().statment
-    assert(stmts.size == 1)
-    val while_stmt = stmts.get(0).while_stmt
-    assert(while_stmt != null)
-    assert(while_stmt.expr != null)
-    assert(while_stmt.block != null)
-  }
-
-  test("Test parsing `for range` statment") {
-    val code = """
-                |for i in REVERSE 1..20 step 2 loop
-                |  print($i);
-                |end loop
-                """.stripMargin
-    val lexer = new sqlLexer(CharStreams.fromString(code))
-    val parser = new sqlParser(new CommonTokenStream(lexer))
-    val stmts = parser.programm().statment
-    assert(stmts.size == 1)
-    val for_stmt = stmts.get(0).for_range_stmt
-    assert(for_stmt != null)
-    assert(for_stmt.from != null)
-    assert(for_stmt.to != null)
-    assert(for_stmt.step != null)
-    assert(for_stmt.ident != null)
-    assert(for_stmt.block != null)
-  }
-
   test("Test parsing `expression` statment") {
     {
       val code = """
@@ -297,5 +222,80 @@ class ParserTest extends AnyFunSuite {
       assert(case_stmt.case_when_then.size == 2)
       assert(case_stmt.ex_else != null)
     }
+  }
+  
+  test("Test parsing `assigment` statment") {
+    val code = """
+                |set x = 10;
+                |set y = $x + 12;
+                """.stripMargin
+    val lexer = new sqlLexer(CharStreams.fromString(code))
+    val parser = new sqlParser(new CommonTokenStream(lexer))
+    val stmts = parser.programm().statment()
+    assert(stmts.size == 2)
+    val assign_stmt1 = stmts.get(0).assigment_stmt
+    assert(assign_stmt1 != null)
+    assert(assign_stmt1.expr != null)
+    val assign_stmt2 = stmts.get(1).assigment_stmt
+    assert(assign_stmt2 != null)
+    assert(assign_stmt2.expr != null)
+  }  
+
+  test("Test parsing `if` statment") {
+    val code = """
+                |if $a < 11 then
+                |  some code to run 1;
+                |ELSIF $a > 12 then
+                |  some code to run 2;
+                |else
+                |  some code to run 3;
+                |end if
+                """.stripMargin
+    val lexer = new sqlLexer(CharStreams.fromString(code))
+    val parser = new sqlParser(new CommonTokenStream(lexer))
+    val stmts = parser.programm().statment
+    assert(stmts.size == 1)
+    val if_stmt = stmts.get(0).if_stmt
+    assert(if_stmt != null)
+    assert(if_stmt.block != null)
+    assert(if_stmt.elseif_block != null)
+    assert(if_stmt.elseif_block.size == 1)
+    assert(if_stmt.else_block != null)
+  }
+
+  test("Test parsing `while` statment") {
+    val code = """
+                |while $x < 5 do
+                |  print($x);
+                |  set x = $x + 1;
+                |end
+                """.stripMargin
+    val lexer = new sqlLexer(CharStreams.fromString(code))
+    val parser = new sqlParser(new CommonTokenStream(lexer))
+    val stmts = parser.programm().statment
+    assert(stmts.size == 1)
+    val while_stmt = stmts.get(0).while_stmt
+    assert(while_stmt != null)
+    assert(while_stmt.expr != null)
+    assert(while_stmt.block != null)
+  }
+
+  test("Test parsing `for range` statment") {
+    val code = """
+                |for i in REVERSE 1..20 step 2 loop
+                |  print($i);
+                |end loop
+                """.stripMargin
+    val lexer = new sqlLexer(CharStreams.fromString(code))
+    val parser = new sqlParser(new CommonTokenStream(lexer))
+    val stmts = parser.programm().statment
+    assert(stmts.size == 1)
+    val for_stmt = stmts.get(0).for_range_stmt
+    assert(for_stmt != null)
+    assert(for_stmt.from != null)
+    assert(for_stmt.to != null)
+    assert(for_stmt.step != null)
+    assert(for_stmt.ident != null)
+    assert(for_stmt.block != null)
   }
 }
