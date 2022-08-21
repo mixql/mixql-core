@@ -13,7 +13,7 @@ class ParserTest extends AnyFunSuite {
                 """.stripMargin
     val lexer = new sqlLexer(CharStreams.fromString(code))
     val parser = new sqlParser(new CommonTokenStream(lexer))
-    val stmts = parser.programm().statment
+    val stmts = parser.program().statment
     assert(stmts.size == 1)
     val any_coma = stmts.get(0).any_comma
     assert(any_coma != null)
@@ -36,7 +36,7 @@ class ParserTest extends AnyFunSuite {
                   """.stripMargin
       val lexer = new sqlLexer(CharStreams.fromString(code))
       val parser = new sqlParser(new CommonTokenStream(lexer))
-      val stmts = parser.programm().statment
+      val stmts = parser.program().statment
       assert(stmts.size == 9)
       var expr_stmt = stmts.get(0).expr
       assert(expr_stmt != null)
@@ -92,7 +92,7 @@ class ParserTest extends AnyFunSuite {
                   """.stripMargin
       val lexer = new sqlLexer(CharStreams.fromString(code))
       val parser = new sqlParser(new CommonTokenStream(lexer))
-      val stmts = parser.programm().statment
+      val stmts = parser.program().statment
       assert(stmts.size == 4)
       var expr_stmt = stmts.get(0).expr
       assert(expr_stmt != null)
@@ -127,7 +127,7 @@ class ParserTest extends AnyFunSuite {
                   """.stripMargin
       val lexer = new sqlLexer(CharStreams.fromString(code))
       val parser = new sqlParser(new CommonTokenStream(lexer))
-      val stmts = parser.programm().statment
+      val stmts = parser.program().statment
       assert(stmts.size == 7)
       var expr_stmt = stmts.get(0).expr
       assert(expr_stmt != null)
@@ -171,7 +171,7 @@ class ParserTest extends AnyFunSuite {
                   """.stripMargin
       val lexer = new sqlLexer(CharStreams.fromString(code))
       val parser = new sqlParser(new CommonTokenStream(lexer))
-      val stmts = parser.programm().statment
+      val stmts = parser.program().statment
       assert(stmts.size == 8)
       var expr_stmt = stmts.get(0).expr
       assert(expr_stmt != null)
@@ -212,7 +212,7 @@ class ParserTest extends AnyFunSuite {
                   """.stripMargin
       val lexer = new sqlLexer(CharStreams.fromString(code))
       val parser = new sqlParser(new CommonTokenStream(lexer))
-      val stmts = parser.programm().statment
+      val stmts = parser.program().statment
       assert(stmts.size == 1)
       var expr_stmt = stmts.get(0).expr
       assert(expr_stmt != null)
@@ -231,7 +231,7 @@ class ParserTest extends AnyFunSuite {
                 """.stripMargin
     val lexer = new sqlLexer(CharStreams.fromString(code))
     val parser = new sqlParser(new CommonTokenStream(lexer))
-    val stmts = parser.programm().statment()
+    val stmts = parser.program().statment()
     assert(stmts.size == 2)
     val assign_stmt1 = stmts.get(0).assigment_stmt
     assert(assign_stmt1 != null)
@@ -253,7 +253,7 @@ class ParserTest extends AnyFunSuite {
                 """.stripMargin
     val lexer = new sqlLexer(CharStreams.fromString(code))
     val parser = new sqlParser(new CommonTokenStream(lexer))
-    val stmts = parser.programm().statment
+    val stmts = parser.program().statment
     assert(stmts.size == 1)
     val if_stmt = stmts.get(0).if_stmt
     assert(if_stmt != null)
@@ -272,7 +272,7 @@ class ParserTest extends AnyFunSuite {
                 """.stripMargin
     val lexer = new sqlLexer(CharStreams.fromString(code))
     val parser = new sqlParser(new CommonTokenStream(lexer))
-    val stmts = parser.programm().statment
+    val stmts = parser.program().statment
     assert(stmts.size == 1)
     val while_stmt = stmts.get(0).while_stmt
     assert(while_stmt != null)
@@ -288,7 +288,7 @@ class ParserTest extends AnyFunSuite {
                 """.stripMargin
     val lexer = new sqlLexer(CharStreams.fromString(code))
     val parser = new sqlParser(new CommonTokenStream(lexer))
-    val stmts = parser.programm().statment
+    val stmts = parser.program().statment
     assert(stmts.size == 1)
     val for_stmt = stmts.get(0).for_range_stmt
     assert(for_stmt != null)

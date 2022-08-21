@@ -3,13 +3,15 @@ package org.grenki.gsql.visitor
 import org.grenki.gsql.context.gtype._
 import org.grenki.gsql.sqlParser
 
-import org.antlr.v4.runtime.misc.Interval
+import scala.collection.mutable
 
 trait LiteralVisitor extends BaseVisitor {
+
   override def visitString(ctx: sqlParser.StringContext): Type = {
-    val pre = tokenStream.getText(new Interval(ctx.start.getTokenIndex + 1, ctx.any().start.getTokenIndex - 1))
-    val post = tokenStream.getText(new Interval(ctx.any().stop.getTokenIndex + 1, ctx.stop.getTokenIndex - 1))
-    string(pre + visit(ctx.any()) + post)
+    val s = new mutable.StringBuilder();
+    for (i <- 1 until ctx.getChildCount - 1)
+      s.append(visit(ctx.getChild(i)))
+    string(s.toString())
   }
 
   override def visitLiteral_string(ctx: sqlParser.Literal_stringContext): Type =
@@ -35,6 +37,6 @@ trait LiteralVisitor extends BaseVisitor {
     else
       throw new IllegalArgumentException("unknown bool literal")
 
-  override def visitLiteral_null(ctx: sqlParser.Literal_nullContext): Type = 
+  override def visitLiteral_null(ctx: sqlParser.Literal_nullContext): Type =
     void
 }

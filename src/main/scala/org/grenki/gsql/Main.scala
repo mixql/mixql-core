@@ -28,6 +28,15 @@ object Main {
         |  print($i);
         |end loop
         |select '${$gg + 2}' from wp;
+        |select '${$gg * 5}' from wp;
+        |print("\$res");
+        |print("$res");
+        |print("${$res}");
+        |print("${'${'$res'+'a'}'}\"");
+        |set t="${'1'+$res}";
+        |print($t);
+        |set t="${'1'+ '${$res}'}";
+        |print($t);
         |some end;""".stripMargin
     execute(code)
   }
@@ -40,7 +49,7 @@ object Main {
 
     val context = new Context[Type]()
 
-    new MainVisitor(context, tokenStream).visit(parser.programm())
+    new MainVisitor(context, tokenStream).visit(parser.program())
     println(context.vars)
   }
 }
