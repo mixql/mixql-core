@@ -411,8 +411,8 @@ L_NAME      : L_NAME_PART
             | T_HIVEVAR T_COLON L_NAME_PART
             | L_NAME_PART '.' L_NAME
             ;
-L_SPEC      : L_SPEC_PART                                               // Identifier
-            ;
+//L_SPEC      : L_SPEC_PART                                               // Identifier
+//            ;
 
 T_S_QUOTE: '\'';
 T_D_QUOTE: '"';
@@ -436,7 +436,9 @@ L_S_COMMENT : ('--' | '//')  .*? '\r'? (EOF | '\n') -> channel(HIDDEN) ;       /
              ( [a-zA-Z]+ ':' L_SLASHES?)? L_SLASHES? (L_NAME | L_SPEC) (':' L_DIGIT+)? (L_SLASHES (L_NAME | L_SPEC) (':' L_DIGIT+)?)*
             ;*/
 
-L_FILE      : ([a-zA-Z] ':' '\\'?)? (L_NAME | L_SPEC)  ('\\' (L_NAME | L_SPEC))*                  // File path (a/b/c Linux path causes conflicts with division operator and handled at parser level)
+//L_FILE      : ([a-zA-Z] ':' '\\'?)? (L_NAME | L_SPEC)  ('\\' (L_NAME | L_SPEC))*                  // File path (a/b/c Linux path causes conflicts with division operator and handled at parser level)
+//            ;
+L_FILE      : ([a-zA-Z] ':' '\\'?)? L_NAME  ('\\' L_NAME )*                  // File path (a/b/c Linux path causes conflicts with division operator and handled at parser level)
             ;
 
 
@@ -451,13 +453,13 @@ L_SLASHES   :
 L_LABEL     : ([a-zA-Z] | L_DIGIT | '_')* ':'
             ;
 
-fragment
-L_SPEC_PART  :
-              ('_' | '@' | ':' | '#') ([a-zA-Z] | L_DIGIT | '_' | '@' | ':' | '#')+     // (at least one char must follow special char)
-//            | '"' .*? '"'                                                   // Quoted identifiers
-//            | '[' .*? ']'
-            | '`' .*? '`'
-            ;
+//fragment
+//L_SPEC_PART  :
+//              ('_' | '@' | ':' | '#') ([a-zA-Z] | L_DIGIT | '_' | '@' | ':' | '#')+     // (at least one char must follow special char)
+////            | '"' .*? '"'                                                   // Quoted identifiers
+////            | '[' .*? ']'
+//            | '`' .*? '`'
+//            ;
 
 fragment
 L_NAME_PART :

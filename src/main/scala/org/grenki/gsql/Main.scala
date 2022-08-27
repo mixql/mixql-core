@@ -34,6 +34,8 @@ object Main {
         |print("${$res}");
         |print("${'${'$res'+'a'}'}\"");
         |set t="${'1'+$res}";
+        |set t="123;
+        |   \n 456";
         |print($t);
         |set t="${'1'+ '${$res}'}";
         |print($t);
