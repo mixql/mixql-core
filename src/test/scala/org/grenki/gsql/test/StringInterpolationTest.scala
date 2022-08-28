@@ -1,13 +1,8 @@
 package org.grenki.gsql.test
 
-import org.antlr.v4.runtime.{CharStreams, CommonTokenStream}
-import org.grenki.gsql.context.Context
-import org.grenki.gsql.context.gtype.{Type, string}
-import org.grenki.gsql.visitor.MainVisitor
-import org.grenki.gsql.{sqlLexer, sqlParser}
-import org.scalatest.funsuite.AnyFunSuite
+import org.grenki.gsql.context.gtype.string
 
-class StringInterpolationTest extends AnyFunSuite {
+class StringInterpolationTest extends MainVisitorBaseTest {
 
   test("Test set with semicolon") {
     val code =
@@ -139,12 +134,70 @@ class StringInterpolationTest extends AnyFunSuite {
     assert(foo.value =="\n\n abc\n cde\n\n\n")
   }
 
-  test("Test set with new lines and single quotes") {
+  test("Test set with new lines and single quote") {
     val code =
       "set foo = '\t\n\n abc\n \tcde\n\n\n';".stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo").asInstanceOf[string]
     assert(foo.value =="\t\n\n abc\n \tcde\n\n\n")
+  }
+
+//  test("Test when single quotes contains escaped single quotes") {
+//    val code =
+//      "set foo = '\\'';".stripMargin
+//    val context = runMainVisitor(code)
+//    val foo = context.getVar("foo").asInstanceOf[string]
+//
+//    assert(foo.value == "'")
+//  }
+
+
+  test("Test when single quotes contains double quotes") {
+    val code =
+      "set foo = '\"';".stripMargin
+    val context = runMainVisitor(code)
+    val foo = context.getVar("foo").asInstanceOf[string]
+    assert(foo.value =="\"")
+  }
+
+  test("Test when double quotes contains two double quotes") {
+    val code =
+      "set foo = '\"\"';".stripMargin
+    val context = runMainVisitor(code)
+    val foo = context.getVar("foo").asInstanceOf[string]
+    assert(foo.value =="\"\"")
+  }
+
+  test("Test when double quotes contains single quote") {
+    val code =
+      "set foo = \"'\";".stripMargin
+    val context = runMainVisitor(code)
+    val foo = context.getVar("foo").asInstanceOf[string]
+    assert(foo.value =="'")
+  }
+
+  test("Test when double quotes contains two single quotes") {
+    val code =
+      "set foo = \"''\";".stripMargin
+    val context = runMainVisitor(code)
+    val foo = context.getVar("foo").asInstanceOf[string]
+    assert(foo.value =="''")
+  }
+
+  test("Test when slashed quotes contains single quote") {
+    val code =
+      "set foo = `'`;".stripMargin
+    val context = runMainVisitor(code)
+    val foo = context.getVar("foo").asInstanceOf[string]
+    assert(foo.value =="'")
+  }
+
+  test("Test when slashed quotes contains two single quotes") {
+    val code =
+      "set foo = `''`;".stripMargin
+    val context = runMainVisitor(code)
+    val foo = context.getVar("foo").asInstanceOf[string]
+    assert(foo.value =="''")
   }
 
   test("Test set with interpolation") {
@@ -181,14 +234,5 @@ class StringInterpolationTest extends AnyFunSuite {
 
     val foo = context.getVar("foo").asInstanceOf[string]
     assert(foo.value == "abc;123")
-  }
-
-  def runMainVisitor(code: String, context: Context[Type] = new Context[Type]()): Context[Type] = {
-    val lexer = new sqlLexer(CharStreams.fromString(code))
-    val tokenStream = new CommonTokenStream(new sqlLexer(CharStreams.fromString(code)))
-    tokenStream.getNumberOfOnChannelTokens // magic. if we do not do this tokenstream is empty
-    val parser = new sqlParser(new CommonTokenStream(lexer))
-    new MainVisitor(context, tokenStream).visit(parser.program())
-    context
   }
 }

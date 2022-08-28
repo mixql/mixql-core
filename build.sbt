@@ -10,6 +10,7 @@ lazy val root = (project in file(".")).enablePlugins(Antlr4Plugin)
     version := "0.1.0-SNAPSHOT",
     libraryDependencies ++= Seq(
       "org.antlr" % "antlr4-runtime" % "4.8-1",
+      "org.scala-lang" % "scala-reflect" % "2.13.8",
       "org.scalatest" %% "scalatest" % "3.1.1" % Test
     ),
     scalacOptions ++= Seq (
