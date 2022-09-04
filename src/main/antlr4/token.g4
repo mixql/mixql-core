@@ -98,7 +98,7 @@ T_DROP            : D R O P ;
 T_DYNAMIC         : D Y N A M I C ;
 T_ELSE            : E L S E ;
 //T_ELSEIF          : E L S E I F ;
-T_ELIF            : E L S I F | E L S E I F;
+T_ELIF            : E L I F | E L S E I F;
 T_ENABLE          : E N A B L E ;
 T_END             : E N D ;
 T_ENGINE          : E N G I N E ;

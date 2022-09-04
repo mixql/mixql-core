@@ -1,10 +1,12 @@
 package org.grenki.gsql
 
+import scala.collection.mutable.{Map => MutMap}
 import org.grenki.gsql.context.Context
 import org.grenki.gsql.context.gtype.Type
 import org.grenki.gsql.visitor.MainVisitor
 
 import org.antlr.v4.runtime.{CharStreams, CommonTokenStream}
+import org.grenki.gsql.engine.Engine
 
 object Main {
   def main(args: Array[String]): Unit = {
@@ -49,7 +51,7 @@ object Main {
     tokenStream.getNumberOfOnChannelTokens // magic. if we do not do this tokenstream is empty
     val parser = new sqlParser(new CommonTokenStream(lexer))
 
-    val context = new Context[Type]()
+    val context = new Context(MutMap[String, Engine]("stub" -> new Engine))
 
     new MainVisitor(context, tokenStream).visit(parser.program())
     println(context.vars)

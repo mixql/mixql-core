@@ -3,13 +3,15 @@ package org.grenki.gsql.context
 import org.grenki.gsql.engine.Engine
 
 import scala.collection.mutable.{Map => MutMap}
+import org.grenki.gsql.context.gtype.Type
 
-/**
+/** @param e map engine_name -> engine
   * 
   *
   */
-class Context[Type] {
-  val engine = new Engine()
+class Context(e: MutMap[String, Engine] = MutMap[String, Engine]("stub" -> new Engine)) {
+  val engine = e
+  var currentEngine = engine("stub")
   val vars: MutMap[String, Type] = MutMap[String, Type]()
 
   def setVar(key: String, value: Type): Unit =
@@ -19,5 +21,5 @@ class Context[Type] {
     vars(key)
 
   def execute(stmt: String) =
-    engine.execute(stmt)
+    currentEngine.execute(stmt)
 }

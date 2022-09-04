@@ -7,7 +7,7 @@ import org.grenki.gsql.sqlParser
 import org.antlr.v4.runtime.TokenStream
 import org.antlr.v4.runtime.misc.Interval
 
-class MainVisitor(ctx: Context[Type], tokens: TokenStream)
+class MainVisitor(ctx: Context, tokens: TokenStream)
   extends ExpressionVisitor
     with LiteralVisitor
     with ControlStmtsVisitor {

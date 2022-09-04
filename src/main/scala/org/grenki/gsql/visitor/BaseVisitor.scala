@@ -11,7 +11,7 @@ import org.grenki.gsql.sqlLexer
 import scala.language.implicitConversions
 
 trait BaseVisitor extends sqlBaseVisitor[Type] {
-  val context: Context[Type]
+  val context: Context
   val tokenStream: TokenStream
 
   protected implicit def to_bool(base: Type): Boolean = {
