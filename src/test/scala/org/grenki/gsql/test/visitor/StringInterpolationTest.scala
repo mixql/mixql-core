@@ -9,7 +9,9 @@ import org.scalatest.funsuite.AnyFunSuite
 import scala.collection.mutable.{Map => MutMap}
 import org.grenki.gsql.test.stub.StubEngine
 import org.grenki.gsql.engine.Engine
+import org.grenki.gsql.test.tag.Interpolation
 
+@Interpolation
 class StringInterpolationTest extends AnyFunSuite {
   
   def getContext(code: String): Context = {

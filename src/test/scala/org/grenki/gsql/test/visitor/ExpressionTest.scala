@@ -74,7 +74,7 @@ class ExpressionTest extends AnyFunSuite {
     assert(res.asInstanceOf[bool].value == true)
   }
 
-  test("Test case then expression") {
+  test("Test case else expression") {
     val code = """
                 |set res = case when 2 < 1 then true else 'false' end;
                 """.stripMargin
