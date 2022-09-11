@@ -1,12 +1,10 @@
 package org.grenki.gsql.visitor
 
-import org.grenki.gsql.context.Context
-import org.grenki.gsql.context.gtype.{Type, bool, string, Null}
-import org.grenki.gsql.sqlBaseVisitor
-
 import org.antlr.v4.runtime.TokenStream
 import org.antlr.v4.runtime.tree.TerminalNode
-import org.grenki.gsql.{sql, token}
+import org.grenki.gsql.context.Context
+import org.grenki.gsql.context.gtype.{Null, Type, bool, string}
+import org.grenki.gsql.{sqlBaseVisitor, token}
 
 import scala.language.implicitConversions
 
@@ -31,7 +29,7 @@ trait BaseVisitor extends sqlBaseVisitor[Type] {
       case token.T_DS_VAR_INTERPOLATION => context.getVar(node.getText().substring(1))
       case token.T_BS_VAR_INTERPOLATION => context.getVar(node.getText().substring(1))
       case _ => string(node.getText)
-    }        
+    }
   }
 
   override def defaultResult(): Type = Null

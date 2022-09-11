@@ -6,6 +6,10 @@ import org.grenki.gsql.sql
 
 import org.antlr.v4.runtime.TokenStream
 import org.antlr.v4.runtime.misc.Interval
+import org.grenki.gsql.context.gtype.{Type, int, string, Null}
+import org.grenki.gsql.function.FunctionInvoker
+
+import scala.jdk.CollectionConverters._
 
 class MainVisitor(ctx: Context, tokens: TokenStream)
   extends ExpressionVisitor
@@ -51,5 +55,20 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
   override def visitPrint_stmt(ctx: sql.Print_stmtContext): Type = {
     println("[USER PRINT]: " + visit(ctx.expr()).toString)
     Null
+  }
+
+  override def visitExpr_func(ctx: sql.Expr_funcContext): Type = {
+    val func = ctx.func()
+    val ident = func.ident(0)
+    val funcName = tokenStream.getText(new Interval(ident.start.getTokenIndex, ident.stop.getTokenIndex))
+    //todo: add implicit cast
+    val params: Seq[Any] = func.expr().asScala.map(visit(_)).map {
+      case string(v,q) => v
+      case int(v)=>v
+    }.toSeq
+    FunctionInvoker.invoke(context.functions.toMap, funcName, params) match {
+      case p:String => string(p)
+      case p:Int => int(p)
+    }
   }
 }

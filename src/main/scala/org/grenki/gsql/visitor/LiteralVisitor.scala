@@ -1,10 +1,7 @@
 package org.grenki.gsql.visitor
 
-import org.antlr.v4.runtime.misc.Interval
 import org.grenki.gsql.context.gtype._
 import org.grenki.gsql.sql
-
-import scala.collection.mutable
 
 trait LiteralVisitor extends BaseVisitor {
 
