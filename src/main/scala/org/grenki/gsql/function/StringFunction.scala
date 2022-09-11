@@ -10,18 +10,19 @@ object StringFunction {
   }
 
   val base64 = new (String => String) {
-    def apply(str: String): String = java.util.Base64.getEncoder.encodeToString(str.getBytes(StandardCharsets.UTF_8))
+    def apply(str: String): String = java.util.Base64.getEncoder
+      .encodeToString(str.getBytes(StandardCharsets.UTF_8))
   }
 
   val concat = new Object {
     def apply(exprs: String*): String = exprs.filterNot(_ == null).mkString("")
   }
 
-  //todo: add support for array https://kontext.tech/article/1079/spark-sql-concatenate-withwithout-separator
+  // todo: add support for array https://kontext.tech/article/1079/spark-sql-concatenate-withwithout-separator
   val concat_ws = new Object {
-    def apply(sep: String, exprs: String*): String = exprs.filterNot(_ == null).mkString(sep)
+    def apply(sep: String, exprs: String*): String =
+      exprs.filterNot(_ == null).mkString(sep)
   }
-
 
   val length = new (String => Int) {
     def apply(str: String): Int = str.length

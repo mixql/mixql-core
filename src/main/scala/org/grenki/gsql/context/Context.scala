@@ -6,11 +6,12 @@ import org.grenki.gsql.function.StringFunction
 import scala.collection.mutable.{Map => MutMap}
 import org.grenki.gsql.context.gtype.Type
 
-/** @param e map engine_name -> engine
-  * 
-  *
+/** @param e
+  *   map engine_name -> engine
   */
-class Context(e: MutMap[String, Engine] = MutMap[String, Engine]("stub" -> new Engine)) {
+class Context(
+  e: MutMap[String, Engine] = MutMap[String, Engine]("stub" -> new Engine)
+) {
   val engine = e
   var currentEngine = engine("stub")
   val vars: MutMap[String, Type] = MutMap[String, Type]()

@@ -7,7 +7,9 @@ trait ExpressionVisitor extends BaseVisitor {
   override def visitExpr_concat(ctx: sql.Expr_concatContext): Type =
     string(visit(ctx.expr(0)).toString + visit(ctx.expr(1)).toString)
 
-  override def visitExpr_arithmetic_p1(ctx: sql.Expr_arithmetic_p1Context): Type = {
+  override def visitExpr_arithmetic_p1(
+    ctx: sql.Expr_arithmetic_p1Context
+  ): Type = {
     val left = visit(ctx.expr(0))
     val right = visit(ctx.expr(1))
     if (ctx.T_DIV() != null)
@@ -18,7 +20,9 @@ trait ExpressionVisitor extends BaseVisitor {
       throw new IllegalArgumentException("unknown operator")
   }
 
-  override def visitExpr_arithmetic_p2(ctx: sql.Expr_arithmetic_p2Context): Type = {
+  override def visitExpr_arithmetic_p2(
+    ctx: sql.Expr_arithmetic_p2Context
+  ): Type = {
     val left = visit(ctx.expr(0))
     val right = visit(ctx.expr(1))
     if (ctx.T_ADD() != null)
@@ -32,7 +36,11 @@ trait ExpressionVisitor extends BaseVisitor {
   override def visitExpr_compare(ctx: sql.Expr_compareContext): Type = {
     val left = visit(ctx.expr(0))
     val right = visit(ctx.expr(1))
-    if (ctx.compare_operator().T_EQUAL() != null || ctx.compare_operator().T_EQUAL2() != null)
+    if (
+      ctx.compare_operator().T_EQUAL() != null || ctx
+        .compare_operator()
+        .T_EQUAL2() != null
+    )
       left == right
     else if (ctx.compare_operator().T_NOTEQUAL() != null)
       left != right
@@ -72,10 +80,13 @@ trait ExpressionVisitor extends BaseVisitor {
 
   override def visitExpr_case(ctx: sql.Expr_caseContext): Type = {
     // TODO ctx.case_r().expr() - what is it
-    ctx.case_r().case_when_then().forEach(case_r => {
-      val condition: Boolean = visit(case_r.condition)
-      if (condition) return visit(case_r.ex_do)
-    })
+    ctx
+      .case_r()
+      .case_when_then()
+      .forEach(case_r => {
+        val condition: Boolean = visit(case_r.condition)
+        if (condition) return visit(case_r.ex_do)
+      })
     if (ctx.case_r().ex_else != null) return visit(ctx.case_r().ex_else)
     Null // TODO default result if no condition matched (mb exception?)
   }

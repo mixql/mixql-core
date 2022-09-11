@@ -16,7 +16,6 @@ class AsciFunctionsTest extends MainVisitorBaseTest {
     assert(foo.value == 0)
   }
 
-
   test("Test `ascii('234') == 50`") {
     val code =
       """

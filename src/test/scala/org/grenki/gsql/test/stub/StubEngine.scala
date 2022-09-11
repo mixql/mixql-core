@@ -5,10 +5,10 @@ import org.grenki.gsql.engine.Engine
 import org.grenki.gsql.context.gtype._
 
 class StubEngine extends Engine {
-    val queue = new Queue[String]()
+  val queue = new Queue[String]()
 
-    override def execute(stmt: String): Type = {
-        queue += stmt
-        Null
-    }
+  override def execute(stmt: String): Type = {
+    queue += stmt
+    Null
+  }
 }

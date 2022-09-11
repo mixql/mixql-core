@@ -11,9 +11,16 @@ import org.scalatest.funsuite.AnyFunSuite
 import scala.collection.mutable.{Map => MutMap}
 
 class MainVisitorBaseTest extends AnyFunSuite {
-  def runMainVisitor(code: String, context: Context = new Context(MutMap[String, Engine]("stub" -> new StubEngine))): Context = {
+  def runMainVisitor(
+    code: String,
+    context: Context = new Context(
+      MutMap[String, Engine]("stub" -> new StubEngine)
+    )
+  ): Context = {
     val lexer = new token(CharStreams.fromString(code))
-    val tokenStream = new CommonTokenStream(new token(CharStreams.fromString(code)))
+    val tokenStream = new CommonTokenStream(
+      new token(CharStreams.fromString(code))
+    )
     tokenStream.getNumberOfOnChannelTokens // magic. if we do not do this tokenstream is empty
     val parser = new sql(new CommonTokenStream(lexer))
     val context = new Context(MutMap[String, Engine]("stub" -> new StubEngine))

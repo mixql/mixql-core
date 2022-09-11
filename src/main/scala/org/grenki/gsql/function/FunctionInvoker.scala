@@ -3,8 +3,17 @@ package org.grenki.gsql.function
 import scala.collection.mutable.ListBuffer
 
 object FunctionInvoker {
-  def invoke(functions: Map[String, Any], funcName: String, params: Seq[Any] = Nil, paramsMap: Map[String, Object] = Map.empty): Any = {
-    def invokeFunc(obj: Any, params: Seq[Any] = Nil, paramsMap: Map[String, Object] = Map.empty): Any = {
+  def invoke(
+    functions: Map[String, Any],
+    funcName: String,
+    params: Seq[Any] = Nil,
+    paramsMap: Map[String, Object] = Map.empty
+  ): Any = {
+    def invokeFunc(
+      obj: Any,
+      params: Seq[Any] = Nil,
+      paramsMap: Map[String, Object] = Map.empty
+    ): Any = {
       val a = obj.getClass.getMethods.find(_.getName == "apply")
       a match {
         case Some(apply) =>
@@ -22,17 +31,20 @@ object FunctionInvoker {
               val tail = lb.drop(pc - 1)
               val bundle = head ++ Seq(tail.toSeq)
               apply.invoke(obj, bundle.toArray: _*)
-            }
-            else
+            } else
               apply.invoke(obj, lb.toArray: _*)
           }
-        case None => throw new RuntimeException(s"Can't find method `apply` in function $funcName")
+        case None =>
+          throw new RuntimeException(
+            s"Can't find method `apply` in function $funcName"
+          )
       }
     }
 
     functions.get(funcName.toLowerCase()) match {
       case Some(func) => invokeFunc(func, params, paramsMap)
-      case None => throw new RuntimeException(s"Can't find function `$funcName`")
+      case None =>
+        throw new RuntimeException(s"Can't find function `$funcName`")
     }
   }
 

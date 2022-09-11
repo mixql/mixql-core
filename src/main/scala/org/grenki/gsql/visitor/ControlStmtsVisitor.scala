@@ -12,13 +12,15 @@ trait ControlStmtsVisitor extends BaseVisitor {
       visit(ctx.block())
       return Null
     } else {
-      ctx.elseif_block().forEach(elif => {
-        val elsecondition: Boolean = visit(elif.expr())
-        if (elsecondition) {
-          visit(elif.block())
-          return Null
-        }
-      })
+      ctx
+        .elseif_block()
+        .forEach(elif => {
+          val elsecondition: Boolean = visit(elif.expr())
+          if (elsecondition) {
+            visit(elif.block())
+            return Null
+          }
+        })
       if (ctx.else_block() != null) {
         visit(ctx.else_block().block())
         return Null
@@ -29,12 +31,16 @@ trait ControlStmtsVisitor extends BaseVisitor {
 
   // TODO maybe better realisation using for?
   override def visitFor_range_stmt(ctx: sql.For_range_stmtContext): Type = {
-    //super.visitFor_range_stmt(ctx)
+    // super.visitFor_range_stmt(ctx)
     val i_name = visit(ctx.ident()).toString
     val old = context.vars.getOrElse(i_name, Null)
     var i = visit(ctx.from)
     val to = visit(ctx.to)
-    val step = (if (ctx.T_REVERSE() != null) int(-1) else int(1)) * (if (ctx.step != null) visit(ctx.step) else int(1))
+    val step =
+      (if (ctx.T_REVERSE() != null) int(-1) else int(1)) * (if (
+                                                              ctx.step != null
+                                                            ) visit(ctx.step)
+                                                            else int(1))
     context.setVar(i_name, i)
     while (i < to) {
       visit(ctx.block())

@@ -22,7 +22,8 @@ class FunctionInvokerTest extends AnyFunSuite {
   }
 
   val firstAndSecondDefArgAndThirdVariableArgFunc = new Object {
-    def apply(str1: String, str2: String, ints: Int*): String = str1 + str2 + ints.toList.sum.toString
+    def apply(str1: String, str2: String, ints: Int*): String =
+      str1 + str2 + ints.toList.sum.toString
   }
 
   val twoDefaultArgFunc = new Object {
@@ -54,7 +55,7 @@ class FunctionInvokerTest extends AnyFunSuite {
     "substr" -> substr,
     "variable_number_of_args" -> variableArgFunc,
     "first_def_arg_and_second_variable_args" -> firstDefArgAndSecondVariableArgFunc,
-    "first_and_second_def_arg_and_third_variable_args" -> firstAndSecondDefArgAndThirdVariableArgFunc,
+    "first_and_second_def_arg_and_third_variable_args" -> firstAndSecondDefArgAndThirdVariableArgFunc
   )
 
   test("Invoke anonymous function") {
@@ -73,7 +74,8 @@ class FunctionInvokerTest extends AnyFunSuite {
   }
 
   test("Invoke function with default second argument") {
-    val res = FunctionInvoker.invoke(functions, "default_second_arg_func", List("abc"))
+    val res =
+      FunctionInvoker.invoke(functions, "default_second_arg_func", List("abc"))
     assert(res == "abc1234")
   }
 
@@ -82,27 +84,20 @@ class FunctionInvokerTest extends AnyFunSuite {
       functions,
       "two_def_arg_func",
       Nil,
-      Map("a" -> "qw", "b" -> "erty"))
+      Map("a" -> "qw", "b" -> "erty")
+    )
 
     assert(res == "qwerty")
   }
 
   test("substr") {
-    val res = FunctionInvoker.invoke(
-      functions,
-      "substr",
-      List("123545", 3, 5)
-    )
+    val res = FunctionInvoker.invoke(functions, "substr", List("123545", 3, 5))
 
     assert(res == "123545".substring(3, 5))
   }
 
   test("substr2") {
-    val res = FunctionInvoker.invoke(
-      functions,
-      "substr",
-      List("123545", 3)
-    )
+    val res = FunctionInvoker.invoke(functions, "substr", List("123545", 3))
 
     assert(res == "123545".substring(3))
   }

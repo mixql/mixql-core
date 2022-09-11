@@ -37,6 +37,9 @@ class OtherInterpolationTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val query = context.currentEngine.asInstanceOf[StubEngine].queue
-    assert(query.dequeue() == "select '10 df;df some str' from table where column > 10")
+    assert(
+      query
+        .dequeue() == "select '10 df;df some str' from table where column > 10"
+    )
   }
 }

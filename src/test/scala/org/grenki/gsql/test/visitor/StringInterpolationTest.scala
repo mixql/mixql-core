@@ -153,7 +153,6 @@ class StringInterpolationTest extends MainVisitorBaseTest {
   //    assert(foo.value == "'")
   //  }
 
-
   test("Test when single quotes contains double quotes") {
     val code =
       "set foo = '\"';".stripMargin
