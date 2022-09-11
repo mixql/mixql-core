@@ -6,7 +6,6 @@ import org.grenki.gsql.test.tag.Interpolation
 
 @Interpolation
 class StringInterpolationTest extends MainVisitorBaseTest {
-
   test("Test set with semicolon") {
     val code =
       """
