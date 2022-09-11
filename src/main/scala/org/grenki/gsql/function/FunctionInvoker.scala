@@ -17,7 +17,14 @@ object FunctionInvoker {
               val paramName = apply.getParameters.apply(i - 1).getName
               lb += paramsMap.getOrElse(paramName, getDefParamsFor(obj, i))
             }
-            apply.invoke(obj, lb.toArray: _*)
+            if (lb.length > pc) {
+              val head = lb.take(pc - 1)
+              val tail = lb.drop(pc - 1)
+              val bundle = head ++ Seq(tail.toSeq)
+              apply.invoke(obj, bundle.toArray: _*)
+            }
+            else
+              apply.invoke(obj, lb.toArray: _*)
           }
         case None => throw new RuntimeException(s"Can't find method `apply` in function $funcName")
       }

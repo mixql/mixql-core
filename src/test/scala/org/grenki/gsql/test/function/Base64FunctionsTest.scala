@@ -3,7 +3,7 @@ package org.grenki.gsql.test.function
 import org.grenki.gsql.context.gtype.{int, string}
 import org.grenki.gsql.test.MainVisitorBaseTest
 
-class BaseFunctionsTest extends MainVisitorBaseTest {
+class Base64FunctionsTest extends MainVisitorBaseTest {
   test("Test `base64('Spark SQL') == 'U3BhcmsgU1FM'`") {
     val code =
       """

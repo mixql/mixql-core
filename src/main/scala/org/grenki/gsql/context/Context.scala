@@ -17,6 +17,8 @@ class Context(e: MutMap[String, Engine] = MutMap[String, Engine]("stub" -> new E
   val functions: MutMap[String, Any] = MutMap[String, Any](
     "ascii" -> StringFunction.ascii,
     "base64" -> StringFunction.base64,
+    "concat" -> StringFunction.concat,
+    "concat_ws" -> StringFunction.concat_ws,
     "length" -> StringFunction.length,
     "substr" -> StringFunction.substr
   )

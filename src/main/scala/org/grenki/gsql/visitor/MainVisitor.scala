@@ -1,13 +1,11 @@
 package org.grenki.gsql.visitor
 
-import org.grenki.gsql.context.Context
-import org.grenki.gsql.context.gtype.{Type, string, Null}
-import org.grenki.gsql.sql
-
 import org.antlr.v4.runtime.TokenStream
 import org.antlr.v4.runtime.misc.Interval
-import org.grenki.gsql.context.gtype.{Type, int, string, Null}
+import org.grenki.gsql.context.Context
+import org.grenki.gsql.context.gtype.{Null, Type, int, string}
 import org.grenki.gsql.function.FunctionInvoker
+import org.grenki.gsql.sql
 
 import scala.jdk.CollectionConverters._
 
@@ -61,10 +59,11 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
     val func = ctx.func()
     val ident = func.ident(0)
     val funcName = tokenStream.getText(new Interval(ident.start.getTokenIndex, ident.stop.getTokenIndex))
-    //todo: add implicit cast
+    //todo: add the implicit cast
     val params: Seq[Any] = func.expr().asScala.map(visit(_)).map {
-      case string(v,q) => v
-      case int(v)=>v
+      case Null => null
+      case string(v, q) => v
+      case int(v) => v
     }.toSeq
     FunctionInvoker.invoke(context.functions.toMap, funcName, params) match {
       case p:String => string(p)
