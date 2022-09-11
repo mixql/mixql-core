@@ -16,7 +16,7 @@ abstract class Type {
   def ! (): Type = throw new UnsupportedOperationException(s"type error: operation `not` for ${this.getClass.getSimpleName} is unsupported")
 }
 
-case object void extends Type {
+case object Null extends Type {
   override def toString: String = "null"
 
   override def +(other: Type): Type = other
@@ -191,9 +191,10 @@ case class double(value: Double) extends Type {
     }
 }
 
-case class string(value: String) extends Type {
+case class string(value: String, quote: String="") extends Type {
   override def toString: String = value
 
+  def quoted = quote + value + quote
   override def +(other: Type): Type =
     string(value + other.toString)
 

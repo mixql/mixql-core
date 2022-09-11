@@ -1,12 +1,12 @@
 package org.grenki.gsql.visitor
 
 import org.grenki.gsql.context.Context
-import org.grenki.gsql.context.gtype.{Type, bool, string, void}
+import org.grenki.gsql.context.gtype.{Type, bool, string, Null}
 import org.grenki.gsql.sqlBaseVisitor
 
 import org.antlr.v4.runtime.TokenStream
 import org.antlr.v4.runtime.tree.TerminalNode
-import org.grenki.gsql.sqlLexer
+import org.grenki.gsql.{sql, token}
 
 import scala.language.implicitConversions
 
@@ -23,13 +23,18 @@ trait BaseVisitor extends sqlBaseVisitor[Type] {
 
   override def visitTerminal(node: TerminalNode): Type = {
     node.getSymbol().getType() match {
-      case sqlLexer.T_ESCAPED_BACK_SLASH => string("\\")
-      case sqlLexer.T_ESCAPED_DOLLAR => string("$")
+      case token.T_ESCAPED_SYMBOLS => string(node.getText().substring(1))
+      case token.T_SS_ESC => string(node.getText().substring(1))
+      case token.T_DS_ESC => string(node.getText().substring(1))
+      case token.T_BS_ESC => string(node.getText().substring(1))
+      case token.T_SS_VAR_INTERPOLATION => context.getVar(node.getText().substring(1))
+      case token.T_DS_VAR_INTERPOLATION => context.getVar(node.getText().substring(1))
+      case token.T_BS_VAR_INTERPOLATION => context.getVar(node.getText().substring(1))
       case _ => string(node.getText)
     }        
   }
 
-  override def defaultResult(): Type = void
+  override def defaultResult(): Type = Null
 
   override def aggregateResult(aggregate: Type, nextResult: Type): Type =
     nextResult

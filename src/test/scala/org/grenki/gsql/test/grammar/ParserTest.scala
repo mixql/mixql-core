@@ -2,7 +2,7 @@ package org.grenki.gsql.test
 
 import org.scalatest.funsuite.AnyFunSuite
 import org.antlr.v4.runtime.{CharStreams, CommonTokenStream}
-import org.grenki.gsql.{sqlLexer, sqlParser}
+import org.grenki.gsql.{sql, token}
 import collection.JavaConverters._
 import org.grenki.gsql.test.tag.Grammar
 
@@ -10,28 +10,16 @@ import org.grenki.gsql.test.tag.Grammar
 class ParserTest extends AnyFunSuite {
   
   def getStatments(code: String) = {
-    val lexer = new sqlLexer(CharStreams.fromString(code))
-    val parser = new sqlParser(new CommonTokenStream(lexer))
+    val lexer = new token(CharStreams.fromString(code))
+    val tokens = new CommonTokenStream(lexer)
+    val parser = new sql(new CommonTokenStream(lexer))
     parser.program().statment
-  }
-
-  test("Test `any_coma` rule") {
-    val code = """
-                |some code to run;
-                """.stripMargin
-    val stmts = getStatments(code)
-    assert(stmts.size == 1)
-    val any_coma = stmts.get(0).any_comma
-    assert(any_coma != null)
-    val any_coma_text = any_coma.getText 
-    assert(any_coma_text == "somecodetorun;")
   }
 
   test("Test parsing `expression` literals") {
     val code = """
-                |$a;
+                |$a.b;
                 |null;
-                |'string';
                 |10;
                 |9.9;
                 |true;
@@ -40,50 +28,180 @@ class ParserTest extends AnyFunSuite {
                 |current_timestamp;
                 """.stripMargin
     val stmts = getStatments(code)
-    assert(stmts.size == 9)
+    assert(stmts.size == 8)
     var expr_stmt = stmts.get(0).expr
     assert(expr_stmt != null)
-    assert(expr_stmt.isInstanceOf[sqlParser.Expr_varContext])
+    assert(expr_stmt.isInstanceOf[sql.Expr_varContext])
     
     expr_stmt = stmts.get(1).expr
     assert(expr_stmt != null)
-    assert(expr_stmt.isInstanceOf[sqlParser.Expr_literalContext])
-    assert(expr_stmt.asInstanceOf[sqlParser.Expr_literalContext].literal.isInstanceOf[sqlParser.Literal_nullContext])
+    assert(expr_stmt.isInstanceOf[sql.Expr_literalContext])
+    assert(expr_stmt.asInstanceOf[sql.Expr_literalContext].literal.isInstanceOf[sql.Literal_nullContext])
 
     expr_stmt = stmts.get(2).expr
     assert(expr_stmt != null)
-    assert(expr_stmt.isInstanceOf[sqlParser.Expr_literalContext])
-    assert(expr_stmt.asInstanceOf[sqlParser.Expr_literalContext].literal.isInstanceOf[sqlParser.Literal_stringContext])
+    assert(expr_stmt.isInstanceOf[sql.Expr_literalContext])
+    assert(expr_stmt.asInstanceOf[sql.Expr_literalContext].literal.isInstanceOf[sql.Literal_intContext])
 
     expr_stmt = stmts.get(3).expr
     assert(expr_stmt != null)
-    assert(expr_stmt.isInstanceOf[sqlParser.Expr_literalContext])
-    assert(expr_stmt.asInstanceOf[sqlParser.Expr_literalContext].literal.isInstanceOf[sqlParser.Literal_intContext])
+    assert(expr_stmt.isInstanceOf[sql.Expr_literalContext])
+    assert(expr_stmt.asInstanceOf[sql.Expr_literalContext].literal.isInstanceOf[sql.Literal_doubleContext])
 
     expr_stmt = stmts.get(4).expr
     assert(expr_stmt != null)
-    assert(expr_stmt.isInstanceOf[sqlParser.Expr_literalContext])
-    assert(expr_stmt.asInstanceOf[sqlParser.Expr_literalContext].literal.isInstanceOf[sqlParser.Literal_doubleContext])
+    assert(expr_stmt.isInstanceOf[sql.Expr_literalContext])
+    assert(expr_stmt.asInstanceOf[sql.Expr_literalContext].literal.isInstanceOf[sql.Literal_boolContext])
 
     expr_stmt = stmts.get(5).expr
     assert(expr_stmt != null)
-    assert(expr_stmt.isInstanceOf[sqlParser.Expr_literalContext])
-    assert(expr_stmt.asInstanceOf[sqlParser.Expr_literalContext].literal.isInstanceOf[sqlParser.Literal_boolContext])
+    assert(expr_stmt.isInstanceOf[sql.Expr_literalContext])
+    assert(expr_stmt.asInstanceOf[sql.Expr_literalContext].literal.isInstanceOf[sql.Literal_boolContext])
 
     expr_stmt = stmts.get(6).expr
     assert(expr_stmt != null)
-    assert(expr_stmt.isInstanceOf[sqlParser.Expr_literalContext])
-    assert(expr_stmt.asInstanceOf[sqlParser.Expr_literalContext].literal.isInstanceOf[sqlParser.Literal_boolContext])
+    assert(expr_stmt.isInstanceOf[sql.Expr_literalContext])
+    assert(expr_stmt.asInstanceOf[sql.Expr_literalContext].literal.isInstanceOf[sql.Literal_current_dateContext])
 
     expr_stmt = stmts.get(7).expr
     assert(expr_stmt != null)
-    assert(expr_stmt.isInstanceOf[sqlParser.Expr_literalContext])
-    assert(expr_stmt.asInstanceOf[sqlParser.Expr_literalContext].literal.isInstanceOf[sqlParser.Literal_current_dateContext])
-
-    expr_stmt = stmts.get(8).expr
+    assert(expr_stmt.isInstanceOf[sql.Expr_literalContext])
+    assert(expr_stmt.asInstanceOf[sql.Expr_literalContext].literal.isInstanceOf[sql.Literal_current_timestampContext])
+  }
+  
+  test("Test parsing string '' literals") {
+    val code = """
+                |'"`  \$string; \\ \'';
+                |'something  $var.val;  other';
+                |'something  ${$var.val + 22};  other';
+                """.stripMargin
+    val stmts = getStatments(code)
+    assert(stmts.size == 3)
+    var expr_stmt = stmts.get(0).expr
     assert(expr_stmt != null)
-    assert(expr_stmt.isInstanceOf[sqlParser.Expr_literalContext])
-    assert(expr_stmt.asInstanceOf[sqlParser.Expr_literalContext].literal.isInstanceOf[sqlParser.Literal_current_timestampContext])
+    assert(expr_stmt.isInstanceOf[sql.Expr_literalContext])
+    assert(expr_stmt.asInstanceOf[sql.Expr_literalContext].literal.isInstanceOf[sql.Literal_stringContext])
+    assert(expr_stmt.asInstanceOf[sql.Expr_literalContext].literal.asInstanceOf[sql.Literal_stringContext].string().isInstanceOf[sql.Single_quotedStringContext])
+    var str = expr_stmt.asInstanceOf[sql.Expr_literalContext].literal.asInstanceOf[sql.Literal_stringContext].string().asInstanceOf[sql.Single_quotedStringContext].s_string()
+    assert(str != null)
+    assert(str.T_SS_ESC().size == 3)
+    assert(str.T_SS_OTHER.size == 3)
+    assert(str.s_interpolation_exp().size == 0)
+    assert(str.T_SS_VAR_INTERPOLATION().size == 0)
+
+    expr_stmt = stmts.get(1).expr
+    assert(expr_stmt != null)
+    assert(expr_stmt.isInstanceOf[sql.Expr_literalContext])
+    assert(expr_stmt.asInstanceOf[sql.Expr_literalContext].literal.isInstanceOf[sql.Literal_stringContext])
+    assert(expr_stmt.asInstanceOf[sql.Expr_literalContext].literal.asInstanceOf[sql.Literal_stringContext].string().isInstanceOf[sql.Single_quotedStringContext])
+    str = expr_stmt.asInstanceOf[sql.Expr_literalContext].literal.asInstanceOf[sql.Literal_stringContext].string().asInstanceOf[sql.Single_quotedStringContext].s_string()
+    assert(str != null)
+    assert(str.T_SS_ESC().size == 0)
+    assert(str.T_SS_OTHER.size == 2)
+    assert(str.s_interpolation_exp().size == 0)
+    assert(str.T_SS_VAR_INTERPOLATION().size == 1)
+
+    expr_stmt = stmts.get(2).expr
+    assert(expr_stmt != null)
+    assert(expr_stmt.isInstanceOf[sql.Expr_literalContext])
+    assert(expr_stmt.asInstanceOf[sql.Expr_literalContext].literal.isInstanceOf[sql.Literal_stringContext])
+    assert(expr_stmt.asInstanceOf[sql.Expr_literalContext].literal.asInstanceOf[sql.Literal_stringContext].string().isInstanceOf[sql.Single_quotedStringContext])
+    str = expr_stmt.asInstanceOf[sql.Expr_literalContext].literal.asInstanceOf[sql.Literal_stringContext].string().asInstanceOf[sql.Single_quotedStringContext].s_string()
+    assert(str != null)
+    assert(str.T_SS_ESC().size == 0)
+    assert(str.T_SS_OTHER.size == 2)
+    assert(str.s_interpolation_exp().size == 1)
+    assert(str.T_SS_VAR_INTERPOLATION().size == 0)
+  }
+
+  test("Test parsing string \"\" literals") {
+    val code = """
+                |"'`  \$string; \\ \"";
+                |"something  $var.val;  other";
+                |"something  ${$var.val + 22};  other";
+                """.stripMargin
+    val stmts = getStatments(code)
+    assert(stmts.size == 3)
+    var expr_stmt = stmts.get(0).expr
+    assert(expr_stmt != null)
+    assert(expr_stmt.isInstanceOf[sql.Expr_literalContext])
+    assert(expr_stmt.asInstanceOf[sql.Expr_literalContext].literal.isInstanceOf[sql.Literal_stringContext])
+    assert(expr_stmt.asInstanceOf[sql.Expr_literalContext].literal.asInstanceOf[sql.Literal_stringContext].string().isInstanceOf[sql.Double_quotedStringContext])
+    var str = expr_stmt.asInstanceOf[sql.Expr_literalContext].literal.asInstanceOf[sql.Literal_stringContext].string().asInstanceOf[sql.Double_quotedStringContext].d_string()
+    assert(str != null)
+    assert(str.T_DS_ESC().size == 3)
+    assert(str.T_DS_OTHER.size == 3)
+    assert(str.d_interpolation_exp().size == 0)
+    assert(str.T_DS_VAR_INTERPOLATION().size == 0)
+
+    expr_stmt = stmts.get(1).expr
+    assert(expr_stmt != null)
+    assert(expr_stmt.isInstanceOf[sql.Expr_literalContext])
+    assert(expr_stmt.asInstanceOf[sql.Expr_literalContext].literal.isInstanceOf[sql.Literal_stringContext])
+    assert(expr_stmt.asInstanceOf[sql.Expr_literalContext].literal.asInstanceOf[sql.Literal_stringContext].string().isInstanceOf[sql.Double_quotedStringContext])
+    str = expr_stmt.asInstanceOf[sql.Expr_literalContext].literal.asInstanceOf[sql.Literal_stringContext].string().asInstanceOf[sql.Double_quotedStringContext].d_string()
+    assert(str != null)
+    assert(str.T_DS_ESC().size == 0)
+    assert(str.T_DS_OTHER.size == 2)
+    assert(str.d_interpolation_exp().size == 0)
+    assert(str.T_DS_VAR_INTERPOLATION().size == 1)
+
+    expr_stmt = stmts.get(2).expr
+    assert(expr_stmt != null)
+    assert(expr_stmt.isInstanceOf[sql.Expr_literalContext])
+    assert(expr_stmt.asInstanceOf[sql.Expr_literalContext].literal.isInstanceOf[sql.Literal_stringContext])
+    assert(expr_stmt.asInstanceOf[sql.Expr_literalContext].literal.asInstanceOf[sql.Literal_stringContext].string().isInstanceOf[sql.Double_quotedStringContext])
+    str = expr_stmt.asInstanceOf[sql.Expr_literalContext].literal.asInstanceOf[sql.Literal_stringContext].string().asInstanceOf[sql.Double_quotedStringContext].d_string()
+    assert(str != null)
+    assert(str.T_DS_ESC().size == 0)
+    assert(str.T_DS_OTHER.size == 2)
+    assert(str.d_interpolation_exp().size == 1)
+    assert(str.T_DS_VAR_INTERPOLATION().size == 0)
+  }
+
+  test("Test parsing string `` literals") {
+    val code = """
+                |`'"  \$string; \\ \``;
+                |`something  $var.val;  other`;
+                |`something  ${$var.val + 22};  other`;
+                """.stripMargin
+    val stmts = getStatments(code)
+    assert(stmts.size == 3)
+    var expr_stmt = stmts.get(0).expr
+    assert(expr_stmt != null)
+    assert(expr_stmt.isInstanceOf[sql.Expr_literalContext])
+    assert(expr_stmt.asInstanceOf[sql.Expr_literalContext].literal.isInstanceOf[sql.Literal_stringContext])
+    assert(expr_stmt.asInstanceOf[sql.Expr_literalContext].literal.asInstanceOf[sql.Literal_stringContext].string().isInstanceOf[sql.Slash_quotedStringContext])
+    var str = expr_stmt.asInstanceOf[sql.Expr_literalContext].literal.asInstanceOf[sql.Literal_stringContext].string().asInstanceOf[sql.Slash_quotedStringContext].b_string()
+    assert(str != null)
+    assert(str.T_BS_ESC().size == 3)
+    assert(str.T_BS_OTHER.size == 3)
+    assert(str.b_interpolation_exp().size == 0)
+    assert(str.T_BS_VAR_INTERPOLATION().size == 0)
+
+    expr_stmt = stmts.get(1).expr
+    assert(expr_stmt != null)
+    assert(expr_stmt.isInstanceOf[sql.Expr_literalContext])
+    assert(expr_stmt.asInstanceOf[sql.Expr_literalContext].literal.isInstanceOf[sql.Literal_stringContext])
+    assert(expr_stmt.asInstanceOf[sql.Expr_literalContext].literal.asInstanceOf[sql.Literal_stringContext].string().isInstanceOf[sql.Slash_quotedStringContext])
+    str = expr_stmt.asInstanceOf[sql.Expr_literalContext].literal.asInstanceOf[sql.Literal_stringContext].string().asInstanceOf[sql.Slash_quotedStringContext].b_string()
+    assert(str != null)
+    assert(str.T_BS_ESC().size == 0)
+    assert(str.T_BS_OTHER.size == 2)
+    assert(str.b_interpolation_exp().size == 0)
+    assert(str.T_BS_VAR_INTERPOLATION().size == 1)
+
+    expr_stmt = stmts.get(2).expr
+    assert(expr_stmt != null)
+    assert(expr_stmt.isInstanceOf[sql.Expr_literalContext])
+    assert(expr_stmt.asInstanceOf[sql.Expr_literalContext].literal.isInstanceOf[sql.Literal_stringContext])
+    assert(expr_stmt.asInstanceOf[sql.Expr_literalContext].literal.asInstanceOf[sql.Literal_stringContext].string().isInstanceOf[sql.Slash_quotedStringContext])
+    str = expr_stmt.asInstanceOf[sql.Expr_literalContext].literal.asInstanceOf[sql.Literal_stringContext].string().asInstanceOf[sql.Slash_quotedStringContext].b_string()
+    assert(str != null)
+    assert(str.T_BS_ESC().size == 0)
+    assert(str.T_BS_OTHER.size == 2)
+    assert(str.b_interpolation_exp().size == 1)
+    assert(str.T_BS_VAR_INTERPOLATION().size == 0)
   }
 
   test("Test parsing `expression` numeric op") {
@@ -97,23 +215,23 @@ class ParserTest extends AnyFunSuite {
     assert(stmts.size == 4)
     var expr_stmt = stmts.get(0).expr
     assert(expr_stmt != null)
-    assert(expr_stmt.isInstanceOf[sqlParser.Expr_arithmetic_p1Context])
-    assert(expr_stmt.asInstanceOf[sqlParser.Expr_arithmetic_p1Context].T_MUL != null)
+    assert(expr_stmt.isInstanceOf[sql.Expr_arithmetic_p1Context])
+    assert(expr_stmt.asInstanceOf[sql.Expr_arithmetic_p1Context].T_MUL != null)
     
     expr_stmt = stmts.get(1).expr
     assert(expr_stmt != null)
-    assert(expr_stmt.isInstanceOf[sqlParser.Expr_arithmetic_p1Context])
-    assert(expr_stmt.asInstanceOf[sqlParser.Expr_arithmetic_p1Context].T_DIV != null)
+    assert(expr_stmt.isInstanceOf[sql.Expr_arithmetic_p1Context])
+    assert(expr_stmt.asInstanceOf[sql.Expr_arithmetic_p1Context].T_DIV != null)
 
     expr_stmt = stmts.get(2).expr
     assert(expr_stmt != null)
-    assert(expr_stmt.isInstanceOf[sqlParser.Expr_arithmetic_p2Context])
-    assert(expr_stmt.asInstanceOf[sqlParser.Expr_arithmetic_p2Context].T_ADD != null)
+    assert(expr_stmt.isInstanceOf[sql.Expr_arithmetic_p2Context])
+    assert(expr_stmt.asInstanceOf[sql.Expr_arithmetic_p2Context].T_ADD != null)
 
     expr_stmt = stmts.get(3).expr
     assert(expr_stmt != null)
-    assert(expr_stmt.isInstanceOf[sqlParser.Expr_arithmetic_p2Context])
-    assert(expr_stmt.asInstanceOf[sqlParser.Expr_arithmetic_p2Context].T_SUB != null)
+    assert(expr_stmt.isInstanceOf[sql.Expr_arithmetic_p2Context])
+    assert(expr_stmt.asInstanceOf[sql.Expr_arithmetic_p2Context].T_SUB != null)
   }
 
   test("Test parsing `expression` bool op") {
@@ -131,35 +249,35 @@ class ParserTest extends AnyFunSuite {
     assert(stmts.size == 8)
     var expr_stmt = stmts.get(0).expr
     assert(expr_stmt != null)
-    assert(expr_stmt.isInstanceOf[sqlParser.Expr_compareContext])
+    assert(expr_stmt.isInstanceOf[sql.Expr_compareContext])
     
     expr_stmt = stmts.get(1).expr
     assert(expr_stmt != null)
-    assert(expr_stmt.isInstanceOf[sqlParser.Expr_compareContext])
+    assert(expr_stmt.isInstanceOf[sql.Expr_compareContext])
 
     expr_stmt = stmts.get(2).expr
     assert(expr_stmt != null)
-    assert(expr_stmt.isInstanceOf[sqlParser.Expr_compareContext])
+    assert(expr_stmt.isInstanceOf[sql.Expr_compareContext])
 
     expr_stmt = stmts.get(3).expr
     assert(expr_stmt != null)
-    assert(expr_stmt.isInstanceOf[sqlParser.Expr_compareContext])
+    assert(expr_stmt.isInstanceOf[sql.Expr_compareContext])
 
     expr_stmt = stmts.get(4).expr
     assert(expr_stmt != null)
-    assert(expr_stmt.isInstanceOf[sqlParser.Expr_logicalContext])
+    assert(expr_stmt.isInstanceOf[sql.Expr_logicalContext])
 
     expr_stmt = stmts.get(5).expr
     assert(expr_stmt != null)
-    assert(expr_stmt.isInstanceOf[sqlParser.Expr_logicalContext])
+    assert(expr_stmt.isInstanceOf[sql.Expr_logicalContext])
 
     expr_stmt = stmts.get(6).expr
     assert(expr_stmt != null)
-    assert(expr_stmt.isInstanceOf[sqlParser.Expr_notContext])
+    assert(expr_stmt.isInstanceOf[sql.Expr_notContext])
 
     expr_stmt = stmts.get(7).expr
     assert(expr_stmt != null)
-    assert(expr_stmt.isInstanceOf[sqlParser.Expr_concatContext])
+    assert(expr_stmt.isInstanceOf[sql.Expr_concatContext])
   }
 
   test("Test parsing `expression` case op") {
@@ -170,8 +288,8 @@ class ParserTest extends AnyFunSuite {
     assert(stmts.size == 1)
     var expr_stmt = stmts.get(0).expr
     assert(expr_stmt != null)
-    assert(expr_stmt.isInstanceOf[sqlParser.Expr_caseContext])
-    val case_stmt = expr_stmt.asInstanceOf[sqlParser.Expr_caseContext].case_r
+    assert(expr_stmt.isInstanceOf[sql.Expr_caseContext])
+    val case_stmt = expr_stmt.asInstanceOf[sql.Expr_caseContext].case_r
     assert(case_stmt.case_when_then != null)
     assert(case_stmt.case_when_then.size == 2)
     assert(case_stmt.ex_else != null)
@@ -242,5 +360,62 @@ class ParserTest extends AnyFunSuite {
     assert(for_stmt.step != null)
     assert(for_stmt.ident != null)
     assert(for_stmt.block != null)
+  }
+
+  test("Test `any_coma` rule") {
+    val code = """
+                |select column from table where column > 10;
+                """.stripMargin
+    val stmts = getStatments(code)
+    assert(stmts.size == 1)
+    val any_coma = stmts.get(0).any_comma
+    assert(any_coma != null)
+    val any_coma_text = any_coma.getText 
+    assert(any_coma_text == "selectcolumnfromtablewherecolumn>10;")
+  }
+
+  test("Test `any_coma` with var interpolation") {
+    val code = """
+                |select $variable from table where column > 10;
+                """.stripMargin
+    val stmts = getStatments(code)
+    assert(stmts.size == 1)
+    val any_coma = stmts.get(0).any_comma
+    assert(any_coma != null)
+    assert(any_coma.other().`var`().size() == 1)
+    assert(any_coma.other().interpolation_exp().size() == 0)
+    assert(any_coma.other().string().size() == 0)
+    val any_coma_text = any_coma.getText 
+    assert(any_coma_text == "select$variablefromtablewherecolumn>10;")
+  }
+
+  test("Test `any_coma` with expr interpolation") {
+    val code = """
+                |select ${$variable + 3} from table where column > 10;
+                """.stripMargin
+    val stmts = getStatments(code)
+    assert(stmts.size == 1)
+    val any_coma = stmts.get(0).any_comma
+    assert(any_coma != null)
+    assert(any_coma.other().`var`().size() == 0)
+    assert(any_coma.other().interpolation_exp().size() == 1)
+    assert(any_coma.other().string().size() == 0)
+    val any_coma_text = any_coma.getText 
+    assert(any_coma_text == "select${$variable+3}fromtablewherecolumn>10;")
+  }
+
+  test("Test `any_coma` with string") {
+    val code = """
+                |select '${$a || ' df;df $b'}' from table where column > 10;
+                """.stripMargin
+    val stmts = getStatments(code)
+    assert(stmts.size == 1)
+    val any_coma = stmts.get(0).any_comma
+    assert(any_coma != null)
+    assert(any_coma.other().`var`().size() == 0)
+    assert(any_coma.other().interpolation_exp().size() == 0)
+    assert(any_coma.other().string().size() == 1)
+    val any_coma_text = any_coma.getText 
+    assert(any_coma_text == "select'${$a||' df;df $b'}'fromtablewherecolumn>10;")
   }
 }

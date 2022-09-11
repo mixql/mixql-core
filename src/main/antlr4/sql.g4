@@ -1,5 +1,6 @@
-grammar sql;
+parser grammar sql;
 
+options { tokenVocab=token; }
 import core;
 
 @header {
@@ -22,5 +23,5 @@ statment:
     | any_comma
     ;
 
-any_comma: any T_SEMICOLON;
-any: (var | interpolation_exp | ~(T_SEMICOLON))*?; // TODO maybe not T_DOLLAR too?
+any_comma: other T_SEMICOLON;
+other: (var | interpolation_exp | string | ~(T_DOLLAR))*?; // TODO maybe not T_DOLLAR too?

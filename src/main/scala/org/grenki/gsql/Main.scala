@@ -46,10 +46,10 @@ object Main {
   }
 
   def execute(code: String): Unit = {
-    val lexer = new sqlLexer(CharStreams.fromString(code))
-    val tokenStream = new CommonTokenStream(new sqlLexer(CharStreams.fromString(code)))
+    val lexer = new token(CharStreams.fromString(code))
+    val tokenStream = new CommonTokenStream(new token(CharStreams.fromString(code)))
     tokenStream.getNumberOfOnChannelTokens // magic. if we do not do this tokenstream is empty
-    val parser = new sqlParser(new CommonTokenStream(lexer))
+    val parser = new sql(new CommonTokenStream(lexer))
 
     val context = new Context(MutMap[String, Engine]("stub" -> new Engine))
 

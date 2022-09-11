@@ -1,6 +1,6 @@
-grammar types;
+parser grammar types;
 
-import token;
+options { tokenVocab=token; }
 
 expr:;//core.g4
 ident:;//core.g4
@@ -66,7 +66,7 @@ struct_type :
      ;
 
 user_defined_type :
-       ident ('%' (T_TYPE | T_ROWTYPE))?             // User-defined or derived data type
+       ident (T_PERCENT (T_TYPE | T_ROWTYPE))?             // User-defined or derived data type
      ;
 
 dtype_len :             // Data type length or size specification

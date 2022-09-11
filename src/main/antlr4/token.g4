@@ -1,5 +1,9 @@
 lexer grammar token;
 
+@header {
+package org.grenki.gsql;
+}
+
 T_ACTION          : A C T I O N ;
 T_ADD2            : A D D ;
 T_AFTER           : A F T E R;
@@ -375,14 +379,15 @@ T_SYSDATE              : S Y S D A T E ;
 T_VARIANCE             : V A R I A N C E ;
 T_USER                 : U S E R;
 
-T_ESCAPED_DOLLAR: '\\$';
-T_ESCAPED_BACK_SLASH: '\\\\';
+T_ESCAPED_SYMBOLS: '\\$' | '\\\\';
 
 T_ADD          : '+' ;
 T_COLON        : ':' ;
 T_COMMA        : ',' ;
 T_PIPE         : '||' ;
+T_STICK        : '|' ;
 T_DIV          : '/' ;
+T_DOT          : '.' ;
 T_DOT2         : '..' ;
 T_EQUAL        : '=' ;
 T_EQUAL2       : '==' ;
@@ -393,15 +398,18 @@ T_GREATEREQUAL : '>=' ;
 T_LESS         : '<' ;
 T_LESSEQUAL    : '<=' ;
 T_MUL          : '*' ;
+T_INTERP_EXPR  : '${' -> pushMode(DEFAULT_MODE);
 T_OPEN_B       : '{' ;
 T_OPEN_P       : '(' ;
 T_OPEN_SB      : '[' ;
-T_CLOSE_B      : '}' ;
+T_CLOSE_B      : '}' -> popMode;
 T_CLOSE_P      : ')' ;
 T_CLOSE_SB     : ']' ;
 T_SEMICOLON    : ';' ;
 T_SUB          : '-' ;
 T_DOLLAR       : '$' ;
+T_PERCENT      : '%' ;
+T_AND_SUMBOL   : '&' ;
 
 L_NAME_WITH_ASYNC :
               L_NAME_PART '_' T_ASYNC
@@ -414,9 +422,9 @@ L_NAME      : L_NAME_PART
 //L_SPEC      : L_SPEC_PART                                               // Identifier
 //            ;
 
-T_S_QUOTE: '\'';
-T_D_QUOTE: '"';
-T_B_QUOTE: '`';
+T_S_QUOTE: '\'' -> pushMode(S_STRING);
+T_D_QUOTE: '"' -> pushMode(D_STRING);
+T_B_QUOTE: '`' -> pushMode(B_STRING);
 
 //L_S_STRING  : '\'' (('\'' '\'') | ('\\' '\'') | ~('\''))* '\''         // Single quoted string literal
 //            ;
@@ -504,3 +512,27 @@ fragment W : ('w'|'W') ;
 fragment X : ('x'|'X') ;
 fragment Y : ('y'|'Y') ;
 fragment Z : ('z'|'Z') ;
+
+mode S_STRING;
+
+T_S_CLOSE_QUOTE: '\'' -> popMode;
+T_SS_ESC: '\\\\' | '\\$' | '\\\'';
+T_SS_EXP_INTERPOLATION: '${' -> pushMode(DEFAULT_MODE);
+T_SS_VAR_INTERPOLATION: '$' L_NAME_PART ('.' L_NAME_PART)*;
+T_SS_OTHER: ~('\'' | '$' | '\\')+;
+
+mode B_STRING;
+
+T_B_CLOSE_QUOTE: '`' -> popMode;
+T_BS_ESC: '\\\\' | '\\$' | '\\`';
+T_BS_EXP_INTERPOLATION: '${' -> pushMode(DEFAULT_MODE);
+T_BS_VAR_INTERPOLATION: '$' L_NAME_PART ('.' L_NAME_PART)*;
+T_BS_OTHER: ~('`' | '$' | '\\')+;
+
+mode D_STRING;
+
+T_D_CLOSE_QUOTE: '"' -> popMode;
+T_DS_ESC: '\\\\' | '\\$' | '\\"';
+T_DS_EXP_INTERPOLATION: '${' -> pushMode(DEFAULT_MODE);
+T_DS_VAR_INTERPOLATION: '$' L_NAME_PART ('.' L_NAME_PART)*;
+T_DS_OTHER: ~('"' | '$' | '\\')+;
