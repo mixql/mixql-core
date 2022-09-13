@@ -565,7 +565,7 @@ class ParserTest extends AnyFunSuite {
                 """.stripMargin
     val stmts = getStatments(code)
     assert(stmts.size == 1)
-    val any_coma = stmts.get(0).any_comma
+    val any_coma = stmts.get(0).other_semicolon
     assert(any_coma != null)
     val any_coma_text = any_coma.getText
     assert(any_coma_text == "selectcolumnfromtablewherecolumn>10;")
@@ -577,7 +577,7 @@ class ParserTest extends AnyFunSuite {
                 """.stripMargin
     val stmts = getStatments(code)
     assert(stmts.size == 1)
-    val any_coma = stmts.get(0).any_comma
+    val any_coma = stmts.get(0).other_semicolon
     assert(any_coma != null)
     assert(any_coma.other().`var`().size() == 1)
     assert(any_coma.other().interpolation_exp().size() == 0)
@@ -592,7 +592,7 @@ class ParserTest extends AnyFunSuite {
                 """.stripMargin
     val stmts = getStatments(code)
     assert(stmts.size == 1)
-    val any_coma = stmts.get(0).any_comma
+    val any_coma = stmts.get(0).other_semicolon
     assert(any_coma != null)
     assert(any_coma.other().`var`().size() == 0)
     assert(any_coma.other().interpolation_exp().size() == 1)
@@ -607,7 +607,7 @@ class ParserTest extends AnyFunSuite {
                 """.stripMargin
     val stmts = getStatments(code)
     assert(stmts.size == 1)
-    val any_coma = stmts.get(0).any_comma
+    val any_coma = stmts.get(0).other_semicolon
     assert(any_coma != null)
     assert(any_coma.other().`var`().size() == 0)
     assert(any_coma.other().interpolation_exp().size() == 0)
