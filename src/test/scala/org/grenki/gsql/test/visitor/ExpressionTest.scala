@@ -87,6 +87,12 @@ class ExpressionTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val query = context.currentEngine.asInstanceOf[StubEngine].queue
-    assert(query.dequeue() == "if(true){\r\n    System.out.println(12);\r\n} else {\r\n    System.out.println(9);\r\n}")
+    assert(query.dequeue() == """
+                                |if(true){
+                                |    System.out.println(12);
+                                |} else {
+                                |    System.out.println(9);
+                                |}
+                """.stripMargin.trim)
   }
 }
