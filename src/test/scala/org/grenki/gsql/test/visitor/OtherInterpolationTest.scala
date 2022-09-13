@@ -21,11 +21,11 @@ class OtherInterpolationTest extends MainVisitorBaseTest {
     val code =
       """
         |set a = 10;
-        |select ${$a + 3} from table where column > 10;
+        |select ${$a - 3} from table where column > 10;
                 """.stripMargin
     val context = runMainVisitor(code)
     val query = context.currentEngine.asInstanceOf[StubEngine].queue
-    assert(query.dequeue() == "select 13 from table where column > 10")
+    assert(query.dequeue() == "select 7 from table where column > 10")
   }
 
   test("Test other statement string interpolation") {
@@ -41,5 +41,15 @@ class OtherInterpolationTest extends MainVisitorBaseTest {
       query
         .dequeue() == "select '10 df;df some str' from table where column > 10"
     )
+  }
+
+  test("Test any statement with curly brackets") {
+    val code =
+      """
+        |select {} {} {} where > 10;
+                """.stripMargin
+    val context = runMainVisitor(code)
+    val query = context.currentEngine.asInstanceOf[StubEngine].queue
+    assert(query.dequeue() == "select {} {} {} where > 10")
   }
 }

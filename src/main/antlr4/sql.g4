@@ -20,8 +20,8 @@ statment:
     | while_stmt
     | for_cursor_stmt
     | for_range_stmt
-    | any_comma
+    | other_semicolon
     ;
 
-any_comma: other T_SEMICOLON;
-other: (var | interpolation_exp | string | ~(T_DOLLAR))*?; // TODO maybe not T_DOLLAR too?
+other_semicolon: other T_SEMICOLON;
+other: (var | interpolation_exp | string | T_OPEN_P other T_CLOSE_P | ~(T_DOLLAR))*?; // TODO maybe not T_DOLLAR too?

@@ -17,7 +17,7 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
   val context = ctx
   val tokenStream = tokens
 
-  override def visitAny_comma(ctx: sql.Any_commaContext): Type = {
+  override def visitOther_semicolon(ctx: sql.Other_semicolonContext): Type = {
     context.execute(visit(ctx.other()).toString)
   }
 

@@ -2,6 +2,7 @@ package org.grenki.gsql.test.visitor
 
 import org.grenki.gsql.context.gtype._
 import org.grenki.gsql.test.MainVisitorBaseTest
+import org.grenki.gsql.test.stub.StubEngine
 
 class ExpressionTest extends MainVisitorBaseTest {
   test("Test arithmetic expression") {
@@ -71,5 +72,21 @@ class ExpressionTest extends MainVisitorBaseTest {
     val res = context.vars("res")
     assert(res.isInstanceOf[string])
     assert(res.asInstanceOf[string].value == "false")
+  }
+
+  test("Test some java code in expression bracketed") {
+    val code =
+      """
+        |(
+        |if(true){
+        |    System.out.println(12);
+        |} else {
+        |    System.out.println(9);
+        |}
+        |);
+                """.stripMargin
+    val context = runMainVisitor(code)
+    val query = context.currentEngine.asInstanceOf[StubEngine].queue
+    assert(query.dequeue() == "if(true){\r\n    System.out.println(12);\r\n} else {\r\n    System.out.println(9);\r\n}")
   }
 }

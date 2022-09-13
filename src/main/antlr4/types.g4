@@ -2,6 +2,7 @@ parser grammar types;
 
 options { tokenVocab=token; }
 
+/** abstract rules */
 expr:;//core.g4
 ident:;//core.g4
 

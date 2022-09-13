@@ -399,7 +399,7 @@ T_LESS         : '<' ;
 T_LESSEQUAL    : '<=' ;
 T_MUL          : '*' ;
 T_INTERP_EXPR  : '${' -> pushMode(DEFAULT_MODE);
-T_OPEN_B       : '{' ;
+T_OPEN_B       : '{' -> pushMode(DEFAULT_MODE);
 T_OPEN_P       : '(' ;
 T_OPEN_SB      : '[' ;
 T_CLOSE_B      : '}' -> popMode;
@@ -426,37 +426,19 @@ T_S_QUOTE: '\'' -> pushMode(S_STRING);
 T_D_QUOTE: '"' -> pushMode(D_STRING);
 T_B_QUOTE: '`' -> pushMode(B_STRING);
 
-//L_S_STRING  : '\'' (('\'' '\'') | ('\\' '\'') | ~('\''))* '\''         // Single quoted string literal
-//            ;
-//L_D_STRING  : '"' (L_STR_ESC_D | .)*? '"'                              // Double quoted string literal
-//            ;
-//L_B_STRING  : '`' (~('`'))*? '`'                                       // Slash quoted (`some_string`) string literal
-//            ;
 L_INT       : L_DIGIT+ ;                                               // Integer
 L_DEC       : L_DIGIT+ '.' ~'.' L_DIGIT*                               // Decimal number
             | '.' L_DIGIT+
             ;
+
 L_WS        : L_BLANK+ -> channel(HIDDEN) ;                                       // Whitespace
 L_M_COMMENT : '/*' .*? '*/' -> channel(HIDDEN) ;                       // Multiline comment
 L_S_COMMENT : ('--' | '//')  .*? '\r'? (EOF | '\n') -> channel(HIDDEN) ;       // Single line comment
 
-/*L_FILE_PATH :
-             ( [a-zA-Z]+ ':' L_SLASHES?)? L_SLASHES? (L_NAME | L_SPEC) (':' L_DIGIT+)? (L_SLASHES (L_NAME | L_SPEC) (':' L_DIGIT+)?)*
-            ;*/
 
-//L_FILE      : ([a-zA-Z] ':' '\\'?)? (L_NAME | L_SPEC)  ('\\' (L_NAME | L_SPEC))*                  // File path (a/b/c Linux path causes conflicts with division operator and handled at parser level)
-//            ;
 L_FILE      : ([a-zA-Z] ':' '\\'?)? L_NAME  ('\\' L_NAME )*                  // File path (a/b/c Linux path causes conflicts with division operator and handled at parser level)
             ;
 
-
-L_SLASHES   :
-              '\''
-            | '\\'
-            | '/'
-            | '//'
-            | '///'
-            ;
 
 L_LABEL     : ([a-zA-Z] | L_DIGIT | '_')* ':'
             ;
