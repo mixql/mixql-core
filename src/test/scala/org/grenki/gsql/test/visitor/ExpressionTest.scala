@@ -23,8 +23,8 @@ class ExpressionTest extends MainVisitorBaseTest {
     val code =
       """
         |set a = 12;
-        |set res = $a > 11 and $a < 12;
-        |set res1 = $a > 11 or $a < 12;
+        |set res = $a > 11 and $a <> 12;
+        |set res1 = $a > 11 or $a != 12;
                 """.stripMargin
     val context = runMainVisitor(code)
     assert(context.vars.contains("res"))
@@ -53,7 +53,7 @@ class ExpressionTest extends MainVisitorBaseTest {
   test("Test case then expression") {
     val code =
       """
-        |set res = case when 2 > 1 then true else 'false' end;
+        |set res = case when 2 >= 1 then true else 'false' end;
                 """.stripMargin
     val context = runMainVisitor(code)
     assert(context.vars.contains("res"))
@@ -65,7 +65,7 @@ class ExpressionTest extends MainVisitorBaseTest {
   test("Test case else expression") {
     val code =
       """
-        |set res = case when 2 < 1 then true else 'false' end;
+        |set res = case when 2 <= 1 then true else 'false' end;
                 """.stripMargin
     val context = runMainVisitor(code)
     assert(context.vars.contains("res"))
@@ -78,21 +78,35 @@ class ExpressionTest extends MainVisitorBaseTest {
     val code =
       """
         |(
-        |if(true){
-        |    System.out.println(12);
+        |if ( true ) {
+        |    System.out.println ( 12 ) ;
         |} else {
-        |    System.out.println(9);
+        |    System.out.println ( 9 ) ;
         |}
         |);
                 """.stripMargin
     val context = runMainVisitor(code)
     val query = context.currentEngine.asInstanceOf[StubEngine].queue
     assert(query.dequeue() == """
-                                |if(true){
-                                |    System.out.println(12);
+                                |if ( true ) {
+                                |    System.out.println ( 12 ) ;
                                 |} else {
-                                |    System.out.println(9);
+                                |    System.out.println ( 9 ) ;
                                 |}
                 """.stripMargin.trim)
+  }
+
+  test("Test complex expression") {
+    val code =
+      """
+        |set a = 5;
+        |set b = 7.5;
+        |set res = (10 - $b) + (3.5 - $a / 2) * 4;
+                """.stripMargin
+    val context = runMainVisitor(code)
+    assert(context.vars.contains("res"))
+    val res = context.vars("res")
+    assert(res.isInstanceOf[double])
+    assert(res.asInstanceOf[double].value == 8.5) // TODO mb reuslt must by 6.5? 5 / 2 = 2 not 2.5
   }
 }

@@ -6,7 +6,7 @@ class ControlStmtsTest extends MainVisitorBaseTest {
   test("Test if: then") {
     val code =
       """
-        |if true then
+        |if true != false then
         |  set res = "if";
         |elif false then
         |  set res = "elif";
@@ -38,9 +38,9 @@ class ControlStmtsTest extends MainVisitorBaseTest {
   test("Test if: else") {
     val code =
       """
-        |if false then
+        |if not true then
         |  set res = "if";
-        |elif false then
+        |elif false == true then
         |  set res = "elif";
         |else
         |  set res = "else";
