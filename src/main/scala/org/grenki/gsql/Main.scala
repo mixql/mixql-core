@@ -55,6 +55,6 @@ object Main {
     val context = new Context(MutMap[String, Engine]("stub" -> new Engine))
 
     new MainVisitor(context, tokenStream).visit(parser.program())
-    println(context.vars)
+    println(context.variables)
   }
 }

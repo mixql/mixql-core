@@ -24,4 +24,4 @@ statment:
     ;
 
 other_semicolon: other T_SEMICOLON;
-other: (var | interpolation_exp | string | T_OPEN_P other T_CLOSE_P | ~(T_DOLLAR))*?; // TODO maybe not T_DOLLAR too?
+other: (var | interpolation_exp | string | T_OPEN_P other T_CLOSE_P | ~(T_DOLLAR))*?;

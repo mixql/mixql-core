@@ -33,23 +33,23 @@ class OtherInterpolationTest extends MainVisitorBaseTest {
       """
         |set a = 10;
         |set b = 'some str';
-        |select '${$a || ' df;df $b'}' from table where column > 10;
+        |select '\$${$a || ' df;df $b'}\\' from table where column > 10;
                 """.stripMargin
     val context = runMainVisitor(code)
     val query = context.currentEngine.asInstanceOf[StubEngine].queue
     assert(
       query
-        .dequeue() == "select '10 df;df some str' from table where column > 10"
+        .dequeue() == "select '$10 df;df some str\\' from table where column > 10"
     )
   }
 
   test("Test any statement with curly brackets") {
     val code =
       """
-        |select {} {} {} where > 10;
+        |select \$ { dfsg } { 15 * 10 } {\\} where > 10;
                 """.stripMargin
     val context = runMainVisitor(code)
     val query = context.currentEngine.asInstanceOf[StubEngine].queue
-    assert(query.dequeue() == "select {} {} {} where > 10")
+    assert(query.dequeue() == "select $ { dfsg } { 15 * 10 } {\\} where > 10")
   }
 }

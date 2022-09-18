@@ -15,8 +15,8 @@ class ControlStmtsTest extends MainVisitorBaseTest {
         |end if
                 """.stripMargin
     val context = runMainVisitor(code)
-    assert(context.vars.contains("res"))
-    assert(context.vars("res").toString() == "if")
+    assert(context.variables.contains("res"))
+    assert(context.variables("res").toString() == "if")
   }
 
   test("Test if: elif") {
@@ -31,8 +31,8 @@ class ControlStmtsTest extends MainVisitorBaseTest {
         |end if
                 """.stripMargin
     val context = runMainVisitor(code)
-    assert(context.vars.contains("res"))
-    assert(context.vars("res").toString() == "elif")
+    assert(context.variables.contains("res"))
+    assert(context.variables("res").toString() == "elif")
   }
 
   test("Test if: else") {
@@ -47,8 +47,8 @@ class ControlStmtsTest extends MainVisitorBaseTest {
         |end if
                 """.stripMargin
     val context = runMainVisitor(code)
-    assert(context.vars.contains("res"))
-    assert(context.vars("res").toString() == "else")
+    assert(context.variables.contains("res"))
+    assert(context.variables("res").toString() == "else")
   }
 
   test("Test while") {
@@ -62,8 +62,8 @@ class ControlStmtsTest extends MainVisitorBaseTest {
         |end
                 """.stripMargin
     val context = runMainVisitor(code)
-    assert(context.vars.contains("res"))
-    assert(context.vars("res").toString() == "01234")
+    assert(context.variables.contains("res"))
+    assert(context.variables("res").toString() == "01234")
   }
 
   test("Test for range") {
@@ -75,9 +75,9 @@ class ControlStmtsTest extends MainVisitorBaseTest {
         |end loop
                 """.stripMargin
     val context = runMainVisitor(code)
-    assert(context.vars.contains("res"))
-    val res = context.vars("res")
-    assert(context.vars("res").toString() == "13579111315171920")
+    assert(context.variables.contains("res"))
+    val res = context.variables("res")
+    assert(context.variables("res").toString() == "13579111315171920")
   }
   // TODO this test fails
   ignore("Test for range reverse") {
@@ -89,8 +89,8 @@ class ControlStmtsTest extends MainVisitorBaseTest {
         |end loop
                 """.stripMargin
     val context = runMainVisitor(code)
-    assert(context.vars.contains("res"))
-    val res = context.vars("res")
-    assert(context.vars("res").toString() == "20181614121086421")
+    assert(context.variables.contains("res"))
+    val res = context.variables("res")
+    assert(context.variables("res").toString() == "20181614121086421")
   }
 }

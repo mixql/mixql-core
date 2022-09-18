@@ -33,7 +33,7 @@ trait ControlStmtsVisitor extends BaseVisitor {
   override def visitFor_range_stmt(ctx: sql.For_range_stmtContext): Type = {
     // super.visitFor_range_stmt(ctx)
     val i_name = visit(ctx.ident()).toString
-    val old = context.vars.getOrElse(i_name, Null)
+    val old = context.getVar(i_name)
     var i = visit(ctx.from)
     val to = visit(ctx.to)
     val step =

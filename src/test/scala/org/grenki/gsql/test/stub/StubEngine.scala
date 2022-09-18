@@ -7,6 +7,7 @@ import org.grenki.gsql.context.gtype._
 class StubEngine extends Engine {
   val queue = new Queue[String]()
 
+  override def name: String = "stub"
   override def execute(stmt: String): Type = {
     queue += stmt
     Null
