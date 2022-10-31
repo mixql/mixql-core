@@ -4,6 +4,7 @@ import org.antlr.v4.runtime.{CharStreams, CommonTokenStream}
 import org.grenki.gsql.context.Context
 import org.grenki.gsql.engine.Engine
 import org.grenki.gsql.visitor.MainVisitor
+import org.grenki.gsql.token
 
 import scala.collection.mutable.{Map => MutMap}
 

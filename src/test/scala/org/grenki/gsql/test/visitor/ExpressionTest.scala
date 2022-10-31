@@ -13,10 +13,9 @@ class ExpressionTest extends MainVisitorBaseTest {
         |set res = (($a + $b) * $a) / 2;
                 """.stripMargin
     val context = runMainVisitor(code)
-    assert(context.variables.contains("res"))
-    val res = context.variables("res")
+    val res = context.getVar("res")
     assert(res.isInstanceOf[double])
-    assert(context.variables("res").asInstanceOf[double].value == 0.5)
+    assert(res.asInstanceOf[double].value == 0.5)
   }
 
   test("Test bool expression") {
@@ -27,13 +26,11 @@ class ExpressionTest extends MainVisitorBaseTest {
         |set res1 = $a > 11 or $a != 12;
                 """.stripMargin
     val context = runMainVisitor(code)
-    assert(context.variables.contains("res"))
-    assert(context.variables.contains("res1"))
-    val res = context.variables("res")
+    val res = context.getVar("res")
     assert(res.isInstanceOf[bool])
-    assert(res.asInstanceOf[bool].value != true)
+    assert(res.asInstanceOf[bool].value == false)
 
-    val res1 = context.variables("res1")
+    val res1 = context.getVar("res1")
     assert(res1.isInstanceOf[bool])
     assert(res1.asInstanceOf[bool].value == true)
   }
@@ -44,8 +41,7 @@ class ExpressionTest extends MainVisitorBaseTest {
         |set res = 'one' || 2 || true;
                 """.stripMargin
     val context = runMainVisitor(code)
-    assert(context.variables.contains("res"))
-    val res = context.variables("res")
+    val res = context.getVar("res")
     assert(res.isInstanceOf[string])
     assert(res.asInstanceOf[string].value == "one2true")
   }
@@ -56,8 +52,7 @@ class ExpressionTest extends MainVisitorBaseTest {
         |set res = case when 2 >= 1 then -1.5 else 'false' end;
                 """.stripMargin
     val context = runMainVisitor(code)
-    assert(context.variables.contains("res"))
-    val res = context.variables("res")
+    val res = context.getVar("res")
     assert(res.isInstanceOf[double])
     assert(res.asInstanceOf[double].value == -1.5)
   }
@@ -68,8 +63,7 @@ class ExpressionTest extends MainVisitorBaseTest {
         |set res = case when 2 <= 1 then true else 'false' end;
                 """.stripMargin
     val context = runMainVisitor(code)
-    assert(context.variables.contains("res"))
-    val res = context.variables("res")
+    val res = context.getVar("res")
     assert(res.isInstanceOf[string])
     assert(res.asInstanceOf[string].value == "false")
   }
@@ -104,9 +98,9 @@ class ExpressionTest extends MainVisitorBaseTest {
         |set res = (10 - $b) + (3.5 - $a / 2) * 4;
                 """.stripMargin
     val context = runMainVisitor(code)
-    assert(context.variables.contains("res"))
-    val res = context.variables("res")
+    val res = context.getVar("res")
     assert(res.isInstanceOf[double])
-    assert(res.asInstanceOf[double].value == 8.5) // TODO mb reuslt must by 6.5? 5 / 2 = 2 not 2.5
+    // TODO mb reuslt must by 6.5? 5 / 2 = 2 not 2.5
+    assert(res.asInstanceOf[double].value == 8.5) 
   }
 }

@@ -1,6 +1,7 @@
 package org.grenki.gsql.test.visitor
 
 import org.grenki.gsql.test.MainVisitorBaseTest
+import org.grenki.gsql.context.gtype.string
 
 class ControlStmtsTest extends MainVisitorBaseTest {
   test("Test if: then") {
@@ -15,8 +16,9 @@ class ControlStmtsTest extends MainVisitorBaseTest {
         |end if
                 """.stripMargin
     val context = runMainVisitor(code)
-    assert(context.variables.contains("res"))
-    assert(context.variables("res").toString() == "if")
+    val res = context.getVar("res")
+    assert(res.isInstanceOf[string])
+    assert(res.asInstanceOf[string].value == "if")
   }
 
   test("Test if: elif") {
@@ -31,8 +33,9 @@ class ControlStmtsTest extends MainVisitorBaseTest {
         |end if
                 """.stripMargin
     val context = runMainVisitor(code)
-    assert(context.variables.contains("res"))
-    assert(context.variables("res").toString() == "elif")
+    val res = context.getVar("res")
+    assert(res.isInstanceOf[string])
+    assert(res.asInstanceOf[string].value == "elif")
   }
 
   test("Test if: else") {
@@ -47,8 +50,9 @@ class ControlStmtsTest extends MainVisitorBaseTest {
         |end if
                 """.stripMargin
     val context = runMainVisitor(code)
-    assert(context.variables.contains("res"))
-    assert(context.variables("res").toString() == "else")
+    val res = context.getVar("res")
+    assert(res.isInstanceOf[string])
+    assert(res.asInstanceOf[string].value == "else")
   }
 
   test("Test while") {
@@ -62,8 +66,9 @@ class ControlStmtsTest extends MainVisitorBaseTest {
         |end
                 """.stripMargin
     val context = runMainVisitor(code)
-    assert(context.variables.contains("res"))
-    assert(context.variables("res").toString() == "01234")
+    val res = context.getVar("res")
+    assert(res.isInstanceOf[string])
+    assert(res.asInstanceOf[string].value == "01234")
   }
 
   test("Test for range") {
@@ -75,9 +80,9 @@ class ControlStmtsTest extends MainVisitorBaseTest {
         |end loop
                 """.stripMargin
     val context = runMainVisitor(code)
-    assert(context.variables.contains("res"))
-    val res = context.variables("res")
-    assert(context.variables("res").toString() == "13579111315171920")
+    val res = context.getVar("res")
+    assert(res.isInstanceOf[string])
+    assert(res.asInstanceOf[string].value == "13579111315171920")
   }
   // TODO this test fails
   ignore("Test for range reverse") {
@@ -89,8 +94,8 @@ class ControlStmtsTest extends MainVisitorBaseTest {
         |end loop
                 """.stripMargin
     val context = runMainVisitor(code)
-    assert(context.variables.contains("res"))
-    val res = context.variables("res")
-    assert(context.variables("res").toString() == "20181614121086421")
+    val res = context.getVar("res")
+    assert(res.isInstanceOf[string])
+    assert(res.asInstanceOf[string].value == "20181614121086421")
   }
 }
