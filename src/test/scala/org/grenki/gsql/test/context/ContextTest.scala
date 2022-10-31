@@ -11,8 +11,8 @@ import scala.collection.mutable.{Map => MutMap}
 class ControlStmtsTest extends AnyFunSuite {
   def isNull(v: Type): Boolean = {
     v match {
-        case Null => true
-        case _ => false
+      case Null => true
+      case _    => false
     }
   }
 
@@ -96,7 +96,7 @@ class ControlStmtsTest extends AnyFunSuite {
   test("Test change current engine") {
     val context = new Context(MutMap[String, Engine]("stub" -> new StubEngine))
     class MyEngine extends Engine {
-      var query: String = ""      
+      var query: String = ""
       override def name: String = "MyTestEngine"
       override def execute(stmt: String): Type = {
         query = stmt

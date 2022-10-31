@@ -3,37 +3,21 @@ package org.grenki.gsql.context.gtype
 import scala.language.implicitConversions
 
 package object gtype {
-  implicit def from_int(a: Int): int = {
-    int(a)
-  }
+  implicit def from_int(a: Int): int = int(a)
 
-  implicit def to_int(a: int): Int = {
-    a.value
-  }
+  implicit def to_int(a: int): Int = a.value
 
-  implicit def from_double(a: Double): double = {
-    double(a)
-  }
+  implicit def from_double(a: Double): double = double(a)
 
-  implicit def to_double(a: double): Double = {
-    a.value
-  }
+  implicit def to_double(a: double): Double = a.value
 
-  implicit def from_bool(a: Boolean): bool = {
-    bool(a)
-  }
+  implicit def from_bool(a: Boolean): bool = bool(a)
 
-  implicit def to_bool(a: bool): Boolean = {
-    a.value
-  }
+  implicit def to_bool(a: bool): Boolean = a.value
 
-  implicit def from_string(a: String): string = {
-    string(a)
-  }
+  implicit def from_string(a: String): string = string(a)
 
-  implicit def to_string(a: string): String = {
-    a.value
-  }
+  implicit def to_string(a: string): String = a.value
 }
 
 abstract class Type {

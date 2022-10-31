@@ -82,7 +82,7 @@ class Context(
     * @return
     *   the first engine isInstanceOf[T]
     */
-  def getEngine[T]()(implicit tag: ClassTag[T]): Option[T] = {
+  def getEngine[T <: Engine]()(implicit tag: ClassTag[T]): Option[T] = {
     val res = engines.values.flatMap {
       case e: T => Some(e)
       case _    => None

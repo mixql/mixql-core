@@ -101,6 +101,6 @@ class ExpressionTest extends MainVisitorBaseTest {
     val res = context.getVar("res")
     assert(res.isInstanceOf[double])
     // TODO mb reuslt must by 6.5? 5 / 2 = 2 not 2.5
-    assert(res.asInstanceOf[double].value == 8.5) 
+    assert(res.asInstanceOf[double].value == 8.5)
   }
 }
