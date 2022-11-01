@@ -13,9 +13,8 @@ import scala.collection.mutable.{Map => MutMap}
 class MainVisitorBaseTest extends AnyFunSuite {
   def runMainVisitor(
     code: String,
-    context: Context = new Context(
-      MutMap[String, Engine]("stub" -> new StubEngine)
-    )
+    context: Context =
+      new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
   ): Context = {
     val lexer = new token(CharStreams.fromString(code))
     val tokenStream = new CommonTokenStream(
@@ -23,7 +22,8 @@ class MainVisitorBaseTest extends AnyFunSuite {
     )
     tokenStream.getNumberOfOnChannelTokens // magic. if we do not do this tokenstream is empty
     val parser = new sql(new CommonTokenStream(lexer))
-    val context = new Context(MutMap[String, Engine]("stub" -> new StubEngine))
+    val context =
+      new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
     new MainVisitor(context, tokenStream).visit(parser.program())
     context
   }

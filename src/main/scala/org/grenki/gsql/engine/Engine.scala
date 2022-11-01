@@ -33,4 +33,15 @@ class Engine {
     *   of the param
     */
   def setParam(name: String, value: Type): Unit = {}
+
+  /** get engine param value
+    *
+    * @param name
+    *   of the param
+    * @return
+    *   param value
+    */
+  def getParam(name: String): Type = Null
+
+  def isParam(name: String): Boolean = true
 }

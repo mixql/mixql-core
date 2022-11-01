@@ -65,12 +65,17 @@ abstract class Type {
 case object Null extends Type {
   override def toString: String = "null"
 
-  override def +(other: Type): Type = other
+  // override def +(other: Type): Type = other
 }
 
 case class bool(value: Boolean) extends Type {
   override def toString: String = value.toString
 
+  override def +(other: Type): Type =
+    other match {
+      case oval: string => string(value.toString + other.toString)
+      case _            => super.+(other)
+    }
   override def !() = bool(!value)
 
   override def ==(other: Type): Type =
@@ -104,6 +109,7 @@ case class int(value: Int) extends Type {
     other match {
       case int(oval)    => int(value + oval)
       case double(oval) => double(value + oval)
+      case oval: string => string(value.toString + other.toString)
       case _            => super.+(other)
     }
 
@@ -175,6 +181,7 @@ case class double(value: Double) extends Type {
     other match {
       case int(oval)    => double(value + oval)
       case double(oval) => double(value + oval)
+      case oval: string => string(value.toString + other.toString)
       case _            => super.+(other)
     }
 

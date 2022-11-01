@@ -34,20 +34,26 @@ trait ControlStmtsVisitor extends BaseVisitor {
     // super.visitFor_range_stmt(ctx)
     val i_name = visit(ctx.ident()).toString
     val old = context.getVar(i_name)
-    var i = visit(ctx.from)
-    val to = visit(ctx.to)
+    var i = if (ctx.T_REVERSE() == null) visit(ctx.from) else visit(ctx.to)
+    val to = if (ctx.T_REVERSE() == null) visit(ctx.to) else visit(ctx.from)
     val step =
       (if (ctx.T_REVERSE() != null) int(-1) else int(1)) * (if (
                                                               ctx.step != null
                                                             ) visit(ctx.step)
                                                             else int(1))
     context.setVar(i_name, i)
-    while (i < to) {
+    while (
+      (ctx.T_REVERSE() == null && i < to) ||
+      (ctx.T_REVERSE() != null && i > to)
+    ) {
       visit(ctx.block())
       i = i + step
       context.setVar(i_name, i)
     }
-    if (i >= to) {
+    if (
+      (ctx.T_REVERSE() == null && i >= to) ||
+      (ctx.T_REVERSE() != null && i <= to)
+    ) {
       context.setVar(i_name, to)
       visit(ctx.block())
     }

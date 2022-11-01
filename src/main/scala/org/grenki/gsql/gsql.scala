@@ -1,4 +1,4 @@
-package org.grenki.gsql
+package org.grenki
 
 import org.antlr.v4.runtime.{CharStreams, CommonTokenStream}
 import org.grenki.gsql.context.Context

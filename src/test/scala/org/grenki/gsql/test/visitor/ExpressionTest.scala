@@ -100,7 +100,45 @@ class ExpressionTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
     val res = context.getVar("res")
     assert(res.isInstanceOf[double])
-    // TODO mb reuslt must by 6.5? 5 / 2 = 2 not 2.5
     assert(res.asInstanceOf[double].value == 8.5)
+  }
+
+  test("Test int + string") {
+    val code =
+      """
+        |set a = 5;
+        |set b = "7.5";
+        |set res = $a + $b;
+                """.stripMargin
+    val context = runMainVisitor(code)
+    val res = context.getVar("res")
+    assert(res.isInstanceOf[string])
+    assert(res.asInstanceOf[string].value == "57.5")
+  }
+
+  test("Test double + string") {
+    val code =
+      """
+        |set a = 5.5;
+        |set b = "gg";
+        |set res = $a + $b;
+                """.stripMargin
+    val context = runMainVisitor(code)
+    val res = context.getVar("res")
+    assert(res.isInstanceOf[string])
+    assert(res.asInstanceOf[string].value == "5.5gg")
+  }
+
+  test("Test bool + string") {
+    val code =
+      """
+        |set a = true;
+        |set b = "gg";
+        |set res = $a + $b;
+                """.stripMargin
+    val context = runMainVisitor(code)
+    val res = context.getVar("res")
+    assert(res.isInstanceOf[string])
+    assert(res.asInstanceOf[string].value == "truegg")
   }
 }

@@ -53,7 +53,8 @@ object Main {
     tokenStream.getNumberOfOnChannelTokens // magic. if we do not do this tokenstream is empty
     val parser = new sql(new CommonTokenStream(lexer))
 
-    val context = new Context(MutMap[String, Engine]("stub" -> new Engine))
+    val context =
+      new Context(MutMap[String, Engine]("stub" -> new Engine), "stub")
 
     new MainVisitor(context, tokenStream).visit(parser.program())
     println(context.variables)

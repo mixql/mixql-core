@@ -85,7 +85,7 @@ class ControlStmtsTest extends MainVisitorBaseTest {
     assert(res.asInstanceOf[string].value == "13579111315171920")
   }
   // TODO this test fails
-  ignore("Test for range reverse") {
+  test("Test for range reverse") {
     val code =
       """
         |set res = "";

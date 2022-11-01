@@ -6,10 +6,21 @@ import org.grenki.gsql.context.gtype._
 
 class StubEngine extends Engine {
   val queue = new Queue[String]()
-
+  var param: (String, Type) = ("" -> string(""))
   override def name: String = "stub"
   override def execute(stmt: String): Type = {
     queue += stmt
     Null
+  }
+
+  override def setParam(name: String, value: Type): Unit = {
+    param = (name -> value)
+  }
+
+  override def getParam(name: String): Type = {
+    if (param._1 == name)
+      param._2
+    else
+      Null
   }
 }

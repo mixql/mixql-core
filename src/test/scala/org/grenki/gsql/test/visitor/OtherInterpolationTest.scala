@@ -9,8 +9,8 @@ class OtherInterpolationTest extends MainVisitorBaseTest {
   test("Test any statement variable interpolation") {
     val code =
       """
-        |set a = 10;
-        |select $a from table where column > 10;
+        |set a.a = 10;
+        |select $a.a from table where column > 10;
                 """.stripMargin
     val context = runMainVisitor(code)
     val query = context.currentEngine.asInstanceOf[StubEngine].queue
