@@ -4,14 +4,14 @@ import org.grenki.gsql.context.gtype._
 
 /** abstract class for execution engine
   */
-class Engine {
+abstract class Engine {
 
   /** engines name
     *
     * @return
     *   name of engine
     */
-  def name: String = "stub"
+  def name: String
 
   /** execute statement engine
     *
@@ -20,10 +20,7 @@ class Engine {
     * @return
     *   the result of exection
     */
-  def execute(stmt: String): Type = {
-    println("execute: " + stmt)
-    Null
-  }
+  def execute(stmt: String): Type
 
   /** set param for engine
     *
@@ -32,7 +29,7 @@ class Engine {
     * @param value
     *   of the param
     */
-  def setParam(name: String, value: Type): Unit = {}
+  def setParam(name: String, value: Type): Unit
 
   /** get engine param value
     *
@@ -41,7 +38,7 @@ class Engine {
     * @return
     *   param value
     */
-  def getParam(name: String): Type = Null
+  def getParam(name: String): Type
 
   def isParam(name: String): Boolean = true
 }

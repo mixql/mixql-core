@@ -7,7 +7,7 @@ class AsciFunctionsTest extends MainVisitorBaseTest {
   test("Test `ascii('') == 0`") {
     val code =
       """
-        |set foo = ascii('');
+        |let foo = ascii('');
         |""".stripMargin
 
     val context = runMainVisitor(code)
@@ -19,7 +19,7 @@ class AsciFunctionsTest extends MainVisitorBaseTest {
   test("Test `ascii('234') == 50`") {
     val code =
       """
-        |set foo = ascii('234');
+        |let foo = ascii('234');
         |""".stripMargin
 
     val context = runMainVisitor(code)

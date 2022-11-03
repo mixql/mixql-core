@@ -7,7 +7,7 @@ class StringFunctionsTest extends MainVisitorBaseTest {
   test("Test `Length('Spark' + ' SQL ')` function") {
     val code =
       """
-        |set foo = Length('Spark' + ' SQL ');
+        |let foo = Length('Spark' + ' SQL ');
         |""".stripMargin
 
     val context = runMainVisitor(code)
@@ -19,7 +19,7 @@ class StringFunctionsTest extends MainVisitorBaseTest {
   test("Test `substr('Spark SQL', 5)`") {
     val code =
       """
-        |set foo = substr('Spark SQL', 5);
+        |let foo = substr('Spark SQL', 5);
         |""".stripMargin
 
     val context = runMainVisitor(code)
@@ -31,7 +31,7 @@ class StringFunctionsTest extends MainVisitorBaseTest {
   test("Test `substr('Spark SQL', -3)`") {
     val code =
       """
-        |set foo = substr('Spark SQL', -3);
+        |let foo = substr('Spark SQL', -3);
         |""".stripMargin
 
     val context = runMainVisitor(code)
@@ -43,7 +43,7 @@ class StringFunctionsTest extends MainVisitorBaseTest {
   test("Test `substring('Spark SQL', 5, 1)`") {
     val code =
       """
-        |set foo = substr('Spark SQL', 5, 1);
+        |let foo = substr('Spark SQL', 5, 1);
         |""".stripMargin
 
     val context = runMainVisitor(code)
@@ -55,7 +55,7 @@ class StringFunctionsTest extends MainVisitorBaseTest {
   test("Test `substring('Spark SQL', -10, 5)`") {
     val code =
       """
-        |set foo = substr('Spark SQL', -10, 5);
+        |let foo = substr('Spark SQL', -10, 5);
         |""".stripMargin
 
     val context = runMainVisitor(code)
@@ -67,7 +67,7 @@ class StringFunctionsTest extends MainVisitorBaseTest {
   test("Test `substring('Spark SQL', -10, 0)`") {
     val code =
       """
-        |set foo = substr('Spark SQL', -10, 0);
+        |let foo = substr('Spark SQL', -10, 0);
         |""".stripMargin
 
     val context = runMainVisitor(code)

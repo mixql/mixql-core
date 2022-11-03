@@ -10,11 +10,23 @@ block:; // main grammar
 interpolation_exp:
     T_INTERP_EXPR expr T_CLOSE_B;
 
+change_engine_stmt:
+     T_LET choose_engine
+     ;
+
+choose_engine:
+     T_ENGINE (expr || ident) T_OPEN_P engine_params? T_CLOSE_P
+     ;
+
+engine_params:
+     ident T_EQUAL expr (T_COMMA ident T_EQUAL expr)*
+     ;
+
 /** print is not case sensitive and should`t be used in expression */
 print_stmt: T_PRINT T_OPEN_P expr T_CLOSE_P;
 
 assigment_stmt:
-      T_SET ident T_COLON? T_EQUAL expr;
+      T_LET ident T_COLON? T_EQUAL expr;
 //    | T_SET ident (T_COMMA ident)* T_COLON? T_EQUAL  expr (T_COMMA expr)*;
 
 if_stmt: T_IF expr T_THEN block elseif_block* else_block? T_END T_IF;

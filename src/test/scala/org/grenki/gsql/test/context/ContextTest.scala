@@ -16,6 +16,17 @@ class ControlStmtsTest extends AnyFunSuite {
     }
   }
 
+  class MyEngine extends Engine {
+    var query: String = ""
+    override def name: String = "MyEngine"
+    override def execute(stmt: String): Type = {
+      query = stmt
+      Null
+    }
+    override def getParam(name: String): Type = Null
+    override def setParam(name: String, value: Type): Unit = {}
+  }
+
   test("Test add var value to context") {
     val context =
       new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
@@ -51,9 +62,6 @@ class ControlStmtsTest extends AnyFunSuite {
   test("Test add engine to context") {
     val context =
       new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
-    class MyEngine extends Engine {
-      override def name: String = "MyEngine"
-    }
     context.addEngine(new MyEngine())
     val e = context.getEngine("MyEngine")
     assert(e != None)
@@ -63,9 +71,6 @@ class ControlStmtsTest extends AnyFunSuite {
   test("Test add engine to context with allias") {
     val context =
       new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
-    class MyEngine extends Engine {
-      override def name: String = "MyEngine"
-    }
     context.addEngine("MyEngine1", new MyEngine())
     context.addEngine("MyEngine2", new MyEngine())
     val e = context.getEngine("MyEngine")
@@ -81,22 +86,16 @@ class ControlStmtsTest extends AnyFunSuite {
   test("Test get engine by class") {
     val context =
       new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
-    class MyEngine extends Engine {
-      override def name: String = "MyTestEngine"
-    }
     context.addEngine(new MyEngine())
     context.addEngine("MyEngine1", new MyEngine())
     val e = context.getEngine[MyEngine]
     assert(e != None)
-    assert(e.get.name == "MyTestEngine")
+    assert(e.get.name == "MyEngine")
   }
 
   test("Test get undefined engine by class") {
     val context =
       new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
-    class MyEngine extends Engine {
-      override def name: String = "MyTestEngine"
-    }
     val e = context.getEngine[MyEngine]
     assert(e == None)
   }
@@ -104,58 +103,16 @@ class ControlStmtsTest extends AnyFunSuite {
   test("Test change current engine") {
     val context =
       new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
-    class MyEngine extends Engine {
-      var query: String = ""
-      override def name: String = "MyTestEngine"
-      override def execute(stmt: String): Type = {
-        query = stmt
-        Null
-      }
-    }
     val e = new MyEngine()
     context.addEngine(e)
-    context.setCurrentEngine("MyTestEngine")
+    context.setCurrentEngine("MyEngine")
     context.execute("select a from b")
     assert(context.currentEngine == e)
     assert(e.query == "select a from b")
     val engine_name = context.getVar("grenki.execution.engine")
-    assert(engine_name.toString == "MyTestEngine")
+    assert(engine_name.toString == "MyEngine")
   }
 
-  test("Test change current engine using grenki.execution.engine param") {
-    val context =
-      new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
-    class MyEngine extends Engine {
-      var query: String = ""
-      override def name: String = "MyTestEngine"
-      override def execute(stmt: String): Type = {
-        query = stmt
-        Null
-      }
-    }
-    val e = new MyEngine()
-    context.addEngine(e)
-    context.setVar("grenki.execution.engine", string("MyTestEngine"))
-    context.execute("select a from b")
-    assert(context.currentEngine == e)
-    assert(e.query == "select a from b")
-    val engine_name = context.getVar("grenki.execution.engine")
-    assert(engine_name.toString == "MyTestEngine")
-  }
-
-  test("Test change engine param") {
-    val context =
-      new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
-    context.setVar("stub.a", int(12))
-    val p = context.getVar("stub.a")
-    assert(p.isInstanceOf[int])
-    assert(p.asInstanceOf[int].value == 12)
-    assert(context.currentEngine.getParam("stub.a").isInstanceOf[int])
-    assert(
-      context.currentEngine.getParam("stub.a").asInstanceOf[int].value == 12
-    )
-  }
-  // TODO params from other engines
   test("Test interpolator") {
     val context =
       new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")

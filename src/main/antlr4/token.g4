@@ -176,6 +176,7 @@ T_LANGUAGE        : L A N G U A G E ;
 T_LATERAL         : L A T E R A L ;
 T_LEAVE           : L E A V E ;
 T_LEFT            : L E F T ;
+T_LET             : L E T ;
 T_LIKE            : L I K E ;
 T_LIMIT           : L I M I T ;
 T_LINES           : L I N E S ;

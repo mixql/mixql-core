@@ -17,10 +17,22 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
   val context = ctx
   val tokenStream = tokens
 
-  override def visitOther_semicolon(ctx: sql.Other_semicolonContext): Type = {
+  override def visitOther_stmt(ctx: sql.Other_stmtContext): Type = {
     context.execute(visit(ctx.other()).toString)
   }
 
+  override def visitChoose_engine(ctx: sql.Choose_engineContext): Type = {
+    if (ctx.expr != null)
+      context.setCurrentEngine(visit(ctx.expr).toString)
+    else
+      context.setCurrentEngine(visit(ctx.ident).toString)
+    if (ctx.engine_params != null)
+      ctx.engine_params.ident.asScala
+        .map(visit)
+        .zip(ctx.engine_params.expr.asScala.map(visit))
+        .foreach(p => context.currentEngine.setParam(p._1.toString, p._2))
+    Null
+  }
   override def visitAssigment_stmt(ctx: sql.Assigment_stmtContext): Type = {
     context.setVar(visit(ctx.ident()).toString, visit(ctx.expr()))
     Null

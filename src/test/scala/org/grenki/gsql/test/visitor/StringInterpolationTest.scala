@@ -9,7 +9,7 @@ class StringInterpolationTest extends MainVisitorBaseTest {
   test("Test set with semicolon") {
     val code =
       """
-        |set foo = 'abc;123';
+        |let foo = 'abc;123';
                 """.stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
@@ -20,7 +20,7 @@ class StringInterpolationTest extends MainVisitorBaseTest {
   test("Test set with space") {
     val code =
       """
-        |set foo = '    abc    ';
+        |let foo = '    abc    ';
                 """.stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
@@ -31,7 +31,7 @@ class StringInterpolationTest extends MainVisitorBaseTest {
   test("Test set with double space") {
     val code =
       """
-        |set foo = '    abc   abc  ';
+        |let foo = '    abc   abc  ';
                 """.stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
@@ -42,7 +42,7 @@ class StringInterpolationTest extends MainVisitorBaseTest {
   test("Test set with string surrounded spaces") {
     val code =
       """
-        |set foo = '    123 abc  ';
+        |let foo = '    123 abc  ';
                 """.stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
@@ -53,7 +53,7 @@ class StringInterpolationTest extends MainVisitorBaseTest {
   test("Test set with space and new line") {
     val code =
       s"""
-         |set foo = '    123 \n   abc  ';
+         |let foo = '    123 \n   abc  ';
                 """.stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
@@ -64,7 +64,7 @@ class StringInterpolationTest extends MainVisitorBaseTest {
   test("Test set with space and new lines") {
     val code =
       s"""
-         |set foo = '\n    123 \n   abc  ';
+         |let foo = '\n    123 \n   abc  ';
                 """.stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
@@ -75,7 +75,7 @@ class StringInterpolationTest extends MainVisitorBaseTest {
   test("Test set with space new lines and tabulation") {
     val code =
       s"""
-         |set foo = '\n    123 \n \t   abc  \n\t';
+         |let foo = '\n    123 \n \t   abc  \n\t';
                 """.stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
@@ -86,7 +86,7 @@ class StringInterpolationTest extends MainVisitorBaseTest {
   test("Test set with space new lines and tabulation 2") {
     val code =
       s"""
-         |set foo = '\t\n    123 \n \t   abc  \n\t';
+         |let foo = '\t\n    123 \n \t   abc  \n\t';
                 """.stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
@@ -97,7 +97,7 @@ class StringInterpolationTest extends MainVisitorBaseTest {
   test("Test set with space new lines and tabulation 3") {
     val code =
       s"""
-         |set foo = "\t\n    123 \n \t   abc  \n\t";
+         |let foo = "\t\n    123 \n \t   abc  \n\t";
                 """.stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
@@ -107,7 +107,7 @@ class StringInterpolationTest extends MainVisitorBaseTest {
 
   test("Test set with space 2") {
     val code =
-      "set foo = 'abc cde';".stripMargin
+      "let foo = 'abc cde';".stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
     assert(foo.isInstanceOf[string])
@@ -116,7 +116,7 @@ class StringInterpolationTest extends MainVisitorBaseTest {
 
   test("Test set with space started with new line") {
     val code =
-      "set foo = '\nabc cde';".stripMargin
+      "let foo = '\nabc cde';".stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
     assert(foo.isInstanceOf[string])
@@ -125,7 +125,7 @@ class StringInterpolationTest extends MainVisitorBaseTest {
 
   test("Test set with new lines") {
     val code =
-      "set foo = '\n\n abc\n cde\n\n\n';".stripMargin
+      "let foo = '\n\n abc\n cde\n\n\n';".stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
     assert(foo.isInstanceOf[string])
@@ -134,7 +134,7 @@ class StringInterpolationTest extends MainVisitorBaseTest {
 
   test("Test set with new lines and double quotes") {
     val code =
-      "set foo = \"\n\n abc\n cde\n\n\n\";".stripMargin
+      "let foo = \"\n\n abc\n cde\n\n\n\";".stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
     assert(foo.isInstanceOf[string])
@@ -143,7 +143,7 @@ class StringInterpolationTest extends MainVisitorBaseTest {
 
   test("Test set with new lines and slash quotes") {
     val code =
-      "set foo = `\n\n abc\n cde\n\n\n`;".stripMargin
+      "let foo = `\n\n abc\n cde\n\n\n`;".stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
     assert(foo.isInstanceOf[string])
@@ -152,7 +152,7 @@ class StringInterpolationTest extends MainVisitorBaseTest {
 
   test("Test set with new lines and single quote") {
     val code =
-      "set foo = '\t\n\n abc\n \tcde\n\n\n';".stripMargin
+      "let foo = '\t\n\n abc\n \tcde\n\n\n';".stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
     assert(foo.isInstanceOf[string])
@@ -170,7 +170,7 @@ class StringInterpolationTest extends MainVisitorBaseTest {
 
   test("Test when single quotes contains double quotes") {
     val code =
-      "set foo = '\"';".stripMargin
+      "let foo = '\"';".stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
     assert(foo.isInstanceOf[string])
@@ -179,7 +179,7 @@ class StringInterpolationTest extends MainVisitorBaseTest {
 
   test("Test when double quotes contains two double quotes") {
     val code =
-      "set foo = '\"\"';".stripMargin
+      "let foo = '\"\"';".stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
     assert(foo.isInstanceOf[string])
@@ -188,7 +188,7 @@ class StringInterpolationTest extends MainVisitorBaseTest {
 
   test("Test when double quotes contains single quote") {
     val code =
-      "set foo = \"'\";".stripMargin
+      "let foo = \"'\";".stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
     assert(foo.isInstanceOf[string])
@@ -197,7 +197,7 @@ class StringInterpolationTest extends MainVisitorBaseTest {
 
   test("Test when double quotes contains two single quotes") {
     val code =
-      "set foo = \"''\";".stripMargin
+      "let foo = \"''\";".stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
     assert(foo.isInstanceOf[string])
@@ -206,7 +206,7 @@ class StringInterpolationTest extends MainVisitorBaseTest {
 
   test("Test when slashed quotes contains single quote") {
     val code =
-      "set foo = `'`;".stripMargin
+      "let foo = `'`;".stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
     assert(foo.isInstanceOf[string])
@@ -215,7 +215,7 @@ class StringInterpolationTest extends MainVisitorBaseTest {
 
   test("Test when slashed quotes contains two single quotes") {
     val code =
-      "set foo = `''`;".stripMargin
+      "let foo = `''`;".stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
     assert(foo.isInstanceOf[string])
@@ -225,8 +225,8 @@ class StringInterpolationTest extends MainVisitorBaseTest {
   test("Test set with interpolation") {
     val code =
       """
-        |set v='abc';
-        |set foo = '$v;123';
+        |let v='abc';
+        |let foo = '$v;123';
                 """.stripMargin
     val context = runMainVisitor(code)
 
@@ -238,8 +238,8 @@ class StringInterpolationTest extends MainVisitorBaseTest {
   test("Test set with expression interpolation") {
     val code =
       """
-        |set v='a';
-        |set foo = '${$v+'bc'};123';
+        |let v='a';
+        |let foo = '${$v+'bc'};123';
                 """.stripMargin
     val context = runMainVisitor(code)
 
@@ -251,8 +251,8 @@ class StringInterpolationTest extends MainVisitorBaseTest {
   test("Test set with deep expression interpolation") {
     val code =
       """
-        |set v='a';
-        |set foo = '${'${$v+'b'}'+'c'};123';
+        |let v='a';
+        |let foo = '${'${$v+'b'}'+'c'};123';
                 """.stripMargin
     val context = runMainVisitor(code)
 

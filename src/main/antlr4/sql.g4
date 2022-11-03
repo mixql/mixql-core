@@ -13,15 +13,17 @@ program: statment* EOF;
 block: statment*?;
 
 statment:
-      assigment_stmt T_SEMICOLON
+      change_engine_stmt T_SEMICOLON
+    | assigment_stmt T_SEMICOLON
     | print_stmt T_SEMICOLON
     | expr T_SEMICOLON
     | if_stmt
     | while_stmt
     | for_cursor_stmt
     | for_range_stmt
-    | other_semicolon
+    | other_stmt
     ;
 
-other_semicolon: other T_SEMICOLON;
-other: (var | interpolation_exp | string | T_OPEN_P other T_CLOSE_P | ~(T_DOLLAR))*?;
+other_stmt: other T_SEMICOLON;
+
+other: (var | interpolation_exp | string | T_OPEN_P other T_CLOSE_P | ~(T_DOLLAR))*?; //(T_ON choose_engine)?;

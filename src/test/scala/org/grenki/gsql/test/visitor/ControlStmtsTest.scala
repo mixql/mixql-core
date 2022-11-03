@@ -2,17 +2,23 @@ package org.grenki.gsql.test.visitor
 
 import org.grenki.gsql.test.MainVisitorBaseTest
 import org.grenki.gsql.context.gtype.string
+import org.grenki.gsql.engine.Engine
+import org.grenki.gsql.context.gtype.Type
+import org.grenki.gsql.context.Context
+
+import scala.collection.mutable.{Map => MutMap}
+import org.grenki.gsql.test.stub.StubEngine
 
 class ControlStmtsTest extends MainVisitorBaseTest {
   test("Test if: then") {
     val code =
       """
         |if true != false then
-        |  set res = "if";
+        |  let res = "if";
         |elif false then
-        |  set res = "elif";
+        |  let res = "elif";
         |else
-        |  set res = "else";
+        |  let res = "else";
         |end if
                 """.stripMargin
     val context = runMainVisitor(code)
@@ -25,11 +31,11 @@ class ControlStmtsTest extends MainVisitorBaseTest {
     val code =
       """
         |if false then
-        |  set res = "if";
+        |  let res = "if";
         |elif true then
-        |  set res = "elif";
+        |  let res = "elif";
         |else
-        |  set res = "else";
+        |  let res = "else";
         |end if
                 """.stripMargin
     val context = runMainVisitor(code)
@@ -42,11 +48,11 @@ class ControlStmtsTest extends MainVisitorBaseTest {
     val code =
       """
         |if not true then
-        |  set res = "if";
+        |  let res = "if";
         |elif false == true then
-        |  set res = "elif";
+        |  let res = "elif";
         |else
-        |  set res = "else";
+        |  let res = "else";
         |end if
                 """.stripMargin
     val context = runMainVisitor(code)
@@ -58,11 +64,11 @@ class ControlStmtsTest extends MainVisitorBaseTest {
   test("Test while") {
     val code =
       """
-        |set x = 0;
-        |set res = "";
+        |let x = 0;
+        |let res = "";
         |while $x < 5 do
-        |  set res = $res || $x;
-        |  set x = $x + 1;
+        |  let res = $res || $x;
+        |  let x = $x + 1;
         |end
                 """.stripMargin
     val context = runMainVisitor(code)
@@ -74,9 +80,9 @@ class ControlStmtsTest extends MainVisitorBaseTest {
   test("Test for range") {
     val code =
       """
-        |set res = "";
+        |let res = "";
         |for i in 1..20 step 2 loop
-        |  set res = $res || $i;
+        |  let res = $res || $i;
         |end loop
                 """.stripMargin
     val context = runMainVisitor(code)
@@ -84,18 +90,79 @@ class ControlStmtsTest extends MainVisitorBaseTest {
     assert(res.isInstanceOf[string])
     assert(res.asInstanceOf[string].value == "13579111315171920")
   }
-  // TODO this test fails
+
   test("Test for range reverse") {
     val code =
       """
-        |set res = "";
+        |let res = "";
         |for i in REVERSE 1..20 step 2 loop
-        |  set res = $res || $i;
+        |  let res = $res || $i;
         |end loop
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
     assert(res.isInstanceOf[string])
     assert(res.asInstanceOf[string].value == "20181614121086421")
+  }
+
+  test("Test change engine") {
+    val code =
+      """
+        |let engine "stub" || 1();
+                """.stripMargin
+    class Other extends Engine {
+      override def name: String = "other"
+
+      override def execute(stmt: String): Type = ???
+
+      override def setParam(name: String, value: Type): Unit = ???
+
+      override def getParam(name: String): Type = ???
+
+    }
+    val context = runMainVisitor(
+      code,
+      new Context(
+        MutMap("stub" -> new StubEngine, "stub1" -> new Other),
+        "stub"
+      )
+    )
+
+    assert(context.currentEngine.isInstanceOf[Other])
+    assert(context.currentEngine.name == "other")
+    assert(context.currentEngineAllias == "stub1")
+  }
+
+  test("Test change engine params") {
+    val code =
+      """
+        |let engine stub(spark.execution.memory="16G");
+                """.stripMargin
+    class Other extends Engine {
+      override def name: String = "other"
+
+      override def execute(stmt: String): Type = ???
+
+      override def setParam(name: String, value: Type): Unit = ???
+
+      override def getParam(name: String): Type = ???
+
+    }
+    val context = runMainVisitor(
+      code,
+      new Context(
+        MutMap("stub" -> new StubEngine, "stub1" -> new Other),
+        "stub"
+      )
+    )
+
+    assert(context.currentEngine.isInstanceOf[StubEngine])
+    assert(context.currentEngine.name == "stub")
+    assert(context.currentEngineAllias == "stub")
+    assert(
+      context.currentEngine
+        .getParam("spark.execution.memory")
+        .toString() == "16G"
+    )
   }
 }

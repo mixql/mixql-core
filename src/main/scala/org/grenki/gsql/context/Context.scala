@@ -1,7 +1,7 @@
 package org.grenki.gsql.context
 
 import scala.collection.mutable.{Map => MutMap}
-import org.grenki.gsql.engine.{Engine}
+import org.grenki.gsql.engine.Engine
 import org.grenki.gsql.function.StringFunction
 import org.grenki.gsql.context.gtype._
 import org.grenki.gsql
@@ -144,6 +144,21 @@ class Context(
   def execute(stmt: String): Type =
     currentEngine.execute(stmt)
 
+  /** execute statement on engine
+    *
+    * @param stmt
+    *   statement to execute
+    * @param engine
+    *   engine name to execute
+    * @return
+    *   the result of execution
+    */
+  def execute(stmt: String, engine: String): Type =
+    getEngine(engine) match {
+      case Some(value) => value.execute(stmt) 
+      case None => throw new NoSuchElementException(s"unknown engine $engine") 
+    }
+
   /** set variable value. if key starts with some engines name then this engines
     * param updates by value
     *
@@ -154,8 +169,8 @@ class Context(
     */
   def setVar(key: String, value: Type): Unit = {
     // set current engine param
-    if (currentEngine.isParam(key))
-      currentEngine.setParam(key, value)
+    // if (currentEngine.isParam(key))
+    //  currentEngine.setParam(key, value)
     // set grenki param
     key match {
       case "grenki.execution.engine" => setCurrentEngine(value.toString)
@@ -178,12 +193,7 @@ class Context(
     *   variable value
     */
   def getVar(key: String): Type = {
-    // TODO если текущий движок spark2, мы ставим параметр
-    // затем переключаемся на spark3 и берем параметр то значение будет от spark2
-    variables.getOrElse(key, Null) match {
-      case Null  => currentEngine.getParam(key)
-      case other => other
-    }
+    variables.getOrElse(key, Null)
   }
 
   /** interpolate statement via current context

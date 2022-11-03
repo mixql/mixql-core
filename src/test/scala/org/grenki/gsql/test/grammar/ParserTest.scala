@@ -494,8 +494,8 @@ class ParserTest extends AnyFunSuite {
 
   test("Test parsing `assigment` statment") {
     val code = """
-                |set x = 10;
-                |set y = $x + 12;
+                |let x = 10;
+                |let y = $x + 12;
                 """.stripMargin
     val stmts = getStatments(code)
     assert(stmts.size == 2)
@@ -565,7 +565,7 @@ class ParserTest extends AnyFunSuite {
                 """.stripMargin
     val stmts = getStatments(code)
     assert(stmts.size == 1)
-    val any_coma = stmts.get(0).other_semicolon
+    val any_coma = stmts.get(0).other_stmt
     assert(any_coma != null)
     val any_coma_text = any_coma.getText
     assert(any_coma_text == "selectcolumnfromtablewherecolumn>10;")
@@ -577,7 +577,7 @@ class ParserTest extends AnyFunSuite {
                 """.stripMargin
     val stmts = getStatments(code)
     assert(stmts.size == 1)
-    val any_coma = stmts.get(0).other_semicolon
+    val any_coma = stmts.get(0).other_stmt
     assert(any_coma != null)
     assert(any_coma.other().`var`().size() == 1)
     assert(any_coma.other().interpolation_exp().size() == 0)
@@ -592,7 +592,7 @@ class ParserTest extends AnyFunSuite {
                 """.stripMargin
     val stmts = getStatments(code)
     assert(stmts.size == 1)
-    val any_coma = stmts.get(0).other_semicolon
+    val any_coma = stmts.get(0).other_stmt
     assert(any_coma != null)
     assert(any_coma.other().`var`().size() == 0)
     assert(any_coma.other().interpolation_exp().size() == 1)
@@ -607,7 +607,7 @@ class ParserTest extends AnyFunSuite {
                 """.stripMargin
     val stmts = getStatments(code)
     assert(stmts.size == 1)
-    val any_coma = stmts.get(0).other_semicolon
+    val any_coma = stmts.get(0).other_stmt
     assert(any_coma != null)
     assert(any_coma.other().`var`().size() == 0)
     assert(any_coma.other().interpolation_exp().size() == 0)
@@ -616,5 +616,32 @@ class ParserTest extends AnyFunSuite {
     assert(
       any_coma_text == "select'${$a||' df;df $b'}'fromtablewherecolumn>10;"
     )
+  }
+
+  test("Test parsing `change_engine_stmt` by name") {
+    val code = """
+                |let engine some.engine();
+                """.stripMargin
+    val stmts = getStatments(code)
+    assert(stmts.size == 1)
+    val change_engine_stmt = stmts.get(0).change_engine_stmt
+    assert(change_engine_stmt != null)
+    assert(change_engine_stmt.choose_engine != null)
+    assert(change_engine_stmt.choose_engine.engine_params == null)
+  }
+
+  test("Test parsing `change_engine_stmt` by expr") {
+    val code = """
+                |let engine $engine || 1(
+                |    spark.exec.mem = 1234,
+                |    some.other.param = $wow || 13 
+                |);
+                """.stripMargin
+    val stmts = getStatments(code)
+    assert(stmts.size == 1)
+    val change_engine_stmt = stmts.get(0).change_engine_stmt
+    assert(change_engine_stmt != null)
+    assert(change_engine_stmt.choose_engine != null)
+    assert(change_engine_stmt.choose_engine.engine_params != null)
   }
 }

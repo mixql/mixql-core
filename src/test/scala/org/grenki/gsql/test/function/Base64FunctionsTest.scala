@@ -7,7 +7,7 @@ class Base64FunctionsTest extends MainVisitorBaseTest {
   test("Test `base64('Spark SQL') == 'U3BhcmsgU1FM'`") {
     val code =
       """
-        |set foo = base64('Spark SQL');
+        |let foo = base64('Spark SQL');
         |""".stripMargin
 
     val context = runMainVisitor(code)

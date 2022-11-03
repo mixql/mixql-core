@@ -9,7 +9,7 @@ class OtherInterpolationTest extends MainVisitorBaseTest {
   test("Test any statement variable interpolation") {
     val code =
       """
-        |set a.a = 10;
+        |let a.a = 10;
         |select $a.a from table where column > 10;
                 """.stripMargin
     val context = runMainVisitor(code)
@@ -20,7 +20,7 @@ class OtherInterpolationTest extends MainVisitorBaseTest {
   test("Test other statement expression interpolation") {
     val code =
       """
-        |set a = 10;
+        |let a = 10;
         |select ${$a - 3} from table where column > 10;
                 """.stripMargin
     val context = runMainVisitor(code)
@@ -31,8 +31,8 @@ class OtherInterpolationTest extends MainVisitorBaseTest {
   test("Test other statement string interpolation") {
     val code =
       """
-        |set a = 10;
-        |set b = 'some str';
+        |let a = 10;
+        |let b = 'some str';
         |select '\$${$a || ' df;df $b'}\\' from table where column > 10;
                 """.stripMargin
     val context = runMainVisitor(code)

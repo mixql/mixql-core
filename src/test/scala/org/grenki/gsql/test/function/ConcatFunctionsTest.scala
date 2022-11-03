@@ -7,7 +7,7 @@ class ConcatFunctionsTest extends MainVisitorBaseTest {
   test("Test `concat('Spark', 'SQL') == 'SparkSQL'`") {
     val code =
       """
-        |set foo = concat('Spark', 'SQL');
+        |let foo = concat('Spark', 'SQL');
         |""".stripMargin
 
     val context = runMainVisitor(code)
@@ -19,7 +19,7 @@ class ConcatFunctionsTest extends MainVisitorBaseTest {
   test("Test `concat_ws('|','A','B','C') == 'A|B|C'`") {
     val code =
       """
-        |set foo = concat_ws('|','A','B','C');
+        |let foo = concat_ws('|','A','B','C');
         |""".stripMargin
 
     val context = runMainVisitor(code)
@@ -31,7 +31,7 @@ class ConcatFunctionsTest extends MainVisitorBaseTest {
   test("Test `concat_ws('|','A','B','C',NULL,'D') == 'A|B|C|D'`") {
     val code =
       """
-        |set foo = concat_ws('|','A','B','C',NULL,'D');
+        |let foo = concat_ws('|','A','B','C',NULL,'D');
         |""".stripMargin
 
     val context = runMainVisitor(code)

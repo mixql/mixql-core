@@ -8,9 +8,9 @@ class ExpressionTest extends MainVisitorBaseTest {
   test("Test arithmetic expression") {
     val code =
       """
-        |set a = 0.5;
-        |set b = 1.5;
-        |set res = (($a + $b) * $a) / 2;
+        |let a = 0.5;
+        |let b = 1.5;
+        |let res = (($a + $b) * $a) / 2;
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
@@ -21,9 +21,9 @@ class ExpressionTest extends MainVisitorBaseTest {
   test("Test bool expression") {
     val code =
       """
-        |set a = 12;
-        |set res = $a > 11 and $a <> 12;
-        |set res1 = $a > 11 or $a != 12;
+        |let a = 12;
+        |let res = $a > 11 and $a <> 12;
+        |let res1 = $a > 11 or $a != 12;
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
@@ -38,7 +38,7 @@ class ExpressionTest extends MainVisitorBaseTest {
   test("Test string expression") {
     val code =
       """
-        |set res = 'one' || 2 || true;
+        |let res = 'one' || 2 || true;
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
@@ -49,7 +49,7 @@ class ExpressionTest extends MainVisitorBaseTest {
   test("Test case then expression") {
     val code =
       """
-        |set res = case when 2 >= 1 then -1.5 else 'false' end;
+        |let res = case when 2 >= 1 then -1.5 else 'false' end;
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
@@ -60,7 +60,7 @@ class ExpressionTest extends MainVisitorBaseTest {
   test("Test case else expression") {
     val code =
       """
-        |set res = case when 2 <= 1 then true else 'false' end;
+        |let res = case when 2 <= 1 then true else 'false' end;
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
@@ -93,9 +93,9 @@ class ExpressionTest extends MainVisitorBaseTest {
   test("Test complex expression") {
     val code =
       """
-        |set a = 5;
-        |set b = 7.5;
-        |set res = (10 - $b) + (3.5 - $a / 2) * 4;
+        |let a = 5;
+        |let b = 7.5;
+        |let res = (10 - $b) + (3.5 - $a / 2) * 4;
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
@@ -106,9 +106,9 @@ class ExpressionTest extends MainVisitorBaseTest {
   test("Test int + string") {
     val code =
       """
-        |set a = 5;
-        |set b = "7.5";
-        |set res = $a + $b;
+        |let a = 5;
+        |let b = "7.5";
+        |let res = $a + $b;
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
@@ -119,9 +119,9 @@ class ExpressionTest extends MainVisitorBaseTest {
   test("Test double + string") {
     val code =
       """
-        |set a = 5.5;
-        |set b = "gg";
-        |set res = $a + $b;
+        |let a = 5.5;
+        |let b = "gg";
+        |let res = $a + $b;
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
@@ -132,9 +132,9 @@ class ExpressionTest extends MainVisitorBaseTest {
   test("Test bool + string") {
     val code =
       """
-        |set a = true;
-        |set b = "gg";
-        |set res = $a + $b;
+        |let a = true;
+        |let b = "gg";
+        |let res = $a + $b;
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
