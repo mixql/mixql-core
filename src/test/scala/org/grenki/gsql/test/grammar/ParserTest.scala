@@ -532,7 +532,7 @@ class ParserTest extends AnyFunSuite {
                 |while $x < 5 do
                 |  print($x);
                 |  set x = $x + 1;
-                |end
+                |end while
                 """.stripMargin
     val stmts = getStatments(code)
     assert(stmts.size == 1)
@@ -620,7 +620,7 @@ class ParserTest extends AnyFunSuite {
 
   test("Test parsing `change_engine_stmt` by name") {
     val code = """
-                |let engine some.engine();
+                |let engine some.engine;
                 """.stripMargin
     val stmts = getStatments(code)
     assert(stmts.size == 1)
@@ -643,5 +643,35 @@ class ParserTest extends AnyFunSuite {
     assert(change_engine_stmt != null)
     assert(change_engine_stmt.choose_engine != null)
     assert(change_engine_stmt.choose_engine.engine_params != null)
+  }
+
+  test("Test parsing simple try catch") {
+    val code = """
+                |try
+                | do something;
+                |catch
+                | some other thing;
+                |end
+                """.stripMargin
+    val stmts = getStatments(code)
+    assert(stmts.size == 1)
+    val try_catch_stmt = stmts.get(0).try_catch_stmt
+    assert(try_catch_stmt != null)
+    assert(try_catch_stmt.exc == null)
+  }
+
+  test("Test parsing try catch exception") {
+    val code = """
+                |try
+                | do something;
+                |catch ex then
+                | some other thing;
+                |end
+                """.stripMargin
+    val stmts = getStatments(code)
+    assert(stmts.size == 1)
+    val try_catch_stmt = stmts.get(0).try_catch_stmt
+    assert(try_catch_stmt != null)
+    assert(try_catch_stmt.exc != null)
   }
 }

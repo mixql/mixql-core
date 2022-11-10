@@ -34,7 +34,7 @@ trait BaseVisitor extends sqlBaseVisitor[Type] {
         context.getVar(node.getText().substring(1))
       case token.T_BS_VAR_INTERPOLATION =>
         context.getVar(node.getText().substring(1))
-      case _ => string(node.getText)
+      case _ => string(node.getText())
     }
   }
 

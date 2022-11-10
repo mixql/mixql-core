@@ -3,7 +3,7 @@ package org.grenki.gsql.test.visitor
 import org.grenki.gsql.test.MainVisitorBaseTest
 import org.grenki.gsql.context.gtype.string
 import org.grenki.gsql.engine.Engine
-import org.grenki.gsql.context.gtype.Type
+import org.grenki.gsql.context.gtype._
 import org.grenki.gsql.context.Context
 
 import scala.collection.mutable.{Map => MutMap}
@@ -69,7 +69,7 @@ class ControlStmtsTest extends MainVisitorBaseTest {
         |while $x < 5 do
         |  let res = $res || $x;
         |  let x = $x + 1;
-        |end
+        |end while
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
@@ -108,7 +108,7 @@ class ControlStmtsTest extends MainVisitorBaseTest {
   test("Test change engine") {
     val code =
       """
-        |let engine "stub" || 1();
+        |let engine "stub" || 1;
                 """.stripMargin
     class Other extends Engine {
       override def name: String = "other"
@@ -138,15 +138,8 @@ class ControlStmtsTest extends MainVisitorBaseTest {
       """
         |let engine stub(spark.execution.memory="16G");
                 """.stripMargin
-    class Other extends Engine {
+    class Other extends StubEngine {
       override def name: String = "other"
-
-      override def execute(stmt: String): Type = ???
-
-      override def setParam(name: String, value: Type): Unit = ???
-
-      override def getParam(name: String): Type = ???
-
     }
     val context = runMainVisitor(
       code,
@@ -164,5 +157,76 @@ class ControlStmtsTest extends MainVisitorBaseTest {
         .getParam("spark.execution.memory")
         .toString() == "16G"
     )
+  }
+
+  test("Test run on other engine with params") {
+    val code =
+      """
+        |select gg from wp on engine stub1(spark.execution.memory="16G");
+                """.stripMargin
+    class Other extends StubEngine {
+      var old: Map[String, Type] = Map()
+      param.put("spark.execution.memory", string("8G"))
+      override def name: String = "other"
+      override def execute(stmt: String): Type = {
+        queue += stmt
+        old = param.toMap
+        Null
+      }
+    }
+    val stub1 = new Other
+    val context = runMainVisitor(
+      code,
+      new Context(MutMap("stub" -> new StubEngine, "stub1" -> stub1), "stub")
+    )
+
+    assert(context.currentEngine.isInstanceOf[StubEngine])
+    assert(context.currentEngine.name == "stub")
+    assert(context.currentEngineAllias == "stub")
+    assert(
+      stub1
+        .getParam("spark.execution.memory")
+        .toString() == "8G"
+    )
+    assert(
+      stub1
+        .old("spark.execution.memory")
+        .toString() == "16G"
+    )
+  }
+
+  test("Test try catch") {
+    val code =
+      """
+        |TRY
+        |  select gg from wp;
+        |CATCH ex THEN
+        |  let res = $ex;
+        |  let res_msg = $ex.message;
+        |END
+                """.stripMargin
+
+    class Other extends StubEngine {
+      override def execute(stmt: String): Type = {
+        throw new NullPointerException("hello")
+      }
+    }
+    val context =
+      runMainVisitor(code, new Context(MutMap("stub" -> new Other), "stub"))
+    val res = context.getVar("res")
+    assert(res.isInstanceOf[string])
+    assert(res.asInstanceOf[string].value == "NullPointerException")
+    val res_msg = context.getVar("res_msg")
+    assert(res_msg.isInstanceOf[string])
+    assert(res_msg.asInstanceOf[string].value == "hello")
+
+    context.getVar("ex") match {
+      case Null => assert(true)
+      case _    => assert(false)
+    }
+    context.getVar("ex.message") match {
+      case Null => assert(true)
+      case _    => assert(false)
+    }
   }
 }

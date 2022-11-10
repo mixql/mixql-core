@@ -21,9 +21,10 @@ statment:
     | while_stmt
     | for_cursor_stmt
     | for_range_stmt
+    | try_catch_stmt
     | other_stmt
     ;
 
-other_stmt: other T_SEMICOLON;
+other_stmt: other (T_ON choose_engine)? T_SEMICOLON;
 
-other: (var | interpolation_exp | string | T_OPEN_P other T_CLOSE_P | ~(T_DOLLAR))*?; //(T_ON choose_engine)?;
+other: (var | interpolation_exp | string | T_OPEN_P other T_CLOSE_P | ~(T_DOLLAR))*?;

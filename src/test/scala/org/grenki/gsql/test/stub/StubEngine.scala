@@ -6,7 +6,7 @@ import org.grenki.gsql.context.gtype._
 
 class StubEngine extends Engine {
   val queue = new Queue[String]()
-  var param: MutMap[String, Type] = MutMap()
+  val param: MutMap[String, Type] = MutMap()
   override def name: String = "stub"
   override def execute(stmt: String): Type = {
     queue += stmt

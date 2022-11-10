@@ -8,18 +8,23 @@ other:; // main grammar
 block:; // main grammar
 
 interpolation_exp:
-    T_INTERP_EXPR expr T_CLOSE_B;
+     T_INTERP_EXPR expr T_CLOSE_B
+     ;
+
+try_catch_stmt:
+     T_TRY try_bock=block T_CATCH (exc=ident T_THEN)? catch_block=block T_END
+     ;
 
 change_engine_stmt:
      T_LET choose_engine
      ;
 
 choose_engine:
-     T_ENGINE (expr || ident) T_OPEN_P engine_params? T_CLOSE_P
+     T_ENGINE (ident || expr) engine_params?
      ;
 
 engine_params:
-     ident T_EQUAL expr (T_COMMA ident T_EQUAL expr)*
+     T_OPEN_P ident T_EQUAL expr (T_COMMA ident T_EQUAL expr)* T_CLOSE_P
      ;
 
 /** print is not case sensitive and should`t be used in expression */
@@ -36,7 +41,7 @@ elseif_block: T_ELIF expr T_THEN block;
 else_block: T_ELSE block;
 
 while_stmt :            // WHILE loop statement
-       T_WHILE expr (T_DO | T_LOOP | T_THEN | T_BEGIN) block T_END (T_WHILE | T_LOOP)?
+       T_WHILE expr (T_DO | T_LOOP | T_THEN | T_BEGIN) block T_END (T_WHILE | T_LOOP)
      ;
 
 for_cursor_stmt :       // FOR (cursor) statement
@@ -48,21 +53,21 @@ for_range_stmt :        // FOR (Integer range) statement
      ;
 
 expr: // TODO other expressions if needed
-    T_OPEN_P (expr | other) T_CLOSE_P                   #expr_recurse
-    | expr (T_MUL | T_DIV) expr                         #expr_arithmetic_p1 // first priority
-    | expr (T_SUB | T_ADD) expr                         #expr_arithmetic_p2 // second pririty
-    | expr compare_operator expr                        #expr_compare
-    | expr logical_operator expr                        #expr_logical
-    | T_NOT expr                                        #expr_not
-    | expr T_PIPE expr                                  #expr_concat
-    | T_INTERVAL expr interval_item                     #expr_interval // TODO do we need it?
-    | case_r                                            #expr_case 
-    | ident T_PERCENT (T_ISOPEN | T_FOUND | T_NOTFOUND)       #expr_found // TODO do we need it?
-    | spec_func                                         #expr_spec_func // TODO what functions to add?
-    | func                                              #expr_func
-    | var                                               #expr_var
-    | ident T_OPEN_SB expr T_CLOSE_SB (T_DOT ident)?      #expr_map // TODO do we need it?
-    | literal                                           #expr_literal
+    T_OPEN_P (expr | other (T_ON choose_engine)?) T_CLOSE_P #expr_recurse
+    | expr (T_MUL | T_DIV) expr                             #expr_arithmetic_p1 // first priority
+    | expr (T_SUB | T_ADD) expr                             #expr_arithmetic_p2 // second pririty
+    | expr compare_operator expr                            #expr_compare
+    | expr logical_operator expr                            #expr_logical
+    | T_NOT expr                                            #expr_not
+    | expr T_PIPE expr                                      #expr_concat
+    | T_INTERVAL expr interval_item                         #expr_interval // TODO do we need it?
+    | case_r                                                #expr_case 
+    | ident T_PERCENT (T_ISOPEN | T_FOUND | T_NOTFOUND)     #expr_found // TODO do we need it?
+    | spec_func                                             #expr_spec_func // TODO what functions to add?
+    | func                                                  #expr_func
+    | var                                                   #expr_var
+    | ident T_OPEN_SB expr T_CLOSE_SB (T_DOT ident)?        #expr_map // TODO do we need it?
+    | literal                                               #expr_literal
     ;
 
 logical_operator:
@@ -88,7 +93,7 @@ spec_func :
      | T_COUNT T_OPEN_P (expr | T_MUL) T_CLOSE_P              #exprSpecFuncCount
      ;
 
-case_r : T_CASE expr? (case_when_then)+ (T_ELSE ex_else=expr)? T_END;
+case_r : T_CASE ex_switch=expr? (case_when_then)+ (T_ELSE ex_else=expr)? T_END;
 
 case_when_then: T_WHEN condition=expr T_THEN ex_do=expr;
 

@@ -3,10 +3,11 @@ package org.grenki.gsql.visitor
 import org.antlr.v4.runtime.TokenStream
 import org.antlr.v4.runtime.misc.Interval
 import org.grenki.gsql.context.Context
-import org.grenki.gsql.context.gtype.{Null, Type, int, string}
+import org.grenki.gsql.context.gtype._
 import org.grenki.gsql.function.FunctionInvoker
 import org.grenki.gsql.sql
 
+import scala.util.{Success, Failure}
 import scala.jdk.CollectionConverters._
 
 class MainVisitor(ctx: Context, tokens: TokenStream)
@@ -18,7 +19,11 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
   val tokenStream = tokens
 
   override def visitOther_stmt(ctx: sql.Other_stmtContext): Type = {
-    context.execute(visit(ctx.other()).toString)
+    executeOther(visit(ctx.other).toString, ctx.choose_engine) match {
+      case Success(value) => value
+      case Failure(exception) =>
+        if (context.grenkiErrorSkip) Null else throw exception
+    }
   }
 
   override def visitChoose_engine(ctx: sql.Choose_engineContext): Type = {
@@ -34,7 +39,7 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
     Null
   }
   override def visitAssigment_stmt(ctx: sql.Assigment_stmtContext): Type = {
-    context.setVar(visit(ctx.ident()).toString, visit(ctx.expr()))
+    context.setVar(visit(ctx.ident).toString, visit(ctx.expr))
     Null
   }
 
@@ -55,17 +60,17 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
   }
 
   override def visitVar(ctx: sql.VarContext): Type = {
-    context.getVar(visit(ctx.ident()).toString)
+    context.getVar(visit(ctx.ident).toString)
   }
 
   override def visitInterpolation_exp(
     ctx: sql.Interpolation_expContext
   ): Type = {
-    visit(ctx.expr())
+    visit(ctx.expr)
   }
 
   override def visitPrint_stmt(ctx: sql.Print_stmtContext): Type = {
-    println("[USER PRINT]: " + visit(ctx.expr()).toString)
+    println("[USER PRINT]: " + visit(ctx.expr).toString)
     Null
   }
 
@@ -76,10 +81,8 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
       new Interval(ident.start.getTokenIndex, ident.stop.getTokenIndex)
     )
     // todo: add the implicit cast
-    val params: Seq[Any] = func
-      .expr()
-      .asScala
-      .map(visit(_))
+    val params: Seq[Any] = func.expr.asScala
+      .map(visit)
       .map {
         case Null         => null
         case string(v, q) => v

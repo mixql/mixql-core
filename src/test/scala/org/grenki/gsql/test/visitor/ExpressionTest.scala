@@ -68,6 +68,18 @@ class ExpressionTest extends MainVisitorBaseTest {
     assert(res.asInstanceOf[string].value == "false")
   }
 
+  test("Test case switch expression") {
+    val code =
+      """
+        |let sw = "when";
+        |let res = case $sw when "when" then true else 'false' end;
+                """.stripMargin
+    val context = runMainVisitor(code)
+    val res = context.getVar("res")
+    assert(res.isInstanceOf[bool])
+    assert(res.asInstanceOf[bool].value == true)
+  }
+
   test("Test some java code in expression bracketed") {
     val code =
       """

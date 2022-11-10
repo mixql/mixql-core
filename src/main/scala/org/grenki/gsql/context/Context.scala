@@ -55,6 +55,7 @@ class Context(
 
   var currentEngine: Engine = engines(defaultEngine)
   var currentEngineAllias: String = defaultEngine
+  var grenkiErrorSkip: Boolean = false
 
   private val interpolator = new Interpolator()
 
@@ -155,8 +156,30 @@ class Context(
     */
   def execute(stmt: String, engine: String): Type =
     getEngine(engine) match {
-      case Some(value) => value.execute(stmt) 
-      case None => throw new NoSuchElementException(s"unknown engine $engine") 
+      case Some(value) => value.execute(stmt)
+      case None => throw new NoSuchElementException(s"unknown engine $engine")
+    }
+
+  /** execute statement on engine with specific params
+    *
+    * @param stmt
+    *   statement to execute
+    * @param engine
+    *   engine name to execute
+    * @param params
+    *   params used to execute. old params sets after
+    * @return
+    *   the result of execution
+    */
+  def execute(stmt: String, engine: String, params: Map[String, Type]): Type =
+    getEngine(engine) match {
+      case Some(eng) =>
+        val old = params.keys.map(name => name -> eng.getParam(name)).toMap
+        params.foreach(p => eng.setParam(p._1, p._2))
+        val res = eng.execute(stmt)
+        old.foreach(p => eng.setParam(p._1, p._2))
+        res
+      case None => throw new NoSuchElementException(s"unknown engine $engine")
     }
 
   /** set variable value. if key starts with some engines name then this engines
@@ -173,8 +196,16 @@ class Context(
     //  currentEngine.setParam(key, value)
     // set grenki param
     key match {
-      case "grenki.execution.engine" => setCurrentEngine(value.toString)
-      case _                         =>
+      case "grenki.execution.engine" =>
+        setCurrentEngine(value.toString) // WARN as deprecated
+      case "grenki.error.skip" =>
+        value match {
+          case bool(value) => 
+            grenkiErrorSkip = value
+          case _ =>
+            throw new IllegalArgumentException("grenki.error.skip must be bool")
+        }
+      case _ =>
     }
     // set variable value
     value match {

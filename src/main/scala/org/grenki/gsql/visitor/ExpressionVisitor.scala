@@ -3,7 +3,37 @@ package org.grenki.gsql.visitor
 import org.grenki.gsql.context.gtype.{Type, string, Null}
 import org.grenki.gsql.sql
 
+import scala.util.{Try, Success, Failure}
+import scala.jdk.CollectionConverters._
+
 trait ExpressionVisitor extends BaseVisitor {
+
+  def executeOther(stmt: String, engine: sql.Choose_engineContext): Try[Type] =
+    Try {
+      if (engine != null) {
+        // execute on custom engine
+        // get engine name
+        val engineName =
+          if (engine.expr != null)
+            visit(engine.expr).toString
+          else
+            visit(engine.ident).toString
+        if (engine.engine_params != null) {
+          // execute with additional params
+          val params = engine.engine_params.ident.asScala
+            .map(visit(_).toString)
+            .zip(engine.engine_params.expr.asScala.map(visit))
+            .toMap
+          context.execute(stmt, engineName, params)
+        } else {
+          // execute with current params
+          context.execute(stmt, engineName)
+        }
+      } else {
+        // execute on current engine
+        context.execute(stmt)
+      }
+    }
   override def visitExpr_concat(ctx: sql.Expr_concatContext): Type =
     string(visit(ctx.expr(0)).toString + visit(ctx.expr(1)).toString)
 
@@ -12,9 +42,9 @@ trait ExpressionVisitor extends BaseVisitor {
   ): Type = {
     val left = visit(ctx.expr(0))
     val right = visit(ctx.expr(1))
-    if (ctx.T_DIV() != null)
+    if (ctx.T_DIV != null)
       left / right
-    else if (ctx.T_MUL() != null)
+    else if (ctx.T_MUL != null)
       left * right
     else
       throw new IllegalArgumentException("unknown operator")
@@ -25,9 +55,9 @@ trait ExpressionVisitor extends BaseVisitor {
   ): Type = {
     val left = visit(ctx.expr(0))
     val right = visit(ctx.expr(1))
-    if (ctx.T_ADD() != null)
+    if (ctx.T_ADD != null)
       left + right
-    else if (ctx.T_SUB() != null)
+    else if (ctx.T_SUB != null)
       left - right
     else
       throw new IllegalArgumentException("unknown operator")
@@ -37,20 +67,18 @@ trait ExpressionVisitor extends BaseVisitor {
     val left = visit(ctx.expr(0))
     val right = visit(ctx.expr(1))
     if (
-      ctx.compare_operator().T_EQUAL() != null || ctx
-        .compare_operator()
-        .T_EQUAL2() != null
+      ctx.compare_operator.T_EQUAL != null || ctx.compare_operator.T_EQUAL2 != null
     )
       left == right
-    else if (ctx.compare_operator().T_NOTEQUAL() != null)
+    else if (ctx.compare_operator.T_NOTEQUAL != null)
       left != right
-    else if (ctx.compare_operator().T_GREATER() != null)
+    else if (ctx.compare_operator.T_GREATER != null)
       left > right
-    else if (ctx.compare_operator().T_GREATEREQUAL() != null)
+    else if (ctx.compare_operator.T_GREATEREQUAL != null)
       left >= right
-    else if (ctx.compare_operator().T_LESS() != null)
+    else if (ctx.compare_operator.T_LESS != null)
       left < right
-    else if (ctx.compare_operator().T_LESSEQUAL() != null)
+    else if (ctx.compare_operator.T_LESSEQUAL != null)
       left <= right
     else
       throw new IllegalArgumentException("unknown compare operator")
@@ -59,35 +87,40 @@ trait ExpressionVisitor extends BaseVisitor {
   override def visitExpr_logical(ctx: sql.Expr_logicalContext): Type = {
     val left = visit(ctx.expr(0))
     val right = visit(ctx.expr(1))
-    if (ctx.logical_operator().T_OR() != null)
+    if (ctx.logical_operator.T_OR != null)
       left || right
-    else if (ctx.logical_operator().T_AND() != null)
+    else if (ctx.logical_operator.T_AND != null)
       left && right
     else
       throw new IllegalArgumentException("unknown operator")
   }
 
   override def visitExpr_not(ctx: sql.Expr_notContext): Type =
-    visit(ctx.expr()).!()
+    visit(ctx.expr).!()
 
   override def visitExpr_recurse(ctx: sql.Expr_recurseContext): Type =
-    if (ctx.expr() != null)
-      visit(ctx.expr())
-    else if (ctx.other() != null)
-      context.currentEngine.execute(visit(ctx.other()).toString())
+    if (ctx.expr != null)
+      visit(ctx.expr)
+    else if (ctx.other != null)
+      executeOther(visit(ctx.other).toString, ctx.choose_engine) match {
+        case Success(value) => value
+        case Failure(exception) =>
+          if (context.grenkiErrorSkip) Null else throw exception
+      }
     else
       throw new IllegalArgumentException("unknown operator")
 
   override def visitExpr_case(ctx: sql.Expr_caseContext): Type = {
-    // TODO ctx.case_r().expr() - what is it
-    ctx
-      .case_r()
-      .case_when_then()
+    ctx.case_r.case_when_then
       .forEach(case_r => {
-        val condition: Boolean = visit(case_r.condition)
+        val condition: Boolean =
+          if (ctx.case_r.ex_switch != null)
+            visit(ctx.case_r.ex_switch) == visit(case_r.condition)
+          else
+            visit(case_r.condition)
         if (condition) return visit(case_r.ex_do)
       })
-    if (ctx.case_r().ex_else != null) return visit(ctx.case_r().ex_else)
+    if (ctx.case_r.ex_else != null) return visit(ctx.case_r.ex_else)
     Null // TODO default result if no condition matched (mb exception?)
   }
 }
