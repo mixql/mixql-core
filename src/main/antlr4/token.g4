@@ -32,6 +32,7 @@ T_BINARY_FLOAT    : B I N A R Y '_' F L O A T ;
 T_BINARY_INTEGER  : B I N A R Y '_' I N T E G E R ;
 T_BIT             : B I T ;
 T_BODY            : B O D Y ;
+T_BOOL            : B O O L;
 T_BREAK           : B R E A K ;
 T_BY              : B Y ;
 T_BYTE            : B Y T E ;

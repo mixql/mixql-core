@@ -57,25 +57,33 @@ trait LiteralVisitor extends BaseVisitor {
     visit(ctx.string)
 
   override def visitLiteral_int(ctx: sql.Literal_intContext): Type =
-    if (ctx.int_number.T_SUB != null)
+    if (ctx.int_number.T_SUB)
       int(-ctx.int_number.L_INT.getText.toInt)
     else
       int(ctx.int_number.L_INT.getText.toInt)
 
   override def visitLiteral_double(ctx: sql.Literal_doubleContext): Type =
-    if (ctx.dec_number.T_SUB != null)
+    if (ctx.dec_number.T_SUB)
       double(-ctx.dec_number.L_DEC.getText.toDouble)
     else
       double(ctx.dec_number.L_DEC.getText.toDouble)
 
   override def visitLiteral_bool(ctx: sql.Literal_boolContext): Type =
-    if (ctx.bool_literal.T_FALSE != null)
+    if (ctx.bool_literal.T_FALSE)
       bool(false)
-    else if (ctx.bool_literal.T_TRUE != null)
+    else if (ctx.bool_literal.T_TRUE)
       bool(true)
     else
       throw new IllegalArgumentException("unknown bool literal")
 
   override def visitLiteral_null(ctx: sql.Literal_nullContext): Type =
     Null
+  // TODO
+  override def visitLiteral_current_date(
+    ctx: sql.Literal_current_dateContext
+  ): Type = ???
+  // TODO
+  override def visitLiteral_current_timestamp(
+    ctx: sql.Literal_current_timestampContext
+  ): Type = ???
 }

@@ -200,7 +200,7 @@ class Context(
         setCurrentEngine(value.toString) // WARN as deprecated
       case "grenki.error.skip" =>
         value match {
-          case bool(value) => 
+          case bool(value) =>
             grenkiErrorSkip = value
           case _ =>
             throw new IllegalArgumentException("grenki.error.skip must be bool")

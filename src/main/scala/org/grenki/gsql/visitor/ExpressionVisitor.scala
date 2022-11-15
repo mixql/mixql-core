@@ -1,6 +1,6 @@
 package org.grenki.gsql.visitor
 
-import org.grenki.gsql.context.gtype.{Type, string, Null}
+import org.grenki.gsql.context.gtype._
 import org.grenki.gsql.sql
 
 import scala.util.{Try, Success, Failure}
@@ -10,15 +10,15 @@ trait ExpressionVisitor extends BaseVisitor {
 
   def executeOther(stmt: String, engine: sql.Choose_engineContext): Try[Type] =
     Try {
-      if (engine != null) {
+      if (engine) {
         // execute on custom engine
         // get engine name
         val engineName =
-          if (engine.expr != null)
+          if (engine.expr)
             visit(engine.expr).toString
           else
             visit(engine.ident).toString
-        if (engine.engine_params != null) {
+        if (engine.engine_params) {
           // execute with additional params
           val params = engine.engine_params.ident.asScala
             .map(visit(_).toString)
@@ -42,9 +42,9 @@ trait ExpressionVisitor extends BaseVisitor {
   ): Type = {
     val left = visit(ctx.expr(0))
     val right = visit(ctx.expr(1))
-    if (ctx.T_DIV != null)
+    if (ctx.T_DIV)
       left / right
-    else if (ctx.T_MUL != null)
+    else if (ctx.T_MUL)
       left * right
     else
       throw new IllegalArgumentException("unknown operator")
@@ -55,9 +55,9 @@ trait ExpressionVisitor extends BaseVisitor {
   ): Type = {
     val left = visit(ctx.expr(0))
     val right = visit(ctx.expr(1))
-    if (ctx.T_ADD != null)
+    if (ctx.T_ADD)
       left + right
-    else if (ctx.T_SUB != null)
+    else if (ctx.T_SUB)
       left - right
     else
       throw new IllegalArgumentException("unknown operator")
@@ -66,19 +66,17 @@ trait ExpressionVisitor extends BaseVisitor {
   override def visitExpr_compare(ctx: sql.Expr_compareContext): Type = {
     val left = visit(ctx.expr(0))
     val right = visit(ctx.expr(1))
-    if (
-      ctx.compare_operator.T_EQUAL != null || ctx.compare_operator.T_EQUAL2 != null
-    )
+    if (ctx.compare_operator.T_EQUAL || ctx.compare_operator.T_EQUAL2)
       left == right
-    else if (ctx.compare_operator.T_NOTEQUAL != null)
+    else if (ctx.compare_operator.T_NOTEQUAL)
       left != right
-    else if (ctx.compare_operator.T_GREATER != null)
+    else if (ctx.compare_operator.T_GREATER)
       left > right
-    else if (ctx.compare_operator.T_GREATEREQUAL != null)
+    else if (ctx.compare_operator.T_GREATEREQUAL)
       left >= right
-    else if (ctx.compare_operator.T_LESS != null)
+    else if (ctx.compare_operator.T_LESS)
       left < right
-    else if (ctx.compare_operator.T_LESSEQUAL != null)
+    else if (ctx.compare_operator.T_LESSEQUAL)
       left <= right
     else
       throw new IllegalArgumentException("unknown compare operator")
@@ -87,9 +85,9 @@ trait ExpressionVisitor extends BaseVisitor {
   override def visitExpr_logical(ctx: sql.Expr_logicalContext): Type = {
     val left = visit(ctx.expr(0))
     val right = visit(ctx.expr(1))
-    if (ctx.logical_operator.T_OR != null)
+    if (ctx.logical_operator.T_OR)
       left || right
-    else if (ctx.logical_operator.T_AND != null)
+    else if (ctx.logical_operator.T_AND)
       left && right
     else
       throw new IllegalArgumentException("unknown operator")
@@ -99,9 +97,9 @@ trait ExpressionVisitor extends BaseVisitor {
     visit(ctx.expr).!()
 
   override def visitExpr_recurse(ctx: sql.Expr_recurseContext): Type =
-    if (ctx.expr != null)
+    if (ctx.expr)
       visit(ctx.expr)
-    else if (ctx.other != null)
+    else if (ctx.other)
       executeOther(visit(ctx.other).toString, ctx.choose_engine) match {
         case Success(value) => value
         case Failure(exception) =>
@@ -114,13 +112,43 @@ trait ExpressionVisitor extends BaseVisitor {
     ctx.case_r.case_when_then
       .forEach(case_r => {
         val condition: Boolean =
-          if (ctx.case_r.ex_switch != null)
+          if (ctx.case_r.ex_switch)
             visit(ctx.case_r.ex_switch) == visit(case_r.condition)
           else
             visit(case_r.condition)
         if (condition) return visit(case_r.ex_do)
       })
-    if (ctx.case_r.ex_else != null) return visit(ctx.case_r.ex_else)
+    if (ctx.case_r.ex_else) return visit(ctx.case_r.ex_else)
     Null // TODO default result if no condition matched (mb exception?)
+  }
+
+  override def visitExprSpecFuncCast(ctx: sql.ExprSpecFuncCastContext): Type = {
+    if (ctx.dtype.primitive_type)
+      castPrimitive(visit(ctx.expr), ctx.dtype.primitive_type)
+    else if (ctx.dtype.array_type)
+      throw new UnsupportedOperationException("array types not supported now")
+    else if (ctx.dtype.map_type)
+      throw new UnsupportedOperationException("map types not supported now")
+    else if (ctx.dtype.struct_type)
+      throw new UnsupportedOperationException("struct types not supported now")
+    else if (ctx.dtype.user_defined_type)
+      throw new UnsupportedOperationException(
+        "user defined types not supported now"
+      )
+    else
+      throw new UnsupportedOperationException("unknown type")
+  }
+
+  def castPrimitive(value: Type, to: sql.Primitive_typeContext): Type = {
+    if (to.T_STRING)
+      typeConversion.to_string(value)
+    else if (to.T_INT)
+      typeConversion.to_int(value)
+    else if (to.T_DOUBLE)
+      typeConversion.to_double(value)
+    else if (to.T_BOOL)
+      typeConversion.to_bool(value)
+    else
+      throw new ClassCastException("could not cast to this type")
   }
 }

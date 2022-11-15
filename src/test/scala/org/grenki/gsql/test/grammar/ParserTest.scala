@@ -674,4 +674,22 @@ class ParserTest extends AnyFunSuite {
     assert(try_catch_stmt != null)
     assert(try_catch_stmt.exc != null)
   }
+
+  test("Test parsing cast expression") {
+    val code = """
+                |cast ($a as string);
+                """.stripMargin
+    val stmts = getStatments(code)
+    assert(stmts.size == 1)
+    var expr_stmt = stmts.get(0).expr
+    assert(expr_stmt != null)
+    assert(expr_stmt.isInstanceOf[sql.Expr_spec_funcContext])
+    assert(expr_stmt.asInstanceOf[sql.Expr_spec_funcContext].spec_func != null)
+    assert(
+      expr_stmt
+        .asInstanceOf[sql.Expr_spec_funcContext]
+        .spec_func
+        .isInstanceOf[sql.ExprSpecFuncCastContext]
+    )
+  }
 }

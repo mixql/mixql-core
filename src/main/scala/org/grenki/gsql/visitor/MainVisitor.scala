@@ -27,11 +27,11 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
   }
 
   override def visitChoose_engine(ctx: sql.Choose_engineContext): Type = {
-    if (ctx.expr != null)
+    if (ctx.expr)
       context.setCurrentEngine(visit(ctx.expr).toString)
     else
       context.setCurrentEngine(visit(ctx.ident).toString)
-    if (ctx.engine_params != null)
+    if (ctx.engine_params)
       ctx.engine_params.ident.asScala
         .map(visit)
         .zip(ctx.engine_params.expr.asScala.map(visit))

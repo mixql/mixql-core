@@ -153,4 +153,92 @@ class ExpressionTest extends MainVisitorBaseTest {
     assert(res.isInstanceOf[string])
     assert(res.asInstanceOf[string].value == "truegg")
   }
+
+  test("Test cast to bool") {
+    val code =
+      """
+        |let a1 = "true";
+        |let a2 = 0;
+        |let a3 = 1.0;
+        |let res1 = cast($a1 as bool);
+        |let res2 = cast($a2 as bool);
+        |let res3 = cast($a3 as bool);
+                """.stripMargin
+    val context = runMainVisitor(code)
+    val res1 = context.getVar("res1")
+    assert(res1.isInstanceOf[bool])
+    assert(res1.asInstanceOf[bool].value == true)
+    val res2 = context.getVar("res2")
+    assert(res2.isInstanceOf[bool])
+    assert(res2.asInstanceOf[bool].value == false)
+    val res3 = context.getVar("res3")
+    assert(res3.isInstanceOf[bool])
+    assert(res3.asInstanceOf[bool].value == true)
+  }
+
+  test("Test cast to int") {
+    val code =
+      """
+        |let a1 = true;
+        |let a2 = "12";
+        |let a3 = 1.5;
+        |let res1 = cast($a1 as int);
+        |let res2 = cast($a2 as int);
+        |let res3 = cast($a3 as int);
+                """.stripMargin
+    val context = runMainVisitor(code)
+    val res1 = context.getVar("res1")
+    assert(res1.isInstanceOf[int])
+    assert(res1.asInstanceOf[int].value == 1)
+    val res2 = context.getVar("res2")
+    assert(res2.isInstanceOf[int])
+    assert(res2.asInstanceOf[int].value == 12)
+    val res3 = context.getVar("res3")
+    assert(res3.isInstanceOf[int])
+    assert(res3.asInstanceOf[int].value == 1)
+  }
+
+  test("Test cast to double") {
+    val code =
+      """
+        |let a1 = true;
+        |let a2 = "17.9";
+        |let a3 = 11;
+        |let res1 = cast($a1 as double);
+        |let res2 = cast($a2 as double);
+        |let res3 = cast($a3 as double);
+                """.stripMargin
+    val context = runMainVisitor(code)
+    val res1 = context.getVar("res1")
+    assert(res1.isInstanceOf[double])
+    assert(res1.asInstanceOf[double].value == 1.0)
+    val res2 = context.getVar("res2")
+    assert(res2.isInstanceOf[double])
+    assert(res2.asInstanceOf[double].value == 17.9)
+    val res3 = context.getVar("res3")
+    assert(res3.isInstanceOf[double])
+    assert(res3.asInstanceOf[double].value == 11.0)
+  }
+
+  test("Test cast to string") {
+    val code =
+      """
+        |let a1 = TRUE;
+        |let a2 = 17.9;
+        |let a3 = 11;
+        |let res1 = cast($a1 as string);
+        |let res2 = cast($a2 as string);
+        |let res3 = cast($a3 as string);
+                """.stripMargin
+    val context = runMainVisitor(code)
+    val res1 = context.getVar("res1")
+    assert(res1.isInstanceOf[string])
+    assert(res1.asInstanceOf[string].value == "true")
+    val res2 = context.getVar("res2")
+    assert(res2.isInstanceOf[string])
+    assert(res2.asInstanceOf[string].value == "17.9")
+    val res3 = context.getVar("res3")
+    assert(res3.isInstanceOf[string])
+    assert(res3.asInstanceOf[string].value == "11")
+  }
 }

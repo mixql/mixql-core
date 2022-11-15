@@ -22,6 +22,7 @@ primitive_type :  // Data types
      | T_BINARY_FLOAT
      | T_BINARY_INTEGER
      | T_BIT
+     | T_BOOL
      | T_DATE
      | T_DATETIME
      | T_DEC

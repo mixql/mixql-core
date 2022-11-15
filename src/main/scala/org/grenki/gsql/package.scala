@@ -6,6 +6,13 @@ import org.grenki.gsql.visitor.MainVisitor
 import org.grenki.gsql.token
 
 package object gsql {
+  /** run script on context
+    *
+    * @param script
+    *   to run
+    * @param context
+    *   run on this context
+    */
   def run(script: String, context: Context): Unit = {
     val lexer = new token(CharStreams.fromString(script))
     val tokenStream = new CommonTokenStream(
