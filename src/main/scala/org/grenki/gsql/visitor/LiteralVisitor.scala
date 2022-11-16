@@ -2,6 +2,8 @@ package org.grenki.gsql.visitor
 
 import org.grenki.gsql.context.gtype._
 import org.grenki.gsql.sql
+import java.time.LocalDateTime
+import java.time.LocalDate
 
 trait LiteralVisitor extends BaseVisitor {
 
@@ -78,12 +80,16 @@ trait LiteralVisitor extends BaseVisitor {
 
   override def visitLiteral_null(ctx: sql.Literal_nullContext): Type =
     Null
-  // TODO
+
   override def visitLiteral_current_date(
     ctx: sql.Literal_current_dateContext
-  ): Type = ???
-  // TODO
+  ): Type = {
+    string(LocalDate.now().toString)
+  }
+
   override def visitLiteral_current_timestamp(
     ctx: sql.Literal_current_timestampContext
-  ): Type = ???
+  ): Type = {
+    string(LocalDateTime.now().toString)
+  }
 }

@@ -59,7 +59,8 @@ object Main {
         |print($t);
         |let t="${'1'+ '${$res}'}";
         |print($t);
-        |some end;""".stripMargin
+        |some end;
+        |print(current_timestamp);""".stripMargin
     val context =
       new Context(MutMap[String, Engine]("demo" -> new DemoEngine), "demo")
     run(code, context)

@@ -47,7 +47,7 @@ trait ExpressionVisitor extends BaseVisitor {
     else if (ctx.T_MUL)
       left * right
     else
-      throw new IllegalArgumentException("unknown operator")
+      throw new UnsupportedOperationException("unknown operator")
   }
 
   override def visitExpr_arithmetic_p2(
@@ -60,7 +60,7 @@ trait ExpressionVisitor extends BaseVisitor {
     else if (ctx.T_SUB)
       left - right
     else
-      throw new IllegalArgumentException("unknown operator")
+      throw new UnsupportedOperationException("unknown operator")
   }
 
   override def visitExpr_compare(ctx: sql.Expr_compareContext): Type = {
@@ -79,7 +79,7 @@ trait ExpressionVisitor extends BaseVisitor {
     else if (ctx.compare_operator.T_LESSEQUAL)
       left <= right
     else
-      throw new IllegalArgumentException("unknown compare operator")
+      throw new UnsupportedOperationException("unknown compare operator")
   }
 
   override def visitExpr_logical(ctx: sql.Expr_logicalContext): Type = {
@@ -90,7 +90,7 @@ trait ExpressionVisitor extends BaseVisitor {
     else if (ctx.logical_operator.T_AND)
       left && right
     else
-      throw new IllegalArgumentException("unknown operator")
+      throw new UnsupportedOperationException("unknown operator")
   }
 
   override def visitExpr_not(ctx: sql.Expr_notContext): Type =
@@ -106,14 +106,19 @@ trait ExpressionVisitor extends BaseVisitor {
           if (context.grenkiErrorSkip) Null else throw exception
       }
     else
-      throw new IllegalArgumentException("unknown operator")
+      throw new UnsupportedOperationException("unknown operator")
 
   override def visitExpr_case(ctx: sql.Expr_caseContext): Type = {
+    val switch =
+      if (ctx.case_r.ex_switch)
+        visit(ctx.case_r.ex_switch)
+      else
+        null
     ctx.case_r.case_when_then
       .forEach(case_r => {
         val condition: Boolean =
-          if (ctx.case_r.ex_switch)
-            visit(ctx.case_r.ex_switch) == visit(case_r.condition)
+          if (switch != null)
+            switch == visit(case_r.condition)
           else
             visit(case_r.condition)
         if (condition) return visit(case_r.ex_do)

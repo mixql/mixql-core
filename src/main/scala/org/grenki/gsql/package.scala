@@ -6,6 +6,7 @@ import org.grenki.gsql.visitor.MainVisitor
 import org.grenki.gsql.token
 
 package object gsql {
+
   /** run script on context
     *
     * @param script
