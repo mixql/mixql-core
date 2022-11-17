@@ -87,6 +87,7 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
         case Null         => null
         case string(v, q) => v
         case int(v)       => v
+        case double(v)    => v
       }
       .toSeq
     FunctionInvoker.invoke(context.functions.toMap, funcName, params) match {

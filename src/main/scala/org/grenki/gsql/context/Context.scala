@@ -30,7 +30,8 @@ class Context(
     "concat" -> StringFunction.concat,
     "concat_ws" -> StringFunction.concat_ws,
     "length" -> StringFunction.length,
-    "substr" -> StringFunction.substr
+    "substr" -> StringFunction.substr,
+    "format_number" -> StringFunction.formatNumber
   )
 ) {
 

@@ -47,6 +47,24 @@ class FunctionInvokerTest extends AnyFunSuite {
     }
   }
 
+  val decInt = new (Int => Int) {
+    def apply(num: Int): Int = num - 1
+  }
+
+  val decList = new Object {
+    def apply(ints: Int*): String = {
+      ints.map(_ - 1).mkString(" ")
+    }
+  }
+
+  val decSting = new (String => String) {
+    def apply(str: String): String = str.dropRight(1)
+  }
+
+  val decDouble = new (Double => Double) {
+    def apply(f: Double): Double = f - 1
+  }
+
   val functions: Map[String, Any] = Map.apply(
     "length" -> length,
     "def_arg_func" -> defArgFunc,
@@ -55,7 +73,8 @@ class FunctionInvokerTest extends AnyFunSuite {
     "substr" -> substr,
     "variable_number_of_args" -> variableArgFunc,
     "first_def_arg_and_second_variable_args" -> firstDefArgAndSecondVariableArgFunc,
-    "first_and_second_def_arg_and_third_variable_args" -> firstAndSecondDefArgAndThirdVariableArgFunc
+    "first_and_second_def_arg_and_third_variable_args" -> firstAndSecondDefArgAndThirdVariableArgFunc,
+    "dec" -> List(decInt, decList, decSting, decDouble)
   )
 
   test("Invoke anonymous function") {
@@ -138,5 +157,33 @@ class FunctionInvokerTest extends AnyFunSuite {
     }
 
     assert(thrown.getMessage == "Can't find function `foo`")
+  }
+
+  test("Invoke overloading function[Int]") {
+    val res = FunctionInvoker.invoke(functions, "dec", List(5))
+    assert(res == 4)
+  }
+
+  test("Invoke overloading function[String]") {
+    val res =
+      FunctionInvoker.invoke(functions, "dec", List("abc")).asInstanceOf[String]
+
+    assert(res == "ab")
+  }
+
+  test("Invoke overloading function[Double]") {
+    val res =
+      FunctionInvoker.invoke(functions, "dec", List(1.1)).asInstanceOf[Double]
+
+    assert((res - 0.1) < 0.0000000001)
+  }
+
+  test("Invoke overloading function[List]") {
+    val res =
+      FunctionInvoker
+        .invoke(functions, "dec", List(1, 2, 3))
+        .asInstanceOf[String]
+
+    assert(res == "0 1 2")
   }
 }
