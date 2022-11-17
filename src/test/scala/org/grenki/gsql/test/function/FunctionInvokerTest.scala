@@ -3,6 +3,8 @@ package org.grenki.gsql.test.function
 import org.grenki.gsql.function.FunctionInvoker
 import org.scalatest.funsuite.AnyFunSuite
 
+import scala.collection.Seq
+
 class FunctionInvokerTest extends AnyFunSuite {
 
   val length: Any = new (String => Int) {
@@ -51,9 +53,21 @@ class FunctionInvokerTest extends AnyFunSuite {
     def apply(num: Int): Int = num - 1
   }
 
-  val decList = new Object {
+  val decListOfInt = new Object {
     def apply(ints: Int*): String = {
       ints.map(_ - 1).mkString(" ")
+    }
+  }
+
+  val decListOfString = new Object {
+    def apply(str: String*): String = {
+      str.map(_.dropRight(1)).mkString(" ")
+    }
+  }
+
+  val decListOfListOfString = new Object {
+    def apply(str: Seq[String]*): String = {
+      str.flatMap(x => x.map(y => y.dropRight(1))).mkString(" ")
     }
   }
 
@@ -74,7 +88,7 @@ class FunctionInvokerTest extends AnyFunSuite {
     "variable_number_of_args" -> variableArgFunc,
     "first_def_arg_and_second_variable_args" -> firstDefArgAndSecondVariableArgFunc,
     "first_and_second_def_arg_and_third_variable_args" -> firstAndSecondDefArgAndThirdVariableArgFunc,
-    "dec" -> List(decInt, decList, decSting, decDouble)
+    "dec" -> List(decInt, decListOfInt, decListOfString, decSting, decDouble)
   )
 
   test("Invoke anonymous function") {
@@ -178,12 +192,30 @@ class FunctionInvokerTest extends AnyFunSuite {
     assert((res - 0.1) < 0.0000000001)
   }
 
-  test("Invoke overloading function[List]") {
+  test("Invoke overloading function[List[Int]]") {
     val res =
       FunctionInvoker
         .invoke(functions, "dec", List(1, 2, 3))
         .asInstanceOf[String]
 
     assert(res == "0 1 2")
+  }
+
+  test("Invoke overloading function[List[String]]") {
+    val res =
+      FunctionInvoker
+        .invoke(functions, "dec", List("ab", "cd", "ef"))
+        .asInstanceOf[String]
+
+    assert(res == "a c e")
+  }
+
+  test("Invoke overloading function[List[List[String]]]") {
+    val res =
+      FunctionInvoker
+        .invoke(functions, "dec", List(List("ab", "cd"), List("ef")))
+        .asInstanceOf[String]
+
+    assert(res == "a c e")
   }
 }
