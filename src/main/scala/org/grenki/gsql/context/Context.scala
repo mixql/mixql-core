@@ -2,7 +2,7 @@ package org.grenki.gsql.context
 
 import scala.collection.mutable.{Map => MutMap}
 import org.grenki.gsql.engine.Engine
-import org.grenki.gsql.function.StringFunction
+import org.grenki.gsql.function.{StringFunction, ArrayFunction}
 import org.grenki.gsql.context.gtype._
 import org.grenki.gsql
 
@@ -23,16 +23,19 @@ import scala.reflect.ClassTag
 class Context(
   val engines: MutMap[String, Engine],
   defaultEngine: String,
-  val variables: MutMap[String, Type] = MutMap[String, Type](),
+  variables: MutMap[String, Type] = MutMap[String, Type](),
   val functions: MutMap[String, Any] = MutMap[String, Any](
     "ascii" -> StringFunction.ascii,
     "base64" -> StringFunction.base64,
     "concat" -> StringFunction.concat,
     "concat_ws" -> StringFunction.concat_ws,
     "length" -> StringFunction.length,
-    "substr" -> StringFunction.substr
+    "substr" -> StringFunction.substr,
+    "size" -> ArrayFunction.size
   )
 ) {
+
+  var scope = List[MutMap[String, Type]](variables)
 
   private sealed class Interpolator extends Engine {
 
@@ -58,6 +61,14 @@ class Context(
   var grenkiErrorSkip: Boolean = false
 
   private val interpolator = new Interpolator()
+
+  def push_scope(): Unit = {
+    scope = MutMap[String, Type]() :: scope
+  }
+
+  def pop_scope(): Unit = {
+    scope = scope.tail
+  }
 
   /** Set current engine by name that registered in this context. Throws
     * [[java.util.NoSuchElementException]] if no engine with this name
@@ -210,9 +221,9 @@ class Context(
     // set variable value
     value match {
       case Null =>
-        variables.remove(key)
+        scope.head.remove(key)
       case _ =>
-        variables.put(key, value)
+        scope.head.put(key, value)
     }
   }
 
@@ -224,7 +235,11 @@ class Context(
     *   variable value
     */
   def getVar(key: String): Type = {
-    variables.getOrElse(key, Null)
+    scope.foreach(vars => {
+      val res = variables.getOrElse(key, Null)
+      if (res == Null) {} else return res
+    })
+    Null
   }
 
   /** interpolate statement via current context

@@ -31,8 +31,10 @@ engine_params:
 print_stmt: T_PRINT T_OPEN_P expr T_CLOSE_P;
 
 assigment_stmt:
-      T_LET ident T_COLON? T_EQUAL expr;
-//    | T_SET ident (T_COMMA ident)* T_COLON? T_EQUAL  expr (T_COMMA expr)*;
+       T_LET ident T_COLON? T_EQUAL expr                                        #assigment_default
+     | T_LET ident T_OPEN_SB index=expr T_CLOSE_SB T_COLON? T_EQUAL value=expr  #assigment_by_index
+//    | T_SET ident (T_COMMA ident)* T_COLON? T_EQUAL  expr (T_COMMA expr)*
+     ;
 
 if_stmt: T_IF expr T_THEN block elseif_block* else_block? T_END T_IF;
 
@@ -53,21 +55,21 @@ for_range_stmt :        // FOR (Integer range) statement
      ;
 
 expr: // TODO other expressions if needed
-    T_OPEN_P (expr | other (T_ON choose_engine)?) T_CLOSE_P #expr_recurse
-    | expr (T_MUL | T_DIV) expr                             #expr_arithmetic_p1 // first priority
-    | expr (T_SUB | T_ADD) expr                             #expr_arithmetic_p2 // second pririty
-    | expr compare_operator expr                            #expr_compare
-    | expr logical_operator expr                            #expr_logical
-    | T_NOT expr                                            #expr_not
-    | expr T_PIPE expr                                      #expr_concat
-    | T_INTERVAL expr interval_item                         #expr_interval // TODO do we need it?
-    | case_r                                                #expr_case 
-    | ident T_PERCENT (T_ISOPEN | T_FOUND | T_NOTFOUND)     #expr_found // TODO do we need it?
-    | spec_func                                             #expr_spec_func // TODO what functions to add?
-    | func                                                  #expr_func
-    | var                                                   #expr_var
-    | ident T_OPEN_SB expr T_CLOSE_SB (T_DOT ident)?        #expr_map // TODO do we need it?
-    | literal                                               #expr_literal
+      T_OPEN_P (expr | other (T_ON choose_engine)?) T_CLOSE_P    #expr_recurse
+    | collection=expr T_OPEN_SB index=expr T_CLOSE_SB            #expr_index
+    | expr (T_MUL | T_DIV) expr                                  #expr_arithmetic_p1 // first priority
+    | expr (T_SUB | T_ADD) expr                                  #expr_arithmetic_p2 // second pririty
+    | expr compare_operator expr                                 #expr_compare
+    | expr logical_operator expr                                 #expr_logical
+    | T_NOT expr                                                 #expr_not
+    | expr T_PIPE expr                                           #expr_concat
+    | T_INTERVAL expr interval_item                              #expr_interval // TODO do we need it? if need its literal
+    | case_r                                                     #expr_case 
+    | ident T_PERCENT (T_ISOPEN | T_FOUND | T_NOTFOUND)          #expr_found // TODO do we need it?
+    | spec_func                                                  #expr_spec_func // TODO what functions to add?
+    | func                                                       #expr_func
+    | var                                                        #expr_var
+    | literal                                                    #expr_literal
     ;
 
 logical_operator:
@@ -124,6 +126,7 @@ literal:
      | int_number               #literal_int
      | dec_number               #literal_double
      | bool_literal             #literal_bool
+     | array_literal            #literal_array
      | T_NULL                   #literal_null
      | T_CURRENT_DATE           #literal_current_date
      | T_CURRENT_TIMESTAMP      #literal_current_timestamp
@@ -168,6 +171,10 @@ bool_literal :                            // Boolean literal
      | T_FALSE
      ;
 
+array_literal:
+       T_OPEN_SB (expr (T_COMMA expr)*)? T_CLOSE_SB
+     ;
+
 non_reserved_words :                      // Tokens that are not reserved words and can be used as identifiers
        T_ACTION
      | T_ACTIVITY_COUNT
@@ -201,7 +208,7 @@ non_reserved_words :                      // Tokens that are not reserved words 
      | T_CASCADE
      | T_CASE
      | T_CASESPECIFIC
-     | T_CAST
+//     | T_CAST
      | T_CHAR
      | T_CHARACTER
      | T_CHARSET
@@ -279,7 +286,7 @@ non_reserved_words :                      // Tokens that are not reserved words 
      | T_EXPLODE
      | T_EXIT
      | T_FALLBACK
-     | T_FALSE
+//     | T_FALSE
      | T_FETCH
      | T_FIELDS
      | T_FILE
@@ -287,7 +294,7 @@ non_reserved_words :                      // Tokens that are not reserved words 
      | T_FIRST
      | T_FIRST_VALUE
      | T_FLOAT
-     | T_FOR
+//     | T_FOR
      | T_FOREIGN
      | T_FORMAT
      | T_FOUND
@@ -306,7 +313,7 @@ non_reserved_words :                      // Tokens that are not reserved words 
      | T_HIVE
      | T_HOST
      | T_IDENTITY
-     | T_IF
+//     | T_IF
      | T_IGNORE
      | T_IMMEDIATE
      | T_IN
@@ -476,7 +483,7 @@ non_reserved_words :                      // Tokens that are not reserved words 
      | T_TOP
      | T_TRANSACTION
      | T_TRIM
-     | T_TRUE
+//     | T_TRUE
      | T_TRUNCATE
      | T_TYPE
      // T_UNION reserved word
@@ -496,7 +503,7 @@ non_reserved_words :                      // Tokens that are not reserved words 
      | T_VOLATILE
      // T_WHEN reserved word
      // T_WHERE reserved word
-     | T_WHILE
+//     | T_WHILE
      | T_WITH
      | T_WITHOUT
      | T_WORK

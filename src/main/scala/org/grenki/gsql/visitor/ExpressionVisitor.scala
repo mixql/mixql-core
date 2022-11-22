@@ -2,6 +2,8 @@ package org.grenki.gsql.visitor
 
 import org.grenki.gsql.context.gtype._
 import org.grenki.gsql.sql
+import org.grenki.gsql.function.FunctionInvoker
+import org.antlr.v4.runtime.misc.Interval
 
 import scala.util.{Try, Success, Failure}
 import scala.jdk.CollectionConverters._
@@ -125,6 +127,39 @@ trait ExpressionVisitor extends BaseVisitor {
       })
     if (ctx.case_r.ex_else) return visit(ctx.case_r.ex_else)
     Null // TODO default result if no condition matched (mb exception?)
+  }
+
+  override def visitExpr_index(ctx: sql.Expr_indexContext): Type = {
+    val col = visit(ctx.collection)
+    col match {
+      case x: collection => x(visit(ctx.index))
+      case _ =>
+        throw new NoSuchMethodException(
+          "only collections supports access by index"
+        )
+    }
+  }
+
+  override def visitExpr_func(ctx: sql.Expr_funcContext): Type = {
+    val funcName = visit(ctx.func.ident(0)).toString
+    // TODO: add the implicit cast
+    val params: Seq[Any] = ctx.func.expr.asScala
+      .map(visit)
+      .map {
+        case Null         => null
+        case string(v, q) => v
+        case int(v)       => v
+        case double(v)    => v
+        case array(v)     => v
+      }
+      .toSeq
+    FunctionInvoker.invoke(context.functions.toMap, funcName, params) match {
+      case p: String  => string(p)
+      case p: Int     => int(p)
+      case p: Double  => double(p)
+      case p: Boolean => bool(p)
+      case other      => string(other.toString)
+    }
   }
 
   override def visitExprSpecFuncCast(ctx: sql.ExprSpecFuncCastContext): Type = {

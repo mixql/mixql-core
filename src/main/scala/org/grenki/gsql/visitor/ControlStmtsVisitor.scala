@@ -49,23 +49,20 @@ trait ControlStmtsVisitor extends BaseVisitor {
     val condition: Boolean = visit(ctx.expr)
     if (condition) {
       visit(ctx.block)
-      return Null
     } else {
       ctx
         .elseif_block()
         .forEach(elif => {
           val elsecondition: Boolean = visit(elif.expr)
           if (elsecondition) {
-            visit(elif.block)
-            return Null
+            return visit(elif.block)
           }
         })
-      if (ctx.else_block) {
+      if (ctx.else_block)
         visit(ctx.else_block.block)
-        return Null
-      }
+      else
+        Null
     }
-    Null
   }
 
   // TODO maybe better realisation using for?

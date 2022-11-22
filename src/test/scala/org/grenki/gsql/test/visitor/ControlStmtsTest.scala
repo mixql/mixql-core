@@ -195,7 +195,7 @@ class ControlStmtsTest extends MainVisitorBaseTest {
     )
   }
 
-  test("Test try catch") {
+  test("Test try/catch") {
     val code =
       """
         |TRY

@@ -5,6 +5,8 @@ import org.grenki.gsql.sql
 import java.time.LocalDateTime
 import java.time.LocalDate
 
+import scala.jdk.CollectionConverters._
+
 trait LiteralVisitor extends BaseVisitor {
 
   override def visitSingle_quotedString(
@@ -91,5 +93,9 @@ trait LiteralVisitor extends BaseVisitor {
     ctx: sql.Literal_current_timestampContext
   ): Type = {
     string(LocalDateTime.now().toString)
+  }
+
+  override def visitLiteral_array(ctx: sql.Literal_arrayContext): Type = {
+    array(ctx.array_literal.expr.asScala.map(visit).toArray)
   }
 }

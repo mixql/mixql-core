@@ -60,10 +60,13 @@ object Main {
         |let t="${'1'+ '${$res}'}";
         |print($t);
         |some end;
-        |print(current_timestamp);""".stripMargin
+        |print(current_timestamp);
+        |let arr = [3, 'gg'];
+        |let arr[0] = 4;
+        |print($arr[0]);""".stripMargin
     val context =
       new Context(MutMap[String, Engine]("demo" -> new DemoEngine), "demo")
     run(code, context)
-    println(context.variables)
+    println(context.scope.head)
   }
 }

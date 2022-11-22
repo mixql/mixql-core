@@ -501,10 +501,16 @@ class ParserTest extends AnyFunSuite {
     assert(stmts.size == 2)
     val assign_stmt1 = stmts.get(0).assigment_stmt
     assert(assign_stmt1 != null)
-    assert(assign_stmt1.expr != null)
+    assert(assign_stmt1.isInstanceOf[sql.Assigment_defaultContext])
+    val assign_stmt1_ctx =
+      assign_stmt1.asInstanceOf[sql.Assigment_defaultContext]
+    assert(assign_stmt1_ctx.expr != null)
     val assign_stmt2 = stmts.get(1).assigment_stmt
     assert(assign_stmt2 != null)
-    assert(assign_stmt2.expr != null)
+    assert(assign_stmt2.isInstanceOf[sql.Assigment_defaultContext])
+    val assign_stmt2_ctx =
+      assign_stmt2.asInstanceOf[sql.Assigment_defaultContext]
+    assert(assign_stmt2_ctx.expr != null)
   }
 
   test("Test parsing `if` statment") {
