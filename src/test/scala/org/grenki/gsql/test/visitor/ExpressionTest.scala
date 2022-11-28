@@ -324,4 +324,17 @@ class ExpressionTest extends MainVisitorBaseTest {
     assert(res2.isInstanceOf[int])
     assert(res2.asInstanceOf[int].value == 1)
   }
+
+  test("Test call lambda") {
+    val code =
+      """
+        |let mysumm = (x, y, z) -> begin $x + $y + $z; end;
+        |let res = mysumm(1, 2, 3);
+                """.stripMargin
+    val context = runMainVisitor(code)
+    val res = context.getVar("res")
+    assert(res.isInstanceOf[int])
+    val i = res.asInstanceOf[int]
+    assert(i.value == 6)
+  }
 }

@@ -85,4 +85,33 @@ package object gtype {
       }
     }
   }
+
+  def isNull(a: Type): Boolean =
+    a match {
+      case Null => true
+      case _    => false
+    }
+
+  def pack(a: Any): Type = {
+    a match {
+      case null        => Null
+      case p: String   => string(p)
+      case p: Int      => int(p)
+      case p: Double   => double(p)
+      case p: Boolean  => bool(p)
+      case p: Seq[Any] => array(p.map(pack).toArray)
+      case other       => string(other.toString)
+    }
+  }
+
+  def unpack(a: Type): Any = {
+    a match {
+      case Null         => null
+      case string(v, q) => v
+      case int(v)       => v
+      case double(v)    => v
+      case bool(v)      => v
+      case array(v)     => v.map(unpack)
+    }
+  }
 }

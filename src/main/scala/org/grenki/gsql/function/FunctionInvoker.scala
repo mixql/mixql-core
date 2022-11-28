@@ -14,6 +14,8 @@ object FunctionInvoker {
       params: Seq[Any] = Nil,
       paramsMap: Map[String, Object] = Map.empty
     ): Any = {
+      if (obj.isInstanceOf[SqlLambda])
+        return obj.asInstanceOf[SqlLambda].apply(params)
       val a = obj.getClass.getMethods.find(_.getName == "apply")
       a match {
         case Some(apply) =>

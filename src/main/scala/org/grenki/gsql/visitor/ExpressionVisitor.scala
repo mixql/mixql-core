@@ -2,6 +2,7 @@ package org.grenki.gsql.visitor
 
 import org.grenki.gsql.context.gtype._
 import org.grenki.gsql.sql
+import org.grenki.gsql.function.SqlLambda
 import org.grenki.gsql.function.FunctionInvoker
 import org.antlr.v4.runtime.misc.Interval
 
@@ -9,7 +10,6 @@ import scala.util.{Try, Success, Failure}
 import scala.jdk.CollectionConverters._
 
 trait ExpressionVisitor extends BaseVisitor {
-
   def executeOther(stmt: String, engine: sql.Choose_engineContext): Try[Type] =
     Try {
       if (engine) {
@@ -36,6 +36,11 @@ trait ExpressionVisitor extends BaseVisitor {
         context.execute(stmt)
       }
     }
+
+  override def visitVar(ctx: sql.VarContext): Type = {
+    context.getVar(visit(ctx.ident).toString)
+  }
+
   override def visitExpr_concat(ctx: sql.Expr_concatContext): Type =
     string(visit(ctx.expr(0)).toString + visit(ctx.expr(1)).toString)
 
@@ -140,26 +145,19 @@ trait ExpressionVisitor extends BaseVisitor {
     }
   }
 
+  override def visitExpr_lambda(ctx: sql.Expr_lambdaContext): Type = {
+    val pNames = ctx.lambda.ident.asScala.map(n => visit(n).toString).toList
+    new SqlLambda(pNames, ctx.lambda.block, this)
+  }
+
   override def visitExpr_func(ctx: sql.Expr_funcContext): Type = {
     val funcName = visit(ctx.func.ident(0)).toString
     // TODO: add the implicit cast
     val params: Seq[Any] = ctx.func.expr.asScala
       .map(visit)
-      .map {
-        case Null         => null
-        case string(v, q) => v
-        case int(v)       => v
-        case double(v)    => v
-        case array(v)     => v
-      }
+      .map(unpack)
       .toSeq
-    FunctionInvoker.invoke(context.functions.toMap, funcName, params) match {
-      case p: String  => string(p)
-      case p: Int     => int(p)
-      case p: Double  => double(p)
-      case p: Boolean => bool(p)
-      case other      => string(other.toString)
-    }
+    pack(FunctionInvoker.invoke(context.functions.toMap, funcName, params))
   }
 
   override def visitExprSpecFuncCast(ctx: sql.ExprSpecFuncCastContext): Type = {

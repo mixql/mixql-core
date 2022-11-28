@@ -6,14 +6,14 @@ import org.grenki.gsql.context.gtype._
   */
 abstract class Engine {
 
-  /** engines name
+  /** engine name
     *
     * @return
     *   name of engine
     */
   def name: String
 
-  /** execute statement engine
+  /** execute statement
     *
     * @param stmt
     *   statement to execute
@@ -40,5 +40,10 @@ abstract class Engine {
     */
   def getParam(name: String): Type
 
+  /** check if it is engine param
+    *
+    * @param name for the param
+    * @return true if param, false if not
+    */
   def isParam(name: String): Boolean = true
 }

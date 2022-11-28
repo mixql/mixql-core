@@ -1,6 +1,7 @@
 package org.grenki.gsql.context.gtype
 
 abstract class Type {
+  var ret = false
   def +(other: Type): Type = throw new UnsupportedOperationException(
     s"type error: ${this.getClass.getSimpleName} + ${other.getClass.getSimpleName} is unsupported"
   )

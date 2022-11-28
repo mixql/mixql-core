@@ -62,10 +62,14 @@ class Context(
 
   private val interpolator = new Interpolator()
 
+  /** add variable scope
+    */
   def push_scope(): Unit = {
     scope = MutMap[String, Type]() :: scope
   }
 
+  /** remove top variable scope
+    */
   def pop_scope(): Unit = {
     scope = scope.tail
   }
@@ -236,8 +240,11 @@ class Context(
     */
   def getVar(key: String): Type = {
     scope.foreach(vars => {
-      val res = variables.getOrElse(key, Null)
-      if (res == Null) {} else return res
+      val res = vars.getOrElse(key, Null)
+      res match {
+        case Null  =>
+        case other => return other
+      }
     })
     Null
   }
@@ -264,6 +271,10 @@ class Context(
     *   of funtion
     * @param function
     */
-  def addFunction(name: String, function: Any): Unit =
-    functions.put(name, function)
+  def addFunction(name: String, function: Any): Unit = {
+    if (functions.contains(name))
+      throw new InstantiationException(s"function $name is already defined")
+    else
+      functions.put(name, function)
+  }
 }

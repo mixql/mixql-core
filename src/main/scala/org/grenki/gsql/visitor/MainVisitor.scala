@@ -4,6 +4,7 @@ import org.antlr.v4.runtime.TokenStream
 import org.antlr.v4.runtime.misc.Interval
 import org.grenki.gsql.context.Context
 import org.grenki.gsql.context.gtype._
+import org.grenki.gsql.function.SqlLambda
 import org.grenki.gsql.sql
 
 import scala.util.{Success, Failure}
@@ -13,34 +14,55 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
     extends ExpressionVisitor
     with LiteralVisitor
     with ControlStmtsVisitor {
-
   val context = ctx
   val tokenStream = tokens
 
-  override def visitOther_stmt(ctx: sql.Other_stmtContext): Type = {
-    executeOther(visit(ctx.other).toString, ctx.choose_engine) match {
-      case Success(value) => value
-      case Failure(exception) =>
-        if (context.grenkiErrorSkip) Null else throw exception
-    }
+  override def visitProgram(ctx: sql.ProgramContext): Type =
+    visit(ctx.block)
+
+  override def visitBlock(ctx: sql.BlockContext): Type = {
+    var res: Type = Null
+    ctx.statment.asScala.foreach(stmt => {
+      res = visit(stmt)
+      if (res.ret)
+        return res
+    })
+    res
   }
 
-  override def visitChoose_engine(ctx: sql.Choose_engineContext): Type = {
-    if (ctx.expr)
-      context.setCurrentEngine(visit(ctx.expr).toString)
+  override def visitReturn_stmt(ctx: sql.Return_stmtContext): Type = {
+    val res = visit(ctx.expr)
+    res.ret = true
+    res
+  }
+
+  override def visitExpr_stmt(ctx: sql.Expr_stmtContext): Type = {
+    visit(ctx.expr)
+  }
+
+  override def visitChange_engine_stmt(
+    ctx: sql.Change_engine_stmtContext
+  ): Type = {
+    if (ctx.choose_engine.expr)
+      context.setCurrentEngine(visit(ctx.choose_engine.expr).toString)
     else
-      context.setCurrentEngine(visit(ctx.ident).toString)
-    if (ctx.engine_params)
-      ctx.engine_params.ident.asScala
+      context.setCurrentEngine(visit(ctx.choose_engine.ident).toString)
+    if (ctx.choose_engine.engine_params)
+      ctx.choose_engine.engine_params.ident.asScala
         .map(visit)
-        .zip(ctx.engine_params.expr.asScala.map(visit))
+        .zip(ctx.choose_engine.engine_params.expr.asScala.map(visit))
         .foreach(p => context.currentEngine.setParam(p._1.toString, p._2))
     Null
   }
+
   override def visitAssigment_default(
     ctx: sql.Assigment_defaultContext
   ): Type = {
-    context.setVar(visit(ctx.ident).toString, visit(ctx.expr))
+    val value = visit(ctx.expr)
+    value match {
+      case v: SqlLambda => context.addFunction(visit(ctx.ident).toString, v)
+      case other => context.setVar(visit(ctx.ident).toString, visit(ctx.expr))
+    }
     Null
   }
 
@@ -56,6 +78,20 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
     }
     Null
   }
+
+  override def visitPrint_stmt(ctx: sql.Print_stmtContext): Type = {
+    println("[USER PRINT]: " + visit(ctx.expr).toString)
+    Null
+  }
+
+  override def visitOther_stmt(ctx: sql.Other_stmtContext): Type = {
+    executeOther(visit(ctx.other).toString, ctx.choose_engine) match {
+      case Success(value) => value
+      case Failure(exception) =>
+        if (context.grenkiErrorSkip) Null else throw exception
+    }
+  }
+
   override def visitOther(ctx: sql.OtherContext): Type = {
     var res = ""
     var from = ctx.start.getTokenIndex
@@ -72,18 +108,9 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
     string(res)
   }
 
-  override def visitVar(ctx: sql.VarContext): Type = {
-    context.getVar(visit(ctx.ident).toString)
-  }
-
-  override def visitInterpolation_exp(
-    ctx: sql.Interpolation_expContext
+  override def visitInterpolation_expr(
+    ctx: sql.Interpolation_exprContext
   ): Type = {
     visit(ctx.expr)
-  }
-
-  override def visitPrint_stmt(ctx: sql.Print_stmtContext): Type = {
-    println("[USER PRINT]: " + visit(ctx.expr).toString)
-    Null
   }
 }

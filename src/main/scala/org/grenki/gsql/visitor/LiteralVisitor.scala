@@ -8,7 +8,6 @@ import java.time.LocalDate
 import scala.jdk.CollectionConverters._
 
 trait LiteralVisitor extends BaseVisitor {
-
   override def visitSingle_quotedString(
     ctx: sql.Single_quotedStringContext
   ): Type =
@@ -30,8 +29,9 @@ trait LiteralVisitor extends BaseVisitor {
       ctx.children.forEach(ch => res += visit(ch).toString)
     string(res, "'")
   }
-  override def visitS_interpolation_exp(
-    ctx: sql.S_interpolation_expContext
+
+  override def visitS_interpolation_expr(
+    ctx: sql.S_interpolation_exprContext
   ): Type =
     visit(ctx.expr)
 
@@ -41,8 +41,9 @@ trait LiteralVisitor extends BaseVisitor {
       ctx.children.forEach(ch => res += visit(ch).toString)
     string(res, "`")
   }
-  override def visitB_interpolation_exp(
-    ctx: sql.B_interpolation_expContext
+
+  override def visitB_interpolation_expr(
+    ctx: sql.B_interpolation_exprContext
   ): Type =
     visit(ctx.expr)
 
@@ -52,8 +53,9 @@ trait LiteralVisitor extends BaseVisitor {
       ctx.children.forEach(ch => res += visit(ch).toString)
     string(res, "\"")
   }
-  override def visitD_interpolation_exp(
-    ctx: sql.D_interpolation_expContext
+
+  override def visitD_interpolation_expr(
+    ctx: sql.D_interpolation_exprContext
   ): Type =
     visit(ctx.expr)
 

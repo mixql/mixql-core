@@ -45,5 +45,4 @@ trait BaseVisitor extends sqlBaseVisitor[Type] {
 
   override def aggregateResult(aggregate: Type, nextResult: Type): Type =
     nextResult
-
 }

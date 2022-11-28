@@ -4,15 +4,12 @@ import org.antlr.v4.runtime.{CharStreams, CommonTokenStream}
 import org.grenki.gsql.context.Context
 import org.grenki.gsql.context.gtype._
 import org.grenki.gsql.engine.Engine
-import org.grenki.gsql.visitor.MainVisitor
-import org.grenki.gsql.token
 import org.grenki.gsql.run
 
 import scala.collection.mutable.{Map => MutMap}
 
 object Main {
   class DemoEngine extends Engine {
-
     override def name: String = "demo"
 
     override def execute(stmt: String): Type = {
@@ -43,7 +40,7 @@ object Main {
         |while $x < 5 do
         |  print($x);
         |  let x = $x + 1;
-        |end
+        |end while
         |for i in 1..20 step 2 loop
         |  print($i);
         |end loop
