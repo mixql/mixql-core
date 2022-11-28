@@ -1,3 +1,3 @@
-# GSQL project
+# Mixql Core
 
-[![codecov](https://codecov.io/gh/mixql/gsql/branch/develop/graph/badge.svg?token=6pvRE15adp)](https://codecov.io/gh/mixql/gsql)
+[![codecov](https://codecov.io/gh/mixql/mixql-core/branch/develop/graph/badge.svg?token=6pvRE15adp)](https://codecov.io/gh/mixql/mixql-core)
