@@ -1,21 +1,23 @@
 package org.grenki.gsql.function
 
 import org.grenki.gsql.context.gtype._
-import org.grenki.gsql.visitor.BaseVisitor
 import org.grenki.gsql.sql.BlockContext
+import org.grenki.gsql.visitor.BaseVisitor
 
-class SqlLambda(paramNames: List[String], 
-                body: BlockContext, 
-                visitor: BaseVisitor) extends Type {
+class SqlLambda(
+  paramNames: List[String],
+  body: BlockContext,
+  visitor: BaseVisitor
+) extends Type {
   def apply(params: Seq[Any]): Any = {
     if (paramNames.size > params.size)
       throw new IllegalArgumentException("not enough arguments")
     else if (paramNames.size < params.size)
       throw new IllegalArgumentException("too many arguments")
     visitor.context.push_scope()
-    paramNames.zip(params).foreach( param =>
-      visitor.context.setVar(param._1, pack(param._2))
-    )
+    paramNames
+      .zip(params)
+      .foreach(param => visitor.context.setVar(param._1, pack(param._2)))
     val res = visitor.visit(body)
     visitor.context.pop_scope()
     unpack(res)
