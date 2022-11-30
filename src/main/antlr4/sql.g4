@@ -7,16 +7,17 @@ import core;
 package org.grenki.gsql;
 }
 
-program: statment* EOF;
+program: block EOF;
 
 /** overwrite */
 block: statment*?;
 
 statment:
-      change_engine_stmt T_SEMICOLON
-    | assigment_stmt T_SEMICOLON
-    | print_stmt T_SEMICOLON
-    | expr T_SEMICOLON
+      change_engine_stmt
+    | assigment_stmt
+    | print_stmt
+    | expr_stmt
+    | return_stmt
     | if_stmt
     | while_stmt
     | for_cursor_stmt
@@ -27,4 +28,6 @@ statment:
 
 other_stmt: other (T_ON choose_engine)? T_SEMICOLON;
 
-other: (var | interpolation_exp | string | T_OPEN_P other T_CLOSE_P | ~(T_DOLLAR))*?;
+other: (var | interpolation_expr | string | T_OPEN_P other T_CLOSE_P | ~(T_DOLLAR))*?;
+
+interpolation_expr: T_INTERP_EXPR expr T_CLOSE_B;

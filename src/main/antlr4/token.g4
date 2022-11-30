@@ -414,6 +414,7 @@ T_SUB          : '-' ;
 T_DOLLAR       : '$' ;
 T_PERCENT      : '%' ;
 T_AND_SUMBOL   : '&' ;
+T_LABMDA       : '->' ;
 
 L_NAME_WITH_ASYNC :
               L_NAME_PART '_' T_ASYNC

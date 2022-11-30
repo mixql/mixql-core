@@ -7,8 +7,8 @@ import types;
 other:; // main grammar
 block:; // main grammar
 
-interpolation_exp:
-     T_INTERP_EXPR expr T_CLOSE_B
+return_stmt:
+     T_RETURN expr T_SEMICOLON
      ;
 
 try_catch_stmt:
@@ -16,7 +16,7 @@ try_catch_stmt:
      ;
 
 change_engine_stmt:
-     T_LET choose_engine
+     T_LET choose_engine T_SEMICOLON
      ;
 
 choose_engine:
@@ -28,11 +28,13 @@ engine_params:
      ;
 
 /** print is not case sensitive and should`t be used in expression */
-print_stmt: T_PRINT T_OPEN_P expr T_CLOSE_P;
+print_stmt: T_PRINT T_OPEN_P expr T_CLOSE_P T_SEMICOLON;
 
 assigment_stmt:
-      T_LET ident T_COLON? T_EQUAL expr;
-//    | T_SET ident (T_COMMA ident)* T_COLON? T_EQUAL  expr (T_COMMA expr)*;
+       T_LET ident T_COLON? T_EQUAL expr T_SEMICOLON                                       #assigment_default
+     | T_LET ident T_OPEN_SB index=expr T_CLOSE_SB T_COLON? T_EQUAL value=expr T_SEMICOLON #assigment_by_index
+//    | T_SET ident (T_COMMA ident)* T_COLON? T_EQUAL  expr (T_COMMA expr)*
+     ;
 
 if_stmt: T_IF expr T_THEN block elseif_block* else_block? T_END T_IF;
 
@@ -45,49 +47,54 @@ while_stmt :            // WHILE loop statement
      ;
 
 for_cursor_stmt :       // FOR (cursor) statement
-       T_FOR L_NAME (T_COMMA L_NAME)* T_IN T_OPEN_P other T_CLOSE_P T_LOOP block T_END T_LOOP
+       T_FOR ident T_IN expr T_LOOP block T_END T_LOOP
      ;
 
 for_range_stmt :        // FOR (Integer range) statement
        T_FOR ident T_IN T_REVERSE? from=expr T_DOT2 to=expr ((T_BY | T_STEP) step=expr)? T_LOOP block T_END T_LOOP
      ;
 
+expr_stmt:
+     expr T_SEMICOLON
+     ;
+     
 expr: // TODO other expressions if needed
-    T_OPEN_P (expr | other (T_ON choose_engine)?) T_CLOSE_P #expr_recurse
-    | expr (T_MUL | T_DIV) expr                             #expr_arithmetic_p1 // first priority
-    | expr (T_SUB | T_ADD) expr                             #expr_arithmetic_p2 // second pririty
-    | expr compare_operator expr                            #expr_compare
-    | expr logical_operator expr                            #expr_logical
-    | T_NOT expr                                            #expr_not
-    | expr T_PIPE expr                                      #expr_concat
-    | T_INTERVAL expr interval_item                         #expr_interval // TODO do we need it?
-    | case_r                                                #expr_case 
-    | ident T_PERCENT (T_ISOPEN | T_FOUND | T_NOTFOUND)     #expr_found // TODO do we need it?
-    | spec_func                                             #expr_spec_func // TODO what functions to add?
-    | func                                                  #expr_func
-    | var                                                   #expr_var
-    | ident T_OPEN_SB expr T_CLOSE_SB (T_DOT ident)?        #expr_map // TODO do we need it?
-    | literal                                               #expr_literal
-    ;
+       lambda                                                    #expr_lambda 
+     | T_OPEN_P (expr | other (T_ON choose_engine)?) T_CLOSE_P   #expr_recurse
+     | collection=expr T_OPEN_SB index=expr T_CLOSE_SB           #expr_index
+     | expr (T_MUL | T_DIV) expr                                 #expr_arithmetic_p1 // first priority
+     | expr (T_SUB | T_ADD) expr                                 #expr_arithmetic_p2 // second pririty
+     | expr compare_operator expr                                #expr_compare
+     | expr logical_operator expr                                #expr_logical
+     | T_NOT expr                                                #expr_not
+     | expr T_PIPE expr                                          #expr_concat
+     | T_INTERVAL expr interval_item                             #expr_interval // TODO do we need it? if need its literal
+     | case_r                                                    #expr_case 
+     | ident T_PERCENT (T_ISOPEN | T_FOUND | T_NOTFOUND)         #expr_found // TODO do we need it?
+     | spec_func                                                 #expr_spec_func // TODO what functions to add?
+     | func                                                      #expr_func
+     | var                                                       #expr_var
+     | literal                                                   #expr_literal
+     ;
 
 logical_operator:
-      T_AND
-    | T_OR
-    | T_STICK
-    | T_AND_SUMBOL
-    ;
+       T_AND
+     | T_OR
+     | T_STICK
+     | T_AND_SUMBOL
+     ;
 
 compare_operator:
-      T_EQUAL
-    | T_NOTEQUAL
-    | T_LESS
-    | T_LESSEQUAL
-    | T_GREATER
-    | T_GREATEREQUAL
-    | T_EQUAL2
-    ;
+       T_EQUAL
+     | T_NOTEQUAL
+     | T_LESS
+     | T_LESSEQUAL
+     | T_GREATER
+     | T_GREATEREQUAL
+     | T_EQUAL2
+     ;
 
-/** functions with special syntax*/
+/** functions with special syntax */
 spec_func :
        T_CAST T_OPEN_P expr T_AS  dtype dtype_len? T_CLOSE_P  #exprSpecFuncCast
      | T_COUNT T_OPEN_P (expr | T_MUL) T_CLOSE_P              #exprSpecFuncCount
@@ -107,7 +114,11 @@ interval_item :
      ;
 
 func:
-     ident T_OPEN_P (ident T_EQUAL)? expr (T_COMMA (ident T_EQUAL)? expr)* T_CLOSE_P (T_OPEN_SB expr T_CLOSE_SB)?
+     ident T_OPEN_P (ident T_EQUAL)? expr (T_COMMA (ident T_EQUAL)? expr)* T_CLOSE_P
+     ;
+
+lambda:
+     T_OPEN_P ident? (T_COMMA ident)* T_CLOSE_P T_LABMDA T_BEGIN block T_END
      ;
 
 var: T_DOLLAR ident;
@@ -124,6 +135,7 @@ literal:
      | int_number               #literal_int
      | dec_number               #literal_double
      | bool_literal             #literal_bool
+     | array_literal            #literal_array
      | T_NULL                   #literal_null
      | T_CURRENT_DATE           #literal_current_date
      | T_CURRENT_TIMESTAMP      #literal_current_timestamp
@@ -136,26 +148,26 @@ string:                                   // String literal (single or double qu
      ;
 
 s_string:
-     (T_SS_ESC | T_SS_VAR_INTERPOLATION | s_interpolation_exp | T_SS_OTHER)*
+     (T_SS_ESC | T_SS_VAR_INTERPOLATION | s_interpolation_expr | T_SS_OTHER)*
      ;
 
-s_interpolation_exp:
+s_interpolation_expr:
      T_SS_EXP_INTERPOLATION expr T_CLOSE_B
      ;
 
 d_string:
-     (T_DS_ESC | T_DS_VAR_INTERPOLATION | d_interpolation_exp | T_DS_OTHER)*
+     (T_DS_ESC | T_DS_VAR_INTERPOLATION | d_interpolation_expr | T_DS_OTHER)*
      ;
 
-d_interpolation_exp:
+d_interpolation_expr:
      T_DS_EXP_INTERPOLATION expr T_CLOSE_B
      ;
 
 b_string:
-     (T_BS_ESC | T_BS_VAR_INTERPOLATION | b_interpolation_exp | T_BS_OTHER)*
+     (T_BS_ESC | T_BS_VAR_INTERPOLATION | b_interpolation_expr | T_BS_OTHER)*
      ;
 
-b_interpolation_exp:
+b_interpolation_expr:
      T_BS_EXP_INTERPOLATION expr T_CLOSE_B
      ;
 
@@ -166,6 +178,10 @@ dec_number: sign=(T_SUB | T_ADD)? L_DEC;
 bool_literal :                            // Boolean literal
        T_TRUE
      | T_FALSE
+     ;
+
+array_literal:
+       T_OPEN_SB (expr (T_COMMA expr)*)? T_CLOSE_SB
      ;
 
 non_reserved_words :                      // Tokens that are not reserved words and can be used as identifiers
@@ -201,7 +217,7 @@ non_reserved_words :                      // Tokens that are not reserved words 
      | T_CASCADE
      | T_CASE
      | T_CASESPECIFIC
-     | T_CAST
+//     | T_CAST
      | T_CHAR
      | T_CHARACTER
      | T_CHARSET
@@ -279,7 +295,7 @@ non_reserved_words :                      // Tokens that are not reserved words 
      | T_EXPLODE
      | T_EXIT
      | T_FALLBACK
-     | T_FALSE
+//     | T_FALSE
      | T_FETCH
      | T_FIELDS
      | T_FILE
@@ -287,7 +303,7 @@ non_reserved_words :                      // Tokens that are not reserved words 
      | T_FIRST
      | T_FIRST_VALUE
      | T_FLOAT
-     | T_FOR
+//     | T_FOR
      | T_FOREIGN
      | T_FORMAT
      | T_FOUND
@@ -306,7 +322,7 @@ non_reserved_words :                      // Tokens that are not reserved words 
      | T_HIVE
      | T_HOST
      | T_IDENTITY
-     | T_IF
+//     | T_IF
      | T_IGNORE
      | T_IMMEDIATE
      | T_IN
@@ -476,7 +492,7 @@ non_reserved_words :                      // Tokens that are not reserved words 
      | T_TOP
      | T_TRANSACTION
      | T_TRIM
-     | T_TRUE
+//     | T_TRUE
      | T_TRUNCATE
      | T_TYPE
      // T_UNION reserved word
@@ -496,7 +512,7 @@ non_reserved_words :                      // Tokens that are not reserved words 
      | T_VOLATILE
      // T_WHEN reserved word
      // T_WHERE reserved word
-     | T_WHILE
+//     | T_WHILE
      | T_WITH
      | T_WITHOUT
      | T_WORK

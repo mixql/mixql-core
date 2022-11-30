@@ -1,12 +1,10 @@
 package org.grenki.gsql.visitor
 
-import org.grenki.gsql.context.gtype.{Type, int, Null}
+import org.grenki.gsql.context.gtype._
 import org.grenki.gsql.sql
 import scala.language.implicitConversions
-import org.grenki.gsql.context.gtype.string
 
 trait ControlStmtsVisitor extends BaseVisitor {
-
   override def visitTry_catch_stmt(ctx: sql.Try_catch_stmtContext): Type = {
     try {
       visit(ctx.try_bock)
@@ -49,23 +47,20 @@ trait ControlStmtsVisitor extends BaseVisitor {
     val condition: Boolean = visit(ctx.expr)
     if (condition) {
       visit(ctx.block)
-      return Null
     } else {
       ctx
         .elseif_block()
         .forEach(elif => {
           val elsecondition: Boolean = visit(elif.expr)
           if (elsecondition) {
-            visit(elif.block)
-            return Null
+            return visit(elif.block)
           }
         })
-      if (ctx.else_block) {
+      if (ctx.else_block)
         visit(ctx.else_block.block)
-        return Null
-      }
+      else
+        Null
     }
-    Null
   }
 
   // TODO maybe better realisation using for?
@@ -95,6 +90,23 @@ trait ControlStmtsVisitor extends BaseVisitor {
       visit(ctx.block)
     }
     context.setVar(i_name, old)
+    Null
+  }
+
+  override def visitFor_cursor_stmt(ctx: sql.For_cursor_stmtContext): Type = {
+    val cursor = visit(ctx.expr)
+    val cursorName = visit(ctx.ident).toString
+    val old = context.getVar(cursorName)
+    cursor match {
+      case array(arr) =>
+        arr.foreach(el => {
+          context.setVar(cursorName, el)
+          visit(ctx.block)
+        })
+      case other =>
+        throw new IllegalArgumentException("cursor must be collection")
+    }
+    context.setVar(cursorName, old)
     Null
   }
 

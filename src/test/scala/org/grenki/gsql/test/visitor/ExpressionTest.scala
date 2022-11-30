@@ -241,4 +241,100 @@ class ExpressionTest extends MainVisitorBaseTest {
     assert(res3.isInstanceOf[string])
     assert(res3.asInstanceOf[string].value == "11")
   }
+
+  test("Test array literal") {
+    val code =
+      """
+        |let res = [TRUE, "gg", 12];
+                """.stripMargin
+    val context = runMainVisitor(code)
+    val res = context.getVar("res")
+    assert(res.isInstanceOf[array])
+    val arr = res.asInstanceOf[array]
+    assert((arr(int(0)) == bool(true)).asInstanceOf[bool].value)
+    assert((arr(int(1)) == string("gg")).asInstanceOf[bool].value)
+    assert((arr(int(2)) == int(12)).asInstanceOf[bool].value)
+  }
+
+  test("Test array get/set by index") {
+    val code =
+      """
+        |let arr = [TRUE, "gg", 12];
+        |let res1 = $arr[0];
+        |let arr[0] = false;
+        |let res2 = $arr[0];
+                """.stripMargin
+    val context = runMainVisitor(code)
+    val res1 = context.getVar("res1")
+    assert(res1.isInstanceOf[bool])
+    assert((res1.asInstanceOf[bool] == bool(true)).asInstanceOf[bool].value)
+    val res2 = context.getVar("res2")
+    assert(res2.isInstanceOf[bool])
+    assert((res2.asInstanceOf[bool] == bool(false)).asInstanceOf[bool].value)
+  }
+
+  test("Test append and prepend value to array") {
+    val code =
+      """
+        |let res = [TRUE, "gg", 12];
+        |let res = $res + "last";
+        |let res = 1 + $res;
+                """.stripMargin
+    val context = runMainVisitor(code)
+    val res = context.getVar("res")
+    assert(res.isInstanceOf[array])
+    val arr = res.asInstanceOf[array]
+    assert((arr.size == int(5)).asInstanceOf[bool].value)
+    assert((arr(int(0)) == int(1)).asInstanceOf[bool].value)
+    assert((arr(int(4)) == string("last")).asInstanceOf[bool].value)
+  }
+
+  test("Test concat 2 arrays") {
+    val code =
+      """
+        |let a1 = [TRUE];
+        |let a2 = [false];
+        |let res = $a1 + $a2;
+                """.stripMargin
+    val context = runMainVisitor(code)
+    val res = context.getVar("res")
+    assert(res.isInstanceOf[array])
+    val arr = res.asInstanceOf[array]
+    assert((arr.size == int(2)).asInstanceOf[bool].value)
+    assert((arr(int(0)) == bool(true)).asInstanceOf[bool].value)
+    assert((arr(int(1)) == bool(false)).asInstanceOf[bool].value)
+  }
+
+  test("Test index priority") {
+    val code =
+      """
+        |let arr1 = [1];
+        |let arr2 = [2];
+        |let res1 = $arr1 + $arr2[0];
+        |let res2 = ($arr1 + $arr2)[0];
+                """.stripMargin
+    val context = runMainVisitor(code)
+    val res1 = context.getVar("res1")
+    assert(res1.isInstanceOf[array])
+    val arr = res1.asInstanceOf[array]
+    assert((arr.size == int(2)).asInstanceOf[bool].value)
+    assert((arr(int(0)) == int(1)).asInstanceOf[bool].value)
+    assert((arr(int(1)) == int(2)).asInstanceOf[bool].value)
+    val res2 = context.getVar("res2")
+    assert(res2.isInstanceOf[int])
+    assert(res2.asInstanceOf[int].value == 1)
+  }
+
+  test("Test call lambda") {
+    val code =
+      """
+        |let mysumm = (x, y, z) -> begin $x + $y + $z; end;
+        |let res = mysumm(1, 2, 3);
+                """.stripMargin
+    val context = runMainVisitor(code)
+    val res = context.getVar("res")
+    assert(res.isInstanceOf[int])
+    val i = res.asInstanceOf[int]
+    assert(i.value == 6)
+  }
 }

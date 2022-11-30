@@ -1,6 +1,7 @@
 package org.grenki
 
 import org.antlr.v4.runtime.{CharStreams, CommonTokenStream}
+import org.grenki.gsql.context.gtype._
 import org.grenki.gsql.context.Context
 import org.grenki.gsql.visitor.MainVisitor
 import org.grenki.gsql.token
@@ -14,7 +15,7 @@ package object gsql {
     * @param context
     *   run on this context
     */
-  def run(script: String, context: Context): Unit = {
+  def run(script: String, context: Context): Type = {
     val lexer = new token(CharStreams.fromString(script))
     val tokenStream = new CommonTokenStream(
       new token(CharStreams.fromString(script))

@@ -1,6 +1,7 @@
 package org.grenki.gsql.context.gtype
 
 abstract class Type {
+  var ret = false
   def +(other: Type): Type = throw new UnsupportedOperationException(
     s"type error: ${this.getClass.getSimpleName} + ${other.getClass.getSimpleName} is unsupported"
   )
@@ -45,7 +46,12 @@ abstract class Type {
 case object Null extends Type {
   override def toString: String = "null"
 
-  // override def +(other: Type): Type = other
+  override def +(other: Type): Type =
+    other match {
+      case array(arr) =>
+        array(this +: arr)
+      case _ => super.+(other)
+    }
 }
 
 case class bool(value: Boolean) extends Type {
@@ -53,7 +59,8 @@ case class bool(value: Boolean) extends Type {
 
   override def +(other: Type): Type =
     other match {
-      case oval: string => string(value.toString + other.toString)
+      case oval: string => string(value.toString + other.toString, oval.quote)
+      case array(arr)   => array(this +: arr)
       case _            => super.+(other)
     }
   override def !() = bool(!value)
@@ -89,7 +96,8 @@ case class int(value: Int) extends Type {
     other match {
       case int(oval)    => int(value + oval)
       case double(oval) => double(value + oval)
-      case oval: string => string(value.toString + other.toString)
+      case oval: string => string(value.toString + other.toString, oval.quote)
+      case array(arr)   => array(this +: arr)
       case _            => super.+(other)
     }
 
@@ -161,7 +169,8 @@ case class double(value: Double) extends Type {
     other match {
       case int(oval)    => double(value + oval)
       case double(oval) => double(value + oval)
-      case oval: string => string(value.toString + other.toString)
+      case array(arr)   => array(this +: arr)
+      case oval: string => string(value.toString + other.toString, oval.quote)
       case _            => super.+(other)
     }
 
@@ -227,9 +236,23 @@ case class double(value: Double) extends Type {
 case class string(value: String, quote: String = "") extends Type {
   override def toString: String = value
 
-  def quoted = quote + value + quote
-  override def +(other: Type): Type =
-    string(value + other.toString)
+  def quoted: String = quote + value + quote
+
+  def asLiteral: String = {
+    val q = if (quote != "") quote else "\""
+    q + value + q
+  }
+  override def +(other: Type): Type = {
+    other match {
+      case string(oval, oq) =>
+        val q = if (quote != "") quote else oq
+        string(value + oval, q)
+      case array(arr) =>
+        array(this +: arr)
+      case oval =>
+        string(value + other.toString, quote)
+    }
+  }
 
   // TODO attention do we need type check?
   override def ==(other: Type): Type =
@@ -238,4 +261,49 @@ case class string(value: String, quote: String = "") extends Type {
   // TODO attention do we need type check?
   override def !=(other: Type): Type =
     bool(value != other.toString)
+}
+
+abstract class collection extends Type {
+  def apply(index: Type): Type
+  def update(index: Type, value: Type): Unit
+  def size: int
+}
+
+case class array(arr: Array[Type]) extends collection {
+  override def toString: String = {
+    arr
+      .map(v => {
+        v match {
+          case str: string => str.asLiteral
+          case other       => other.toString
+        }
+      })
+      .mkString("[", ", ", "]")
+  }
+
+  override def +(other: Type): Type =
+    other match {
+      case array(v) => array(arr ++ v)
+      case obj      => array(arr :+ obj)
+    }
+
+  override def ==(other: Type): Type =
+    other match {
+      case array(other) => bool(arr == other)
+      case _            => bool(false)
+    }
+
+  override def size: int = int(arr.size)
+
+  override def apply(index: Type): Type =
+    index match {
+      case int(i) => arr(i)
+      case _ => throw new IllegalArgumentException("array index must be int")
+    }
+
+  override def update(index: Type, value: Type): Unit =
+    index match {
+      case int(i) => arr.update(i, value)
+      case _ => throw new IllegalArgumentException("array index must be int")
+    }
 }

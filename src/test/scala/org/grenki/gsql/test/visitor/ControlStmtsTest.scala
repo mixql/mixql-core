@@ -5,6 +5,7 @@ import org.grenki.gsql.context.gtype.string
 import org.grenki.gsql.engine.Engine
 import org.grenki.gsql.context.gtype._
 import org.grenki.gsql.context.Context
+import org.grenki.gsql
 
 import scala.collection.mutable.{Map => MutMap}
 import org.grenki.gsql.test.stub.StubEngine
@@ -86,6 +87,8 @@ class ControlStmtsTest extends MainVisitorBaseTest {
         |end loop
                 """.stripMargin
     val context = runMainVisitor(code)
+    val i = context.getVar("i")
+    assert(isNull(i))
     val res = context.getVar("res")
     assert(res.isInstanceOf[string])
     assert(res.asInstanceOf[string].value == "13579111315171920")
@@ -100,9 +103,27 @@ class ControlStmtsTest extends MainVisitorBaseTest {
         |end loop
                 """.stripMargin
     val context = runMainVisitor(code)
+    val i = context.getVar("i")
+    assert(isNull(i))
     val res = context.getVar("res")
     assert(res.isInstanceOf[string])
     assert(res.asInstanceOf[string].value == "20181614121086421")
+  }
+
+  test("Test for in cursor: array") {
+    val code =
+      """
+        |let res = "";
+        |for i in [1, 3, 5] loop
+        |  let res = $res || $i;
+        |end loop
+                """.stripMargin
+    val context = runMainVisitor(code)
+    val i = context.getVar("i")
+    assert(isNull(i))
+    val res = context.getVar("res")
+    assert(res.isInstanceOf[string])
+    assert(res.asInstanceOf[string].value == "135")
   }
 
   test("Test change engine") {
@@ -195,7 +216,7 @@ class ControlStmtsTest extends MainVisitorBaseTest {
     )
   }
 
-  test("Test try catch") {
+  test("Test try/catch") {
     val code =
       """
         |TRY
@@ -220,13 +241,40 @@ class ControlStmtsTest extends MainVisitorBaseTest {
     assert(res_msg.isInstanceOf[string])
     assert(res_msg.asInstanceOf[string].value == "hello")
 
-    context.getVar("ex") match {
-      case Null => assert(true)
-      case _    => assert(false)
-    }
-    context.getVar("ex.message") match {
-      case Null => assert(true)
-      case _    => assert(false)
-    }
+    assert(isNull(context.getVar("ex")))
+    assert(isNull(context.getVar("ex.message")))
+  }
+
+  test("Test return") {
+    val code =
+      """
+        |let x = 1;
+        |let y = 2;
+        |return $x;
+        |return $y;
+        |$x + $y;
+                """.stripMargin
+    val res = gsql.run(
+      code,
+      new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
+    )
+    assert(res.isInstanceOf[int])
+    assert(res.asInstanceOf[int].value == 1)
+  }
+
+  test("Test return from lambda") {
+    val code =
+      """
+        |let test_ret = (x) -> begin 
+        |  return 1;
+        |  return 2;
+        |  1 + 2;
+        |end;
+        |let res = test_ret(1);
+                """.stripMargin
+    val context = runMainVisitor(code)
+    val res = context.getVar("res")
+    assert(res.isInstanceOf[int])
+    assert(res.asInstanceOf[int].value == 1)
   }
 }
