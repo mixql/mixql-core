@@ -31,6 +31,7 @@ class Context(
     "concat_ws" -> StringFunction.concat_ws,
     "length" -> StringFunction.length,
     "substr" -> StringFunction.substr,
+    "format_number" -> StringFunction.formatNumber,
     "size" -> ArrayFunction.size
   )
 ) {

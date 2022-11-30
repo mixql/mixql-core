@@ -15,6 +15,8 @@ lazy val root = (project in file("."))
       "org.scala-lang"           % "scala-reflect"  % "2.13.8",
       "org.apache.logging.log4j" % "log4j-api"      % "2.19.0",
       "org.apache.logging.log4j" % "log4j-core"     % "2.19.0",
+      "org.ow2.asm"              % "asm"            % "9.3",
+      "org.ow2.asm"              % "asm-tree"       % "9.3",
       "org.scalatest"           %% "scalatest"      % "3.1.1" % Test
     ),
     scalacOptions ++= Seq("-feature", "-deprecation")
