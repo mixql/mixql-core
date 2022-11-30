@@ -32,7 +32,8 @@ class Context(
     "length" -> StringFunction.length,
     "substr" -> StringFunction.substr,
     "format_number" -> StringFunction.formatNumber,
-    "size" -> ArrayFunction.size
+    "size" -> ArrayFunction.size,
+    "sort" -> ArrayFunction.sort
   )
 ) {
 

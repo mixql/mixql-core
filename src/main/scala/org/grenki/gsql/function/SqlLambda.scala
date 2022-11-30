@@ -4,12 +4,12 @@ import org.grenki.gsql.context.gtype._
 import org.grenki.gsql.sql.BlockContext
 import org.grenki.gsql.visitor.BaseVisitor
 
-class SqlLambda(
+final class SqlLambda(
   paramNames: List[String],
   body: BlockContext,
   visitor: BaseVisitor
 ) extends Type {
-  def apply(params: Seq[Any]): Any = {
+  def apply(params: Any*): Any = {
     if (paramNames.size > params.size)
       throw new IllegalArgumentException("not enough arguments")
     else if (paramNames.size < params.size)

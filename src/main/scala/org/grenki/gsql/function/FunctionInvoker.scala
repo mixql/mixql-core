@@ -77,7 +77,7 @@ object FunctionInvoker {
     funcName: String
   ): Any = {
     if (obj.isInstanceOf[SqlLambda])
-      return obj.asInstanceOf[SqlLambda].apply(params)
+      return obj.asInstanceOf[SqlLambda].apply(params: _*)
     val a = obj.getClass.getMethods.find(_.getName == "apply")
     a match {
       case Some(apply) =>
@@ -85,7 +85,7 @@ object FunctionInvoker {
         if (pc == params.length)
           apply.invoke(obj, params: _*)
         else {
-          val lb = ListBuffer(params.toArray: _*)
+          val lb = ListBuffer(params.toIndexedSeq: _*)
           for (i <- params.length + 1 to pc) {
             val paramName = apply.getParameters.apply(i - 1).getName
             lb += paramsMap.getOrElse(paramName, getDefParamsFor(obj, i))

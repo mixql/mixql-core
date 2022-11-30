@@ -1,5 +1,7 @@
 package org.grenki.gsql.context
 
+import org.grenki.gsql.function.SqlLambda
+
 package object gtype {
   import scala.language.implicitConversions
 
@@ -94,13 +96,14 @@ package object gtype {
 
   def pack(a: Any): Type = {
     a match {
-      case null        => Null
-      case p: String   => string(p)
-      case p: Int      => int(p)
-      case p: Double   => double(p)
-      case p: Boolean  => bool(p)
-      case p: Seq[Any] => array(p.map(pack).toArray)
-      case other       => string(other.toString)
+      case null          => Null
+      case p: String     => string(p)
+      case p: Int        => int(p)
+      case p: Double     => double(p)
+      case p: Boolean    => bool(p)
+      case p: Array[Any] => array(p.map(pack))
+      case p: SqlLambda  => p
+      case other         => string(other.toString)
     }
   }
 
@@ -112,6 +115,7 @@ package object gtype {
       case double(v)    => v
       case bool(v)      => v
       case array(v)     => v.map(unpack)
+      case v: SqlLambda => v
     }
   }
 }

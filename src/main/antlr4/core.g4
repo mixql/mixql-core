@@ -460,6 +460,7 @@ non_reserved_words :                      // Tokens that are not reserved words 
      | T_SIMPLE_FLOAT
      | T_SMALLDATETIME
      | T_SMALLINT
+     | T_SORT
      | T_SQL
      | T_SQLEXCEPTION
      | T_SQLINSERT
