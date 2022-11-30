@@ -7,8 +7,8 @@ Antlr4 / antlr4GenVisitor := true // default: true
 lazy val root = (project in file("."))
   .enablePlugins(Antlr4Plugin)
   .settings(
-    organization := "org.grenki",
-    name := "gsql",
+    organization := "org.mixql",
+    name := "mixql-core",
     version := "0.1.0-SNAPSHOT",
     libraryDependencies ++= Seq(
       "org.antlr"                % "antlr4-runtime" % "4.8-1",

@@ -4,7 +4,7 @@ options { tokenVocab=token; }
 import core;
 
 @header {
-package org.grenki.gsql;
+package org.mixql.core;
 }
 
 program: block EOF;

@@ -1,7 +1,7 @@
 lexer grammar token;
 
 @header {
-package org.grenki.gsql;
+package org.mixql.core;
 }
 
 T_ACTION          : A C T I O N ;
