@@ -16,7 +16,7 @@ class FormatFunctionTest extends MainVisitorBaseTest {
     assert(foo.value == "12,332.1235")
   }
 
-  test("Test `format_number(12332.123456, '#.###') == '12332.123'`") {
+  ignore("Test `format_number(12332.123456, '#.###') == '12332.123'`") {
     val code =
       """
         |let foo = format_number(12332.123456, '#.###');

@@ -1,6 +1,7 @@
 package org.grenki.gsql.test.function
 
 import org.grenki.gsql.function.FunctionInvoker
+import org.scalatest.Ignore
 import org.scalatest.funsuite.AnyFunSuite
 
 import scala.collection.Seq
@@ -201,7 +202,7 @@ class FunctionInvokerTest extends AnyFunSuite {
     assert(res == "0 1 2")
   }
 
-  test("Invoke overloading function[List[String]]") {
+  ignore("Invoke overloading function[List[String]]") {
     val res =
       FunctionInvoker
         .invoke(functions, "dec", List("ab", "cd", "ef"))
@@ -210,7 +211,7 @@ class FunctionInvokerTest extends AnyFunSuite {
     assert(res == "a c e")
   }
 
-  test("Invoke overloading function[List[List[String]]]") {
+  ignore("Invoke overloading function[List[List[String]]]") {
     val res =
       FunctionInvoker
         .invoke(functions, "dec", List(List("ab", "cd"), List("ef")))
