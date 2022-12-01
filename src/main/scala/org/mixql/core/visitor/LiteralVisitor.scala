@@ -1,7 +1,7 @@
 package org.mixql.core.visitor
 
 import org.mixql.core.context.gtype._
-import org.mixql.core.sql
+import org.mixql.core.parser.sql
 import java.time.LocalDateTime
 import java.time.LocalDate
 

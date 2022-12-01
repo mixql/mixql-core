@@ -1,17 +1,13 @@
 package org.mixql.core.test.visitor
 
 import org.mixql.core.test.MainVisitorBaseTest
-import org.mixql.core.context.gtype.string
-import org.mixql.core.engine.Engine
 import org.mixql.core.context.gtype._
+import org.mixql.core.engine.Engine
 import org.mixql.core.context.Context
 import org.mixql.core
+import org.mixql.core.test.stub.StubEngine
 
 import scala.collection.mutable.{Map => MutMap}
-import org.mixql.core.test.stub.StubEngine
-import org.mixql.core.context.gtype.{Null, Type, int, string}
-import org.mixql.core.engine.Engine
-import org.mixql.core.test.stub.StubEngine
 
 class ControlStmtsTest extends MainVisitorBaseTest {
   test("Test if: then") {

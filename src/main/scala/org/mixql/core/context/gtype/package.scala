@@ -1,7 +1,6 @@
 package org.mixql.core.context
 
 import org.mixql.core.function.SqlLambda
-import org.mixql.core.function.SqlLambda
 
 package object gtype {
   import scala.language.implicitConversions

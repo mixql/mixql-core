@@ -1,6 +1,6 @@
 package org.mixql.core.test.function
 
-import org.mixql.core.context.gtype.{int, string}
+import org.mixql.core.context.gtype._
 import org.mixql.core.test.MainVisitorBaseTest
 
 class AsciFunctionsTest extends MainVisitorBaseTest {

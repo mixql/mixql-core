@@ -2,9 +2,10 @@ package org.mixql.core.test.grammar
 
 import org.scalatest.funsuite.AnyFunSuite
 import org.antlr.v4.runtime.{CharStreams, CommonTokenStream}
-import org.mixql.core.{sql, token}
-import collection.JavaConverters._
+import org.mixql.core.parser.{sql, token}
 import org.mixql.core.test.tag.Grammar
+
+import collection.JavaConverters._
 
 @Grammar
 class ParserTest extends AnyFunSuite {

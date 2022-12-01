@@ -1,6 +1,6 @@
 package org.mixql.core.test.function
 
-import org.mixql.core.context.gtype.string
+import org.mixql.core.context.gtype._
 import org.mixql.core.test.MainVisitorBaseTest
 
 class FormatFunctionTest extends MainVisitorBaseTest {

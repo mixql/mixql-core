@@ -4,7 +4,7 @@ options { tokenVocab=token; }
 import core;
 
 @header {
-package org.mixql.core;
+package org.mixql.core.parser;
 }
 
 program: block EOF;

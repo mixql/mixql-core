@@ -4,12 +4,11 @@ import org.mixql.core.context.gtype._
 import org.mixql.core.context.Context
 import org.mixql.core.engine.Engine
 import org.mixql.core.test.stub.StubEngine
-import org.mixql.core.engine.Engine
 import org.scalatest.funsuite.AnyFunSuite
 
 import scala.collection.mutable.{Map => MutMap}
 
-class ControlStmtsTest extends AnyFunSuite {
+class ContextTest extends AnyFunSuite {
   def isNull(v: Type): Boolean = {
     v match {
       case Null => true

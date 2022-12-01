@@ -1,7 +1,7 @@
 lexer grammar token;
 
 @header {
-package org.mixql.core;
+package org.mixql.core.parser;
 }
 
 T_ACTION          : A C T I O N ;

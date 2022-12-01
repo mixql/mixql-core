@@ -4,7 +4,6 @@ import org.antlr.v4.runtime.{CharStreams, CommonTokenStream}
 import org.mixql.core.context.gtype._
 import org.mixql.core.run
 import org.mixql.core.context.Context
-import org.mixql.core.context.gtype.{Null, Type}
 import org.mixql.core.engine.Engine
 
 import scala.collection.mutable.{Map => MutMap}
