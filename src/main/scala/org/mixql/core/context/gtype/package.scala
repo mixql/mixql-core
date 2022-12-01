@@ -40,9 +40,9 @@ package object gtype {
         case double(value) => value != 0
         case int(value)    => value != 0
         case string(value, _) =>
-          if (value.toLowerCase == "true")
+          if value.toLowerCase == "true" then
             true
-          else if (value.toLowerCase == "false")
+          else if value.toLowerCase == "false" then
             false
           else
             throw new ClassCastException(
@@ -59,7 +59,7 @@ package object gtype {
 
     def to_int(a: Type): int = {
       a match {
-        case bool(value)      => if (value) 1 else 0
+        case bool(value)      => if value then 1 else 0
         case double(value)    => int(value.toInt)
         case value: int       => value
         case string(value, _) => int(value.toInt)
@@ -74,7 +74,7 @@ package object gtype {
 
     def to_double(a: Type): double = {
       a match {
-        case bool(value)      => if (value) 1 else 0
+        case bool(value)      => if value then 1 else 0
         case value: double    => value
         case int(value)       => value.toDouble
         case string(value, _) => value.toDouble

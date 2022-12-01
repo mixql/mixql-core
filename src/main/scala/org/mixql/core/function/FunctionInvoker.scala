@@ -14,7 +14,7 @@ object FunctionInvoker {
       case Some(func) =>
         func match {
           case l: List[_] =>
-            for (f <- l) {
+            for f <- l do {
               val applyMethods =
                 f.getClass.getMethods.filter(x =>
                   // x.getParameters.length != 0 &&
@@ -23,7 +23,7 @@ object FunctionInvoker {
                   ) && x.getName == "apply"
                 )
 
-              if (compareFunctionTypes(applyMethods(0), params)) {
+              if compareFunctionTypes(applyMethods(0), params) then {
                 return invokeFunc(f, params, paramsMap, funcName)
               }
             }
@@ -40,18 +40,18 @@ object FunctionInvoker {
 
   private def compareFunctionTypes(a: Method, paramsSeq: Seq[_]): Boolean = {
     val params = paramsSeq.toArray
-    if (a.getParameters.length != params.length) {
-      if (
+    if a.getParameters.length != params.length then {
+      if
         a.getParameters.last.getType.isAssignableFrom(
           Class.forName("scala.collection.immutable.Seq")
         )
-      ) return true
+      then return true
       else return false
     }
 
     var i = 0
-    for (p <- a.getParameters) {
-      if (!isTypeEquals(p.getType, params(i).getClass)) return false
+    for p <- a.getParameters do {
+      if !isTypeEquals(p.getType, params(i).getClass) then return false
       i += 1
     }
 
@@ -59,7 +59,7 @@ object FunctionInvoker {
   }
 
   private def isTypeEquals(left: Class[_], right: Class[_]): Boolean = {
-    if (left.isPrimitive) {
+    if left.isPrimitive then {
       left.getName match {
         case "int" =>
           return right.getName == "java.lang.Integer"
@@ -76,21 +76,21 @@ object FunctionInvoker {
     paramsMap: Map[String, Object] = Map.empty,
     funcName: String
   ): Any = {
-    if (obj.isInstanceOf[SqlLambda])
+    if obj.isInstanceOf[SqlLambda] then
       return obj.asInstanceOf[SqlLambda].apply(params: _*)
     val a = obj.getClass.getMethods.find(_.getName == "apply")
     a match {
       case Some(apply) =>
         val pc = apply.getParameters.length
-        if (pc == params.length)
+        if pc == params.length then
           apply.invoke(obj, params: _*)
         else {
           val lb = ListBuffer(params.toIndexedSeq: _*)
-          for (i <- params.length + 1 to pc) {
+          for i <- params.length + 1 to pc do {
             val paramName = apply.getParameters.apply(i - 1).getName
             lb += paramsMap.getOrElse(paramName, getDefParamsFor(obj, i))
           }
-          if (lb.length > pc) {
+          if lb.length > pc then {
             val head = lb.take(pc - 1)
             val tail = lb.drop(pc - 1)
             val bundle = head ++ Seq(tail.toSeq)

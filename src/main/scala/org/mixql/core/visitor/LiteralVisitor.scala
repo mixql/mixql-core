@@ -25,7 +25,7 @@ trait LiteralVisitor extends BaseVisitor {
 
   override def visitS_string(ctx: sql.S_stringContext): Type = {
     var res = ""
-    if (ctx.children != null)
+    if ctx.children != null then
       ctx.children.forEach(ch => res += visit(ch).toString)
     string(res, "'")
   }
@@ -37,7 +37,7 @@ trait LiteralVisitor extends BaseVisitor {
 
   override def visitB_string(ctx: sql.B_stringContext): Type = {
     var res = ""
-    if (ctx.children != null)
+    if ctx.children != null then
       ctx.children.forEach(ch => res += visit(ch).toString)
     string(res, "`")
   }
@@ -49,7 +49,7 @@ trait LiteralVisitor extends BaseVisitor {
 
   override def visitD_string(ctx: sql.D_stringContext): Type = {
     var res = ""
-    if (ctx.children != null)
+    if ctx.children != null then
       ctx.children.forEach(ch => res += visit(ch).toString)
     string(res, "\"")
   }
@@ -63,21 +63,21 @@ trait LiteralVisitor extends BaseVisitor {
     visit(ctx.string)
 
   override def visitLiteral_int(ctx: sql.Literal_intContext): Type =
-    if (ctx.int_number.T_SUB)
+    if ctx.int_number.T_SUB then
       int(-ctx.int_number.L_INT.getText.toInt)
     else
       int(ctx.int_number.L_INT.getText.toInt)
 
   override def visitLiteral_double(ctx: sql.Literal_doubleContext): Type =
-    if (ctx.dec_number.T_SUB)
+    if ctx.dec_number.T_SUB then
       double(-ctx.dec_number.L_DEC.getText.toDouble)
     else
       double(ctx.dec_number.L_DEC.getText.toDouble)
 
   override def visitLiteral_bool(ctx: sql.Literal_boolContext): Type =
-    if (ctx.bool_literal.T_FALSE)
+    if ctx.bool_literal.T_FALSE then
       bool(false)
-    else if (ctx.bool_literal.T_TRUE)
+    else if ctx.bool_literal.T_TRUE then
       bool(true)
     else
       throw new IllegalArgumentException("unknown bool literal")

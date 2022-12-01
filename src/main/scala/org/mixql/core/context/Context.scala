@@ -82,7 +82,7 @@ class Context(
     *   of engine
     */
   def setCurrentEngine(name: String): Unit = {
-    if (name == "interpolator")
+    if name == "interpolator" then
       throw new IllegalArgumentException(
         "interpolator could not be set as current engine"
       )
@@ -103,7 +103,7 @@ class Context(
     *   to register
     */
   def addEngine(engine: Engine): Unit = {
-    if (engine.name == "interpolator")
+    if engine.name == "interpolator" then
       throw new IllegalArgumentException(
         "engine cannot be registered as interpolator"
       )
@@ -119,7 +119,7 @@ class Context(
     *   to register
     */
   def addEngine(name: String, engine: Engine): Unit = {
-    if (name == "interpolator")
+    if name == "interpolator" then
       throw new IllegalArgumentException(
         "engine cannot be registered as interpolator"
       )
@@ -146,7 +146,7 @@ class Context(
       case e: T => Some(e)
       case _    => None
     }
-    if (res.isEmpty)
+    if res.isEmpty then
       None
     else
       Some(res.head)
@@ -274,7 +274,7 @@ class Context(
     * @param function
     */
   def addFunction(name: String, function: Any): Unit = {
-    if (functions.contains(name))
+    if functions.contains(name) then
       throw new InstantiationException(s"function $name is already defined")
     else
       functions.put(name, function)

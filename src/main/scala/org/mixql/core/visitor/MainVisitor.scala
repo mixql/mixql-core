@@ -24,7 +24,7 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
     var res: Type = Null
     ctx.statment.asScala.foreach(stmt => {
       res = visit(stmt)
-      if (res.ret)
+      if res.ret then
         return res
     })
     res
@@ -43,11 +43,11 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
   override def visitChange_engine_stmt(
     ctx: sql.Change_engine_stmtContext
   ): Type = {
-    if (ctx.choose_engine.expr)
+    if ctx.choose_engine.expr then
       context.setCurrentEngine(visit(ctx.choose_engine.expr).toString)
     else
       context.setCurrentEngine(visit(ctx.choose_engine.ident).toString)
-    if (ctx.choose_engine.engine_params)
+    if ctx.choose_engine.engine_params then
       ctx.choose_engine.engine_params.ident.asScala
         .map(visit)
         .zip(ctx.choose_engine.engine_params.expr.asScala.map(visit))
@@ -88,7 +88,7 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
     executeOther(visit(ctx.other).toString, ctx.choose_engine) match {
       case Success(value) => value
       case Failure(exception) =>
-        if (context.grenkiErrorSkip) Null else throw exception
+        if context.grenkiErrorSkip then Null else throw exception
     }
   }
 

@@ -239,13 +239,13 @@ case class string(value: String, quote: String = "") extends Type {
   def quoted: String = quote + value + quote
 
   def asLiteral: String = {
-    val q = if (quote != "") quote else "\""
+    val q = if quote != "" then quote else "\""
     q + value + q
   }
   override def +(other: Type): Type = {
     other match {
       case string(oval, oq) =>
-        val q = if (quote != "") quote else oq
+        val q = if quote != "" then quote else oq
         string(value + oval, q)
       case array(arr) =>
         array(this +: arr)

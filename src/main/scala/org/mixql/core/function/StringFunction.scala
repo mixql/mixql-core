@@ -7,7 +7,7 @@ import java.util.Locale
 object StringFunction {
   val ascii = new (String => Int) {
     override def apply(str: String): Int =
-      if (str.isEmpty) 0
+      if str.isEmpty then 0
       else str(0).toInt
   }
 
@@ -32,10 +32,10 @@ object StringFunction {
 
   val substr = new ((String, Int, Int) => String) {
     def apply(str: String, pos: Int, len: Int = Int.MaxValue): String = {
-      if (len < 1) return ""
-      val pre = if (pos > 0) pos - 1 else str.length + pos
-      val p = if (pre < 0) 0 else pre
-      if (len == Int.MaxValue)
+      if len < 1 then return ""
+      val pre = if pos > 0 then pos - 1 else str.length + pos
+      val p = if pre < 0 then 0 else pre
+      if len == Int.MaxValue then
         str.substring(p)
       else
         str.substring(p, pre + len)
@@ -52,11 +52,11 @@ object StringFunction {
     def apply(number: Double, scale: Int): String = {
       pattern.delete(0, pattern.length)
       pattern.append(defaultFormat)
-      if (scale < 0) return null
+      if scale < 0 then return null
 
       pattern.append(".")
       var i = 0
-      while (i < scale) {
+      while i < scale do {
         i += 1
         pattern.append("0")
       }

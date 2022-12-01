@@ -10,9 +10,9 @@ final class SqlLambda(
   visitor: BaseVisitor
 ) extends Type {
   def apply(params: Any*): Any = {
-    if (paramNames.size > params.size)
+    if paramNames.size > params.size then
       throw new IllegalArgumentException("not enough arguments")
-    else if (paramNames.size < params.size)
+    else if paramNames.size < params.size then
       throw new IllegalArgumentException("too many arguments")
     visitor.context.push_scope()
     paramNames

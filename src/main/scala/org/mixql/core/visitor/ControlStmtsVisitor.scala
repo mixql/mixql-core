@@ -11,32 +11,32 @@ trait ControlStmtsVisitor extends BaseVisitor {
     } catch {
       case e: Throwable =>
         val old_exc =
-          if (ctx.exc)
+          if ctx.exc then
             context.getVar(visit(ctx.exc).toString)
           else
             null
         val old_message =
-          if (ctx.exc)
+          if ctx.exc then
             context.getVar(visit(ctx.exc).toString + ".message")
           else
             null
-        if (old_exc != null) {
+        if old_exc != null then {
           context.setVar(
             visit(ctx.exc).toString,
             string(e.getClass.getSimpleName)
           )
         }
-        if (old_message != null) {
+        if old_message != null then {
           context.setVar(
             visit(ctx.exc).toString + ".message",
             string(e.getMessage)
           )
         }
         visit(ctx.catch_block)
-        if (old_exc != null) {
+        if old_exc != null then {
           context.setVar(visit(ctx.exc).toString, old_exc)
         }
-        if (old_message != null) {
+        if old_message != null then {
           context.setVar(visit(ctx.exc).toString + ".message", old_message)
         }
     }
@@ -45,18 +45,18 @@ trait ControlStmtsVisitor extends BaseVisitor {
 
   override def visitIf_stmt(ctx: sql.If_stmtContext): Type = {
     val condition: Boolean = visit(ctx.expr)
-    if (condition) {
+    if condition then {
       visit(ctx.block)
     } else {
       ctx
         .elseif_block()
         .forEach(elif => {
           val elsecondition: Boolean = visit(elif.expr)
-          if (elsecondition) {
+          if elsecondition then {
             return visit(elif.block)
           }
         })
-      if (ctx.else_block)
+      if ctx.else_block then
         visit(ctx.else_block.block)
       else
         Null
@@ -68,27 +68,25 @@ trait ControlStmtsVisitor extends BaseVisitor {
     // super.visitFor_range_stmt(ctx)
     val i_name = visit(ctx.ident).toString
     val old = context.getVar(i_name)
-    var i = if (!ctx.T_REVERSE) visit(ctx.from) else visit(ctx.to)
-    val to = if (!ctx.T_REVERSE) visit(ctx.to) else visit(ctx.from)
+    var i = if !ctx.T_REVERSE then visit(ctx.from) else visit(ctx.to)
+    val to = if !ctx.T_REVERSE then visit(ctx.to) else visit(ctx.from)
     val step =
-      (if (ctx.T_REVERSE) int(-1) else int(1)) * (if (ctx.step) visit(ctx.step)
-                                                  else int(1))
+      (if ctx.T_REVERSE then int(-1) else int(1)) * (if ctx.step then visit(ctx.step)
+      else int(1))
     context.setVar(i_name, i)
-    while (
-      (!ctx.T_REVERSE && i < to) ||
-      (ctx.T_REVERSE && i > to)
-    ) {
+
+    while ((!ctx.T_REVERSE && i < to) || (ctx.T_REVERSE && i > to)) {
       visit(ctx.block)
       i = i + step
       context.setVar(i_name, i)
     }
-    if (
-      (!ctx.T_REVERSE && i >= to) ||
-      (ctx.T_REVERSE && i <= to)
-    ) {
+
+    if ((!ctx.T_REVERSE && i >= to) || (ctx.T_REVERSE && i <= to)) {
       context.setVar(i_name, to)
       visit(ctx.block)
     }
+
+
     context.setVar(i_name, old)
     Null
   }
@@ -112,7 +110,7 @@ trait ControlStmtsVisitor extends BaseVisitor {
 
   override def visitWhile_stmt(ctx: sql.While_stmtContext): Type = {
     var condition: Boolean = visit(ctx.expr)
-    while (condition) {
+    while condition do {
       visit(ctx.block)
       condition = visit(ctx.expr)
     }

@@ -43,7 +43,7 @@ class FunctionInvokerTest extends AnyFunSuite {
 
   val substr = new ((String, Int, Int) => String) {
     def apply(str: String, pos: Int, len: Int = Int.MaxValue): String = {
-      if (len == Int.MaxValue)
+      if len == Int.MaxValue then
         str.substring(pos)
       else
         str.substring(pos, len)
