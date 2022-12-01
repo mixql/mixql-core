@@ -4,11 +4,11 @@ import org.mixql.core.context.gtype._
 import org.mixql.core.parser.sql
 import scala.language.implicitConversions
 
-trait ControlStmtsVisitor extends BaseVisitor {
-  override def visitTry_catch_stmt(ctx: sql.Try_catch_stmtContext): Type = {
-    try {
+trait ControlStmtsVisitor extends BaseVisitor:
+  override def visitTry_catch_stmt(ctx: sql.Try_catch_stmtContext): Type =
+    try
       visit(ctx.try_bock)
-    } catch {
+    catch
       case e: Throwable =>
         val old_exc =
           if ctx.exc then
@@ -20,34 +20,28 @@ trait ControlStmtsVisitor extends BaseVisitor {
             context.getVar(visit(ctx.exc).toString + ".message")
           else
             null
-        if old_exc != null then {
+        if old_exc != null then
           context.setVar(
             visit(ctx.exc).toString,
             string(e.getClass.getSimpleName)
           )
-        }
-        if old_message != null then {
+        if old_message != null then
           context.setVar(
             visit(ctx.exc).toString + ".message",
             string(e.getMessage)
           )
-        }
         visit(ctx.catch_block)
-        if old_exc != null then {
+        if old_exc != null then
           context.setVar(visit(ctx.exc).toString, old_exc)
-        }
-        if old_message != null then {
+        if old_message != null then
           context.setVar(visit(ctx.exc).toString + ".message", old_message)
-        }
-    }
     Null
-  }
 
-  override def visitIf_stmt(ctx: sql.If_stmtContext): Type = {
+  override def visitIf_stmt(ctx: sql.If_stmtContext): Type =
     val condition: Boolean = visit(ctx.expr)
-    if condition then {
+    if condition then
       visit(ctx.block)
-    } else {
+    else
       ctx
         .elseif_block()
         .forEach(elif => {
@@ -60,11 +54,9 @@ trait ControlStmtsVisitor extends BaseVisitor {
         visit(ctx.else_block.block)
       else
         Null
-    }
-  }
 
   // TODO maybe better realisation using for?
-  override def visitFor_range_stmt(ctx: sql.For_range_stmtContext): Type = {
+  override def visitFor_range_stmt(ctx: sql.For_range_stmtContext): Type =
     // super.visitFor_range_stmt(ctx)
     val i_name = visit(ctx.ident).toString
     val old = context.getVar(i_name)
@@ -75,27 +67,24 @@ trait ControlStmtsVisitor extends BaseVisitor {
       else int(1))
     context.setVar(i_name, i)
 
-    while ((!ctx.T_REVERSE && i < to) || (ctx.T_REVERSE && i > to)) {
+    while ((!ctx.T_REVERSE && i < to) || (ctx.T_REVERSE && i > to))
       visit(ctx.block)
       i = i + step
       context.setVar(i_name, i)
-    }
 
-    if ((!ctx.T_REVERSE && i >= to) || (ctx.T_REVERSE && i <= to)) {
+    if ((!ctx.T_REVERSE && i >= to) || (ctx.T_REVERSE && i <= to))
       context.setVar(i_name, to)
       visit(ctx.block)
-    }
 
 
     context.setVar(i_name, old)
     Null
-  }
 
-  override def visitFor_cursor_stmt(ctx: sql.For_cursor_stmtContext): Type = {
+  override def visitFor_cursor_stmt(ctx: sql.For_cursor_stmtContext): Type =
     val cursor = visit(ctx.expr)
     val cursorName = visit(ctx.ident).toString
     val old = context.getVar(cursorName)
-    cursor match {
+    cursor match
       case array(arr) =>
         arr.foreach(el => {
           context.setVar(cursorName, el)
@@ -103,17 +92,12 @@ trait ControlStmtsVisitor extends BaseVisitor {
         })
       case other =>
         throw new IllegalArgumentException("cursor must be collection")
-    }
     context.setVar(cursorName, old)
     Null
-  }
 
-  override def visitWhile_stmt(ctx: sql.While_stmtContext): Type = {
+  override def visitWhile_stmt(ctx: sql.While_stmtContext): Type =
     var condition: Boolean = visit(ctx.expr)
-    while condition do {
+    while condition do
       visit(ctx.block)
       condition = visit(ctx.expr)
-    }
     Null
-  }
-}

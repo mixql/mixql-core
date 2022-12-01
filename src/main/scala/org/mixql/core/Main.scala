@@ -8,23 +8,21 @@ import org.mixql.core.engine.Engine
 
 import scala.collection.mutable.{Map => MutMap}
 
-object Main {
-  class DemoEngine extends Engine {
+object Main:
+  class DemoEngine extends Engine:
     override def name: String = "demo"
 
-    override def execute(stmt: String): Type = {
+    override def execute(stmt: String): Type =
       println("execute: " + stmt)
       Null
-    }
 
     override def setParam(name: String, value: Type): Unit = {}
 
     override def getParam(name: String): Type = Null
 
     override def isParam(name: String): Boolean = true
-  }
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     val code =
       """some code;
         |let gg = 12.4 - 11.2;
@@ -65,5 +63,3 @@ object Main {
       new Context(MutMap[String, Engine]("demo" -> new DemoEngine), "demo")
     run(code, context)
     println(context.scope.head)
-  }
-}

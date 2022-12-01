@@ -4,7 +4,7 @@ import org.mixql.core.context.gtype._
 
 /** abstract class for execution engine
   */
-abstract class Engine {
+abstract class Engine:
 
   /** engine name
     *
@@ -48,4 +48,3 @@ abstract class Engine {
     *   true if param, false if not
     */
   def isParam(name: String): Boolean = true
-}

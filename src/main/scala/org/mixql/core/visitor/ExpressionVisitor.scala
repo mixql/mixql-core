@@ -9,10 +9,10 @@ import org.antlr.v4.runtime.misc.Interval
 import scala.util.{Failure, Success, Try}
 import scala.jdk.CollectionConverters._
 
-trait ExpressionVisitor extends BaseVisitor {
+trait ExpressionVisitor extends BaseVisitor:
   def executeOther(stmt: String, engine: sql.Choose_engineContext): Try[Type] =
     Try {
-      if engine then {
+      if engine then
         // execute on custom engine
         // get engine name
         val engineName =
@@ -20,33 +20,30 @@ trait ExpressionVisitor extends BaseVisitor {
             visit(engine.expr).toString
           else
             visit(engine.ident).toString
-        if engine.engine_params then {
+        if engine.engine_params then
           // execute with additional params
           val params = engine.engine_params.ident.asScala
             .map(visit(_).toString)
             .zip(engine.engine_params.expr.asScala.map(visit))
             .toMap
           context.execute(stmt, engineName, params)
-        } else {
+        else
           // execute with current params
           context.execute(stmt, engineName)
-        }
-      } else {
+      else
         // execute on current engine
         context.execute(stmt)
-      }
     }
 
-  override def visitVar(ctx: sql.VarContext): Type = {
+  override def visitVar(ctx: sql.VarContext): Type =
     context.getVar(visit(ctx.ident).toString)
-  }
 
   override def visitExpr_concat(ctx: sql.Expr_concatContext): Type =
     string(visit(ctx.expr(0)).toString + visit(ctx.expr(1)).toString)
 
   override def visitExpr_arithmetic_p1(
     ctx: sql.Expr_arithmetic_p1Context
-  ): Type = {
+  ): Type =
     val left = visit(ctx.expr(0))
     val right = visit(ctx.expr(1))
     if ctx.T_DIV then
@@ -55,11 +52,10 @@ trait ExpressionVisitor extends BaseVisitor {
       left * right
     else
       throw new UnsupportedOperationException("unknown operator")
-  }
 
   override def visitExpr_arithmetic_p2(
     ctx: sql.Expr_arithmetic_p2Context
-  ): Type = {
+  ): Type =
     val left = visit(ctx.expr(0))
     val right = visit(ctx.expr(1))
     if ctx.T_ADD then
@@ -68,9 +64,8 @@ trait ExpressionVisitor extends BaseVisitor {
       left - right
     else
       throw new UnsupportedOperationException("unknown operator")
-  }
 
-  override def visitExpr_compare(ctx: sql.Expr_compareContext): Type = {
+  override def visitExpr_compare(ctx: sql.Expr_compareContext): Type =
     val left = visit(ctx.expr(0))
     val right = visit(ctx.expr(1))
     if ctx.compare_operator.T_EQUAL || ctx.compare_operator.T_EQUAL2 then
@@ -87,9 +82,8 @@ trait ExpressionVisitor extends BaseVisitor {
       left <= right
     else
       throw new UnsupportedOperationException("unknown compare operator")
-  }
 
-  override def visitExpr_logical(ctx: sql.Expr_logicalContext): Type = {
+  override def visitExpr_logical(ctx: sql.Expr_logicalContext): Type =
     val left = visit(ctx.expr(0))
     val right = visit(ctx.expr(1))
     if ctx.logical_operator.T_OR then
@@ -98,7 +92,6 @@ trait ExpressionVisitor extends BaseVisitor {
       left && right
     else
       throw new UnsupportedOperationException("unknown operator")
-  }
 
   override def visitExpr_not(ctx: sql.Expr_notContext): Type =
     visit(ctx.expr).!()
@@ -107,15 +100,14 @@ trait ExpressionVisitor extends BaseVisitor {
     if ctx.expr then
       visit(ctx.expr)
     else if ctx.other then
-      executeOther(visit(ctx.other).toString, ctx.choose_engine) match {
+      executeOther(visit(ctx.other).toString, ctx.choose_engine) match
         case Success(value) => value
         case Failure(exception) =>
           if context.grenkiErrorSkip then Null else throw exception
-      }
     else
       throw new UnsupportedOperationException("unknown operator")
 
-  override def visitExpr_case(ctx: sql.Expr_caseContext): Type = {
+  override def visitExpr_case(ctx: sql.Expr_caseContext): Type =
     val switch =
       if ctx.case_r.ex_switch then
         visit(ctx.case_r.ex_switch)
@@ -132,25 +124,21 @@ trait ExpressionVisitor extends BaseVisitor {
       })
     if ctx.case_r.ex_else then return visit(ctx.case_r.ex_else)
     Null // TODO default result if no condition matched (mb exception?)
-  }
 
-  override def visitExpr_index(ctx: sql.Expr_indexContext): Type = {
+  override def visitExpr_index(ctx: sql.Expr_indexContext): Type =
     val col = visit(ctx.collection)
-    col match {
+    col match
       case x: collection => x(visit(ctx.index))
       case _ =>
         throw new NoSuchMethodException(
           "only collections supports access by index"
         )
-    }
-  }
 
-  override def visitExpr_lambda(ctx: sql.Expr_lambdaContext): Type = {
+  override def visitExpr_lambda(ctx: sql.Expr_lambdaContext): Type =
     val pNames = ctx.lambda.ident.asScala.map(n => visit(n).toString).toList
     new SqlLambda(pNames, ctx.lambda.block, this)
-  }
 
-  override def visitExpr_func(ctx: sql.Expr_funcContext): Type = {
+  override def visitExpr_func(ctx: sql.Expr_funcContext): Type =
     val funcName = visit(ctx.func.ident(0)).toString
     // TODO: add the implicit cast
     val params: Seq[Any] = ctx.func.expr.asScala
@@ -158,9 +146,8 @@ trait ExpressionVisitor extends BaseVisitor {
       .map(unpack)
       .toSeq
     pack(FunctionInvoker.invoke(context.functions.toMap, funcName, params))
-  }
 
-  override def visitExprSpecFuncCast(ctx: sql.ExprSpecFuncCastContext): Type = {
+  override def visitExprSpecFuncCast(ctx: sql.ExprSpecFuncCastContext): Type =
     if ctx.dtype.primitive_type then
       castPrimitive(visit(ctx.expr), ctx.dtype.primitive_type)
     else if ctx.dtype.array_type then
@@ -175,9 +162,8 @@ trait ExpressionVisitor extends BaseVisitor {
       )
     else
       throw new UnsupportedOperationException("unknown type")
-  }
 
-  def castPrimitive(value: Type, to: sql.Primitive_typeContext): Type = {
+  def castPrimitive(value: Type, to: sql.Primitive_typeContext): Type =
     if to.T_STRING then
       typeConversion.to_string(value)
     else if to.T_INT then
@@ -188,5 +174,3 @@ trait ExpressionVisitor extends BaseVisitor {
       typeConversion.to_bool(value)
     else
       throw new ClassCastException("could not cast to this type")
-  }
-}

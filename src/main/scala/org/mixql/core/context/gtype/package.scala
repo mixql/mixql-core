@@ -2,12 +2,12 @@ package org.mixql.core.context
 
 import org.mixql.core.function.SqlLambda
 
-package object gtype {
+package object gtype:
   import scala.language.implicitConversions
 
   /** implicit conversions from scala types to gtypes or gtypes to scala types
     */
-  object implicitGtypeConversions {
+  object implicitGtypeConversions:
     implicit def from_int(a: Int): int = int(a)
 
     implicit def to_int(a: int): Int = a.value
@@ -23,19 +23,17 @@ package object gtype {
     implicit def from_string(a: String): string = string(a)
 
     implicit def to_string(a: string): String = a.value
-  }
 
   /** conversions any gtype to gtype you need (if possible)
     */
-  object typeConversion {
+  object typeConversion:
     import implicitGtypeConversions._
 
-    def to_string(a: Type): string = {
+    def to_string(a: Type): string =
       string(a.toString)
-    }
 
-    def to_bool(a: Type): bool = {
-      a match {
+    def to_bool(a: Type): bool =
+      a match
         case value: bool   => value
         case double(value) => value != 0
         case int(value)    => value != 0
@@ -54,11 +52,9 @@ package object gtype {
           throw new ClassCastException(
             s"cannot convert ${value.getClass.getSimpleName} to bool"
           )
-      }
-    }
 
-    def to_int(a: Type): int = {
-      a match {
+    def to_int(a: Type): int =
+      a match
         case bool(value)      => if value then 1 else 0
         case double(value)    => int(value.toInt)
         case value: int       => value
@@ -69,11 +65,9 @@ package object gtype {
           throw new ClassCastException(
             s"cannot convert ${value.getClass.getSimpleName} to int"
           )
-      }
-    }
 
-    def to_double(a: Type): double = {
-      a match {
+    def to_double(a: Type): double =
+      a match
         case bool(value)      => if value then 1 else 0
         case value: double    => value
         case int(value)       => value.toDouble
@@ -84,18 +78,14 @@ package object gtype {
           throw new ClassCastException(
             s"cannot convert ${value.getClass.getSimpleName} to double"
           )
-      }
-    }
-  }
 
   def isNull(a: Type): Boolean =
-    a match {
+    a match
       case Null => true
       case _    => false
-    }
 
-  def pack(a: Any): Type = {
-    a match {
+  def pack(a: Any): Type =
+    a match
       case null          => Null
       case p: String     => string(p)
       case p: Int        => int(p)
@@ -104,11 +94,9 @@ package object gtype {
       case p: Array[Any] => array(p.map(pack))
       case p: SqlLambda  => p
       case other         => string(other.toString)
-    }
-  }
 
-  def unpack(a: Type): Any = {
-    a match {
+  def unpack(a: Type): Any =
+    a match
       case Null         => null
       case string(v, q) => v
       case int(v)       => v
@@ -116,6 +104,3 @@ package object gtype {
       case bool(v)      => v
       case array(v)     => v.map(unpack)
       case v: SqlLambda => v
-    }
-  }
-}

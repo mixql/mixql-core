@@ -7,7 +7,7 @@ import java.time.LocalDate
 
 import scala.jdk.CollectionConverters._
 
-trait LiteralVisitor extends BaseVisitor {
+trait LiteralVisitor extends BaseVisitor:
   override def visitSingle_quotedString(
     ctx: sql.Single_quotedStringContext
   ): Type =
@@ -23,36 +23,33 @@ trait LiteralVisitor extends BaseVisitor {
   ): Type =
     visit(ctx.d_string)
 
-  override def visitS_string(ctx: sql.S_stringContext): Type = {
+  override def visitS_string(ctx: sql.S_stringContext): Type =
     var res = ""
     if ctx.children != null then
       ctx.children.forEach(ch => res += visit(ch).toString)
     string(res, "'")
-  }
 
   override def visitS_interpolation_expr(
     ctx: sql.S_interpolation_exprContext
   ): Type =
     visit(ctx.expr)
 
-  override def visitB_string(ctx: sql.B_stringContext): Type = {
+  override def visitB_string(ctx: sql.B_stringContext): Type =
     var res = ""
     if ctx.children != null then
       ctx.children.forEach(ch => res += visit(ch).toString)
     string(res, "`")
-  }
 
   override def visitB_interpolation_expr(
     ctx: sql.B_interpolation_exprContext
   ): Type =
     visit(ctx.expr)
 
-  override def visitD_string(ctx: sql.D_stringContext): Type = {
+  override def visitD_string(ctx: sql.D_stringContext): Type =
     var res = ""
     if ctx.children != null then
       ctx.children.forEach(ch => res += visit(ch).toString)
     string(res, "\"")
-  }
 
   override def visitD_interpolation_expr(
     ctx: sql.D_interpolation_exprContext
@@ -87,17 +84,13 @@ trait LiteralVisitor extends BaseVisitor {
 
   override def visitLiteral_current_date(
     ctx: sql.Literal_current_dateContext
-  ): Type = {
+  ): Type =
     string(LocalDate.now().toString)
-  }
 
   override def visitLiteral_current_timestamp(
     ctx: sql.Literal_current_timestampContext
-  ): Type = {
+  ): Type =
     string(LocalDateTime.now().toString)
-  }
 
-  override def visitLiteral_array(ctx: sql.Literal_arrayContext): Type = {
+  override def visitLiteral_array(ctx: sql.Literal_arrayContext): Type =
     array(ctx.array_literal.expr.asScala.map(visit).toArray)
-  }
-}

@@ -10,7 +10,7 @@ lazy val root = (project in file("."))
     organization := "org.mixql",
     name := "mixql-core",
     version := "0.1.0-SNAPSHOT",
-    javaSource in Antlr4 := (sourceManaged in Compile).value,
+//    javaSource in Antlr4 := baseDirectory.value / "src" / "main" / "java" / "org" / "mixql" / "core" / "parser",
     libraryDependencies ++= Seq(
       "org.antlr"                % "antlr4-runtime" % "4.8-1",
       "org.scala-lang"           % "scala-reflect"  % "2.13.8",
@@ -24,12 +24,12 @@ lazy val root = (project in file("."))
       "-feature",
       "-deprecation",
       ///////////////////////////////////////////////////////////////////////////////////
-      //https://docs.scala-lang.org/scala3/guides/migration/tooling-syntax-rewriting.html
+      // https://docs.scala-lang.org/scala3/guides/migration/tooling-syntax-rewriting.html
 //      "-new-syntax", "-rewrite",
 //      "-indent", "-rewrite",
       ///////////////////////////////////////////////////////////////////////////////////
-      "-source",
-      "3.0-migration",
+//      "-source",
+//      "3.0-migration",
       "-Xmax-inlines:139", // https://github.com/lampefl/dotty/issues/13044
       "-Xmax-inlined-trees:12000000" // https://github.com/lampefl/dotty/issues/13044
     )

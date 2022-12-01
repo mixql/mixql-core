@@ -8,8 +8,8 @@ final class SqlLambda(
   paramNames: List[String],
   body: BlockContext,
   visitor: BaseVisitor
-) extends Type {
-  def apply(params: Any*): Any = {
+) extends Type:
+  def apply(params: Any*): Any =
     if paramNames.size > params.size then
       throw new IllegalArgumentException("not enough arguments")
     else if paramNames.size < params.size then
@@ -21,5 +21,3 @@ final class SqlLambda(
     val res = visitor.visit(body)
     visitor.context.pop_scope()
     unpack(res)
-  }
-}

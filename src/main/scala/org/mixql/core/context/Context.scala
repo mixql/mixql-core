@@ -35,28 +35,26 @@ class Context(
     "size" -> ArrayFunction.size,
     "sort" -> ArrayFunction.sort
   )
-) {
+):
 
   var scope = List[MutMap[String, Type]](variables)
 
-  private sealed class Interpolator extends Engine {
+  private sealed class Interpolator extends Engine:
 
     var interpolated: String = ""
     override def name: String = ""
 
     var currentEngine: Engine = null
 
-    override def execute(stmt: String): Type = {
+    override def execute(stmt: String): Type =
       interpolated = stmt
       Null
-    }
 
     override def setParam(name: String, value: Type): Unit = {}
 
     override def getParam(name: String): Type = currentEngine.getParam(name)
 
     override def isParam(name: String): Boolean = true
-  }
 
   var currentEngine: Engine = engines(defaultEngine)
   var currentEngineAllias: String = defaultEngine
@@ -66,35 +64,31 @@ class Context(
 
   /** add variable scope
     */
-  def push_scope(): Unit = {
+  def push_scope(): Unit =
     scope = MutMap[String, Type]() :: scope
-  }
 
   /** remove top variable scope
     */
-  def pop_scope(): Unit = {
+  def pop_scope(): Unit =
     scope = scope.tail
-  }
 
   /** Set current engine by name that registered in this context. Throws
     * [[java.util.NoSuchElementException]] if no engine with this name
     * @param name
     *   of engine
     */
-  def setCurrentEngine(name: String): Unit = {
+  def setCurrentEngine(name: String): Unit =
     if name == "interpolator" then
       throw new IllegalArgumentException(
         "interpolator could not be set as current engine"
       )
-    currentEngine = engines.get(name) match {
+    currentEngine = engines.get(name) match
       case Some(value) =>
         variables.put("grenki.execution.engine", string(name))
         value
       case None =>
         throw new NoSuchElementException(s"no engine with name $name")
-    }
     currentEngineAllias = name
-  }
 
   /** register engine by this name. If there was other engine with this name it
     * would be removed from context
@@ -102,13 +96,12 @@ class Context(
     * @param engine
     *   to register
     */
-  def addEngine(engine: Engine): Unit = {
+  def addEngine(engine: Engine): Unit =
     if engine.name == "interpolator" then
       throw new IllegalArgumentException(
         "engine cannot be registered as interpolator"
       )
     engines.put(engine.name, engine)
-  }
 
   /** register engine with passed name. name may differ to engine.name if there
     * was other engine with this name it would be removed from context
@@ -118,13 +111,12 @@ class Context(
     * @param engine
     *   to register
     */
-  def addEngine(name: String, engine: Engine): Unit = {
+  def addEngine(name: String, engine: Engine): Unit =
     if name == "interpolator" then
       throw new IllegalArgumentException(
         "engine cannot be registered as interpolator"
       )
     engines.put(name, engine)
-  }
 
   /** get execution engine by name
     *
@@ -141,7 +133,7 @@ class Context(
     * @return
     *   the first engine isInstanceOf[T]
     */
-  def getEngine[T <: Engine: ClassTag]: Option[T] = {
+  def getEngine[T <: Engine: ClassTag]: Option[T] =
     val res = engines.values.flatMap {
       case e: T => Some(e)
       case _    => None
@@ -150,7 +142,6 @@ class Context(
       None
     else
       Some(res.head)
-  }
 
   /** execute statement on current engine
     *
@@ -172,10 +163,9 @@ class Context(
     *   the result of execution
     */
   def execute(stmt: String, engine: String): Type =
-    getEngine(engine) match {
+    getEngine(engine) match
       case Some(value) => value.execute(stmt)
       case None => throw new NoSuchElementException(s"unknown engine $engine")
-    }
 
   /** execute statement on engine with specific params
     *
@@ -189,7 +179,7 @@ class Context(
     *   the result of execution
     */
   def execute(stmt: String, engine: String, params: Map[String, Type]): Type =
-    getEngine(engine) match {
+    getEngine(engine) match
       case Some(eng) =>
         val old = params.keys.map(name => name -> eng.getParam(name)).toMap
         params.foreach(p => eng.setParam(p._1, p._2))
@@ -197,7 +187,6 @@ class Context(
         old.foreach(p => eng.setParam(p._1, p._2))
         res
       case None => throw new NoSuchElementException(s"unknown engine $engine")
-    }
 
   /** set variable value. if key starts with some engines name then this engines
     * param updates by value
@@ -207,31 +196,27 @@ class Context(
     * @param value
     *   the value of variable or param
     */
-  def setVar(key: String, value: Type): Unit = {
+  def setVar(key: String, value: Type): Unit =
     // set current engine param
     // if (currentEngine.isParam(key))
     //  currentEngine.setParam(key, value)
     // set grenki param
-    key match {
+    key match
       case "grenki.execution.engine" =>
         setCurrentEngine(value.toString) // WARN as deprecated
       case "grenki.error.skip" =>
-        value match {
+        value match
           case bool(value) =>
             grenkiErrorSkip = value
           case _ =>
             throw new IllegalArgumentException("grenki.error.skip must be bool")
-        }
       case _ =>
-    }
     // set variable value
-    value match {
+    value match
       case Null =>
         scope.head.remove(key)
       case _ =>
         scope.head.put(key, value)
-    }
-  }
 
   /** get the variable value by name
     *
@@ -240,7 +225,7 @@ class Context(
     * @return
     *   variable value
     */
-  def getVar(key: String): Type = {
+  def getVar(key: String): Type =
     scope.foreach(vars => {
       val res = vars.getOrElse(key, Null)
       res match {
@@ -249,7 +234,6 @@ class Context(
       }
     })
     Null
-  }
 
   /** interpolate statement via current context
     *
@@ -258,13 +242,12 @@ class Context(
     * @return
     *   interpolated statement
     */
-  def interpolate(stmt: String): String = {
+  def interpolate(stmt: String): String =
     interpolator.currentEngine = currentEngine
     currentEngine = interpolator
     core.run(stmt + ";", this)
     setCurrentEngine(currentEngineAllias)
     interpolator.interpolated
-  }
 
   /** register function with passed name. If there was other function with this
     * name it would be removed from context
@@ -273,10 +256,8 @@ class Context(
     *   of funtion
     * @param function
     */
-  def addFunction(name: String, function: Any): Unit = {
+  def addFunction(name: String, function: Any): Unit =
     if functions.contains(name) then
       throw new InstantiationException(s"function $name is already defined")
     else
       functions.put(name, function)
-  }
-}
