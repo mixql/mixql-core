@@ -10,6 +10,7 @@ lazy val root = (project in file("."))
     organization := "org.mixql",
     name := "mixql-core",
     version := "0.1.0-SNAPSHOT",
+    javaSource in Antlr4 := (sourceManaged in Compile).value,
     libraryDependencies ++= Seq(
       "org.antlr"                % "antlr4-runtime" % "4.8-1",
       "org.scala-lang"           % "scala-reflect"  % "2.13.8",
