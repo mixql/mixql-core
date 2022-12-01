@@ -15,6 +15,7 @@ project/plugins/project/
 .history
 .cache
 .lib/
+src/main/java/org/mixql/core/parser/
 
 ### Scala ###
 *.class
