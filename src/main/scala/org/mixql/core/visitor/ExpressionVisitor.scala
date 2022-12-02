@@ -110,14 +110,14 @@ trait ExpressionVisitor extends BaseVisitor:
   override def visitExpr_case(ctx: sql.Expr_caseContext): Type =
     val switch =
       if ctx.case_r.ex_switch then
-        visit(ctx.case_r.ex_switch)
+        Some(visit(ctx.case_r.ex_switch))
       else
-        null
+        None
     ctx.case_r.case_when_then
       .forEach(case_r => {
         val condition: Boolean =
-          if switch != null then
-            switch == visit(case_r.condition)
+          if switch.nonEmpty then
+            switch.get == visit(case_r.condition)
           else
             visit(case_r.condition)
         if condition then return visit(case_r.ex_do)

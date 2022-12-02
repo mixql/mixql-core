@@ -12,29 +12,29 @@ trait ControlStmtsVisitor extends BaseVisitor:
       case e: Throwable =>
         val old_exc =
           if ctx.exc then
-            context.getVar(visit(ctx.exc).toString)
+            Some(context.getVar(visit(ctx.exc).toString))
           else
-            null
+            None
         val old_message =
           if ctx.exc then
-            context.getVar(visit(ctx.exc).toString + ".message")
+            Some(context.getVar(visit(ctx.exc).toString + ".message"))
           else
-            null
-        if old_exc != null then
+            None
+        if old_exc.nonEmpty then
           context.setVar(
             visit(ctx.exc).toString,
             string(e.getClass.getSimpleName)
           )
-        if old_message != null then
+        if old_message.nonEmpty then
           context.setVar(
             visit(ctx.exc).toString + ".message",
             string(e.getMessage)
           )
         visit(ctx.catch_block)
-        if old_exc != null then
-          context.setVar(visit(ctx.exc).toString, old_exc)
-        if old_message != null then
-          context.setVar(visit(ctx.exc).toString + ".message", old_message)
+        if old_exc.nonEmpty then
+          context.setVar(visit(ctx.exc).toString, old_exc.get)
+        if old_message.nonEmpty then
+          context.setVar(visit(ctx.exc).toString + ".message", old_message.get)
     Null
 
   override def visitIf_stmt(ctx: sql.If_stmtContext): Type =
