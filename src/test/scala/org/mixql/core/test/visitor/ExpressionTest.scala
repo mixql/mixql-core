@@ -337,4 +337,69 @@ class ExpressionTest extends MainVisitorBaseTest {
     val i = res.asInstanceOf[int]
     assert(i.value == 6)
   }
+
+  test("Test array pack/unpack in lambda") {
+    val code =
+      """
+        |let arr = [TRUE, "gg", 12];
+        |let foo = (x) -> begin
+        |  let x[0] = false;
+        |  return $x;
+        |end;
+        |let arr1 = foo($arr);
+        |let res = $arr1[0];
+                """.stripMargin
+    val context = runMainVisitor(code)
+    val res2 = context.getVar("res")
+    assert(res2.isInstanceOf[bool])
+    assert((res2.asInstanceOf[bool] == bool(false)).asInstanceOf[bool].value)
+  }
+
+  test("Test map literal") {
+    val code =
+      """
+        |let res = {1: 1, "1": 2};
+                """.stripMargin
+    val context = runMainVisitor(code)
+    val res = context.getVar("res")
+    assert(res.isInstanceOf[map])
+    val mapa = res.asInstanceOf[map]
+    assert(mapa.size.value == 2)
+    assert((mapa(int(1)) == int(1)).asInstanceOf[bool].value)
+    assert((mapa(string("1")) == int(2)).asInstanceOf[bool].value)
+  }
+
+  test("Test map get/set by index") {
+    val code =
+      """
+        |let mapa = {1.1: 1, "1.1": 2};
+        |let res1 = $mapa[1.1];
+        |let mapa[1.1] = false;
+        |let res2 = $mapa[1.1];
+                """.stripMargin
+    val context = runMainVisitor(code)
+    val res1 = context.getVar("res1")
+    assert(res1.isInstanceOf[int])
+    assert((res1.asInstanceOf[int] == int(1)).asInstanceOf[bool].value)
+    val res2 = context.getVar("res2")
+    assert(res2.isInstanceOf[bool])
+    assert((res2.asInstanceOf[bool] == bool(false)).asInstanceOf[bool].value)
+  }
+
+  test("Test map pack/unpack in lambda") {
+    val code =
+      """
+        |let mapa = {1.1: 1, "1.1": 2};
+        |let foo = (x) -> begin
+        |  let x[1.1] = false;
+        |  return $x;
+        |end;
+        |let mapa1 = foo($mapa);
+        |let res = $mapa1[1.1];
+                """.stripMargin
+    val context = runMainVisitor(code)
+    val res2 = context.getVar("res")
+    assert(res2.isInstanceOf[bool])
+    assert((res2.asInstanceOf[bool] == bool(false)).asInstanceOf[bool].value)
+  }
 }

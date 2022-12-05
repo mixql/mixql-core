@@ -60,7 +60,10 @@ object Main {
         |print(current_timestamp);
         |let arr = [3, 'gg'];
         |let arr[0] = 4;
-        |print($arr[0]);""".stripMargin
+        |print($arr[0]);
+        |let mapa = {1: 1, "1": 2};
+        |print($mapa[1]);
+        |print($mapa["1"]);""".stripMargin
     val context =
       new Context(MutMap[String, Engine]("demo" -> new DemoEngine), "demo")
     run(code, context)

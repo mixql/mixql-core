@@ -445,8 +445,8 @@ L_FILE      : ([a-zA-Z] ':' '\\'?)? L_NAME  ('\\' L_NAME )*                  // 
             ;
 
 
-L_LABEL     : ([a-zA-Z] | L_DIGIT | '_')* ':'
-            ;
+//L_LABEL     : ([a-zA-Z] | L_DIGIT | '_')* ':'
+//            ;
 
 //fragment
 //L_SPEC_PART  :

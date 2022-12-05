@@ -1,6 +1,7 @@
 package org.mixql.core.context
 
 import org.mixql.core.function.SqlLambda
+import scala.collection.mutable.{Map => MutMap}
 
 package object gtype {
   import scala.language.implicitConversions
@@ -23,6 +24,10 @@ package object gtype {
     implicit def from_string(a: String): string = string(a)
 
     implicit def to_string(a: string): String = a.value
+
+    // implicit def from_array(a: Array[Any]): array = array(a)
+
+    // implicit def to_array(a: array): Array[Any] = a.arr
   }
 
   /** conversions any gtype to gtype you need (if possible)
@@ -102,8 +107,10 @@ package object gtype {
       case p: Double     => double(p)
       case p: Boolean    => bool(p)
       case p: Array[Any] => array(p.map(pack))
-      case p: SqlLambda  => p
-      case other         => string(other.toString)
+      case p: Map[Any, Any] =>
+        map(p.map(kv => pack(kv._1) -> pack(kv._2)).toMap.to(MutMap))
+      case p: SqlLambda => p
+      case other        => string(other.toString)
     }
   }
 
@@ -115,6 +122,7 @@ package object gtype {
       case double(v)    => v
       case bool(v)      => v
       case array(v)     => v.map(unpack)
+      case map(v)       => v.map(kv => unpack(kv._1) -> unpack(kv._2)).toMap
       case v: SqlLambda => v
     }
   }

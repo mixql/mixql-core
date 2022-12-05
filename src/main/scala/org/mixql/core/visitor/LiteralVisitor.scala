@@ -4,6 +4,7 @@ import org.mixql.core.context.gtype._
 import org.mixql.core.parser.sql
 import java.time.LocalDateTime
 import java.time.LocalDate
+import scala.collection.mutable.{Map => MutMap}
 
 import scala.jdk.CollectionConverters._
 
@@ -99,5 +100,17 @@ trait LiteralVisitor extends BaseVisitor {
 
   override def visitLiteral_array(ctx: sql.Literal_arrayContext): Type = {
     array(ctx.array_literal.expr.asScala.map(visit).toArray)
+  }
+
+  override def visitLiteral_map(ctx: sql.Literal_mapContext): Type = {
+    val res = ctx.map_literal.map_item.asScala
+      .map(item => {
+        val k = visit(item.key)
+        if (k.isInstanceOf[collection])
+          throw new IllegalArgumentException("collection can't be key")
+        k -> visit(item.value)
+      })
+      .toMap
+    map(res.to(MutMap))
   }
 }

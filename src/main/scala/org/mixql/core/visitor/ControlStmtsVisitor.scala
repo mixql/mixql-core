@@ -95,18 +95,34 @@ trait ControlStmtsVisitor extends BaseVisitor {
 
   override def visitFor_cursor_stmt(ctx: sql.For_cursor_stmtContext): Type = {
     val cursor = visit(ctx.expr)
-    val cursorName = visit(ctx.ident).toString
-    val old = context.getVar(cursorName)
     cursor match {
       case array(arr) =>
+        if (ctx.ident.size != 1)
+          throw new IllegalStateException("array can have only 1 cursor")
+        val cursorName = visit(ctx.ident(0)).toString
+        val old = context.getVar(cursorName)
         arr.foreach(el => {
           context.setVar(cursorName, el)
           visit(ctx.block)
         })
+        context.setVar(cursorName, old)
+      case map(m) =>
+        if (ctx.ident.size != 2)
+          throw new IllegalStateException("map can have only 2 cursors")
+        val cursorKeyName = visit(ctx.ident(0)).toString
+        val cursorValueName = visit(ctx.ident(1)).toString
+        val oldKey = context.getVar(cursorKeyName)
+        val oldValue = context.getVar(cursorValueName)
+        m.foreach(el => {
+          context.setVar(cursorKeyName, el._1)
+          context.setVar(cursorValueName, el._2)
+          visit(ctx.block)
+        })
+        context.setVar(cursorKeyName, oldKey)
+        context.setVar(cursorValueName, oldValue)
       case other =>
         throw new IllegalArgumentException("cursor must be collection")
     }
-    context.setVar(cursorName, old)
     Null
   }
 

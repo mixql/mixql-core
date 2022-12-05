@@ -47,7 +47,7 @@ while_stmt :            // WHILE loop statement
      ;
 
 for_cursor_stmt :       // FOR (cursor) statement
-       T_FOR ident T_IN expr T_LOOP block T_END T_LOOP
+       T_FOR ident (T_COMMA ident)* T_IN expr T_LOOP block T_END T_LOOP
      ;
 
 for_range_stmt :        // FOR (Integer range) statement
@@ -136,6 +136,7 @@ literal:
      | dec_number               #literal_double
      | bool_literal             #literal_bool
      | array_literal            #literal_array
+     | map_literal              #literal_map
      | T_NULL                   #literal_null
      | T_CURRENT_DATE           #literal_current_date
      | T_CURRENT_TIMESTAMP      #literal_current_timestamp
@@ -182,6 +183,14 @@ bool_literal :                            // Boolean literal
 
 array_literal:
        T_OPEN_SB (expr (T_COMMA expr)*)? T_CLOSE_SB
+     ;
+
+map_literal:
+       T_OPEN_B (map_item (T_COMMA map_item)*)? T_CLOSE_B
+     ;
+
+map_item:
+       key=expr T_COLON value=expr
      ;
 
 non_reserved_words :                      // Tokens that are not reserved words and can be used as identifiers

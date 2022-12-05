@@ -566,62 +566,62 @@ class ParserTest extends AnyFunSuite {
     assert(for_stmt.block != null)
   }
 
-  test("Test `any_coma` rule") {
+  test("Test `other_stmt` rule") {
     val code = """
                 |select column from table where column > 10;
                 """.stripMargin
     val stmts = getStatments(code)
     assert(stmts.size == 1)
-    val any_coma = stmts.get(0).other_stmt
-    assert(any_coma != null)
-    val any_coma_text = any_coma.getText
-    assert(any_coma_text == "selectcolumnfromtablewherecolumn>10;")
+    val other_stmt = stmts.get(0).other_stmt
+    assert(other_stmt != null)
+    val other_stmt_text = other_stmt.getText
+    assert(other_stmt_text == "selectcolumnfromtablewherecolumn>10;")
   }
 
-  test("Test `any_coma` with var interpolation") {
+  test("Test `other_stmt` with var interpolation") {
     val code = """
                 |select $variable from table where column > 10;
                 """.stripMargin
     val stmts = getStatments(code)
     assert(stmts.size == 1)
-    val any_coma = stmts.get(0).other_stmt
-    assert(any_coma != null)
-    assert(any_coma.other.`var`.size == 1)
-    assert(any_coma.other.interpolation_expr.size == 0)
-    assert(any_coma.other.string.size == 0)
-    val any_coma_text = any_coma.getText
-    assert(any_coma_text == "select$variablefromtablewherecolumn>10;")
+    val other_stmt = stmts.get(0).other_stmt
+    assert(other_stmt != null)
+    assert(other_stmt.other.`var`.size == 1)
+    assert(other_stmt.other.interpolation_expr.size == 0)
+    assert(other_stmt.other.string.size == 0)
+    val other_stmt_text = other_stmt.getText
+    assert(other_stmt_text == "select$variablefromtablewherecolumn>10;")
   }
 
-  test("Test `any_coma` with expr interpolation") {
+  test("Test `other_stmt` with expr interpolation") {
     val code = """
                 |select ${$variable + 3} from table where column > 10;
                 """.stripMargin
     val stmts = getStatments(code)
     assert(stmts.size == 1)
-    val any_coma = stmts.get(0).other_stmt
-    assert(any_coma != null)
-    assert(any_coma.other.`var`.size == 0)
-    assert(any_coma.other.interpolation_expr.size == 1)
-    assert(any_coma.other.string.size == 0)
-    val any_coma_text = any_coma.getText
-    assert(any_coma_text == "select${$variable+3}fromtablewherecolumn>10;")
+    val other_stmt = stmts.get(0).other_stmt
+    assert(other_stmt != null)
+    assert(other_stmt.other.`var`.size == 0)
+    assert(other_stmt.other.interpolation_expr.size == 1)
+    assert(other_stmt.other.string.size == 0)
+    val other_stmt_text = other_stmt.getText
+    assert(other_stmt_text == "select${$variable+3}fromtablewherecolumn>10;")
   }
 
-  test("Test `any_coma` with string") {
+  test("Test `other_stmt` with string") {
     val code = """
                 |select '${$a || ' df;df $b'}' from table where column > 10;
                 """.stripMargin
     val stmts = getStatments(code)
     assert(stmts.size == 1)
-    val any_coma = stmts.get(0).other_stmt
-    assert(any_coma != null)
-    assert(any_coma.other.`var`.size == 0)
-    assert(any_coma.other.interpolation_expr.size == 0)
-    assert(any_coma.other.string.size == 1)
-    val any_coma_text = any_coma.getText
+    val other_stmt = stmts.get(0).other_stmt
+    assert(other_stmt != null)
+    assert(other_stmt.other.`var`.size == 0)
+    assert(other_stmt.other.interpolation_expr.size == 0)
+    assert(other_stmt.other.string.size == 1)
+    val other_stmt_text = other_stmt.getText
     assert(
-      any_coma_text == "select'${$a||' df;df $b'}'fromtablewherecolumn>10;"
+      other_stmt_text == "select'${$a||' df;df $b'}'fromtablewherecolumn>10;"
     )
   }
 
@@ -698,5 +698,53 @@ class ParserTest extends AnyFunSuite {
         .spec_func
         .isInstanceOf[sql.ExprSpecFuncCastContext]
     )
+  }
+
+  test("Test parsing array literal") {
+    val code = """
+                |[$x, 12, true, Null];
+                """.stripMargin
+    val stmts = getStatments(code)
+    assert(stmts.size == 1)
+    var expr_stmt = stmts.get(0).expr_stmt.expr
+    assert(expr_stmt != null)
+    assert(expr_stmt.isInstanceOf[sql.Expr_literalContext])
+    assert(
+      expr_stmt
+        .asInstanceOf[sql.Expr_literalContext]
+        .literal
+        .isInstanceOf[sql.Literal_arrayContext]
+    )
+    val arr = expr_stmt
+      .asInstanceOf[sql.Expr_literalContext]
+      .literal
+      .asInstanceOf[sql.Literal_arrayContext]
+      .array_literal
+    assert(arr != null)
+    assert(arr.expr.size == 4)
+  }
+
+  test("Test parsing map literal") {
+    val code = """
+                |{1: 1, "1": 2, null: $a, $x + $y: true};
+                """.stripMargin
+    val stmts = getStatments(code)
+    assert(stmts.size == 1)
+    var expr_stmt = stmts.get(0).expr_stmt.expr
+    assert(expr_stmt != null)
+    assert(expr_stmt.isInstanceOf[sql.Expr_literalContext])
+    assert(
+      expr_stmt
+        .asInstanceOf[sql.Expr_literalContext]
+        .literal
+        .isInstanceOf[sql.Literal_mapContext]
+    )
+    val mapa = expr_stmt
+      .asInstanceOf[sql.Expr_literalContext]
+      .literal
+      .asInstanceOf[sql.Literal_mapContext]
+      .map_literal
+    assert(mapa != null)
+    assert(mapa.map_item.size == 4)
   }
 }
