@@ -46,23 +46,23 @@ lazy val root = (project in file("."))
     name := "mixql-core",
     crossScalaVersions := ScalaVersions,
     libraryDependencies ++= Seq(
-      "org.antlr" % "antlr4-runtime" % "4.8-1",
+      "org.antlr"      % "antlr4-runtime" % "4.8-1",
       "org.scala-lang" % "scala-reflect" % {
         CrossVersion.partialVersion(scalaVersion.value) match {
           case Some((2, 13)) => scalaVersion.value
           case Some((2, 12)) => scalaVersion.value
-          case Some((3, _)) => "2.13.8"
+          case Some((3, _))  => "2.13.8"
         }
       },
-      "org.apache.logging.log4j" % "log4j-api" % "2.19.0",
+      "org.apache.logging.log4j" % "log4j-api"  % "2.19.0",
       "org.apache.logging.log4j" % "log4j-core" % "2.19.0",
-      "org.ow2.asm" % "asm" % "9.3",
-      "org.ow2.asm" % "asm-tree" % "9.3",
-      "org.scalatest" %% "scalatest" % {
+      "org.ow2.asm"              % "asm"        % "9.3",
+      "org.ow2.asm"              % "asm-tree"   % "9.3",
+      "org.scalatest"           %% "scalatest" % {
         CrossVersion.partialVersion(scalaVersion.value) match {
           case Some((2, 13)) => "3.1.1"
           case Some((2, 12)) => "3.1.1"
-          case Some((3, _)) => "3.2.14"
+          case Some((3, _))  => "3.2.14"
         }
       } % Test
     ),
@@ -71,18 +71,19 @@ lazy val root = (project in file("."))
       CrossVersion.partialVersion(scalaVersion.value) match {
         case Some((2, 13)) => stdOptions
         case Some((2, 12)) => stdOptions
-        case Some((3, _)) => stdOptions ++
-          Seq(
-            ///////////////////////////////////////////////////////////////////////////////////
-            // https://docs.scala-lang.org/scala3/guides/migration/tooling-syntax-rewriting.html
-            //      "-new-syntax", "-rewrite",
-            //      "-indent", "-rewrite",
-            ///////////////////////////////////////////////////////////////////////////////////
-            //      "-source",
-            //      "3.0-migration",
-            "-Xmax-inlines:139", // https://github.com/lampefl/dotty/issues/13044
-            "-Xmax-inlined-trees:12000000" // https://github.com/lampefl/dotty/issues/13044
-          )
+        case Some((3, _)) =>
+          stdOptions ++
+            Seq(
+              ///////////////////////////////////////////////////////////////////////////////////
+              // https://docs.scala-lang.org/scala3/guides/migration/tooling-syntax-rewriting.html
+              //      "-new-syntax", "-rewrite",
+              //      "-indent", "-rewrite",
+              ///////////////////////////////////////////////////////////////////////////////////
+              //      "-source",
+              //      "3.0-migration",
+              "-Xmax-inlines:139", // https://github.com/lampefl/dotty/issues/13044
+              "-Xmax-inlined-trees:12000000" // https://github.com/lampefl/dotty/issues/13044
+            )
       }
     }
   )

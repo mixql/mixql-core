@@ -24,14 +24,24 @@ object FunctionInvoker {
                 )
 
               if (compareFunctionTypes(applyMethods(0), params)) {
-                return invokeFunc(f.asInstanceOf[Object], params.map(a => a.asInstanceOf[Object]), paramsMap, funcName)
+                return invokeFunc(
+                  f.asInstanceOf[Object],
+                  params.map(a => a.asInstanceOf[Object]),
+                  paramsMap,
+                  funcName
+                )
               }
             }
             throw new RuntimeException(
               s"Can't find function `$funcName` in $l [${l.length}] params=$params"
             )
           case _ =>
-            invokeFunc(func.asInstanceOf[Object], params.map(a => a.asInstanceOf[Object]), paramsMap, funcName)
+            invokeFunc(
+              func.asInstanceOf[Object],
+              params.map(a => a.asInstanceOf[Object]),
+              paramsMap,
+              funcName
+            )
         }
       case None =>
         throw new RuntimeException(s"Can't find function `$funcName`")

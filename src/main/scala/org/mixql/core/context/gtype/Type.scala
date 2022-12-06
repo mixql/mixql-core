@@ -246,10 +246,10 @@ case class string(value: String, quote: String = "") extends Type {
   }
 
   override def hashCode = value.hashCode
-  
+
   override def equals(other: Any) = other match {
     case o: string => value == o.value
-    case _ => false // TODO mb String too?
+    case _         => false // TODO mb String too?
   }
 
   override def +(other: Type): Type = {

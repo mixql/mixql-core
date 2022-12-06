@@ -52,7 +52,7 @@ package object gtype {
           else {
             val quot = """""""
             throw new ClassCastException(
-              s"cannot convert string " + quot + value + quot+" to bool" //bug in scala 2_12
+              s"cannot convert string " + quot + value + quot + " to bool" // bug in scala 2_12
             )
           }
         case Null =>
@@ -110,7 +110,10 @@ package object gtype {
       case p: Boolean    => bool(p)
       case p: Array[Any] => array(p.map(pack))
       case p: Map[Any, Any] =>
-        map(collection.mutable.Map(p.map(kv => pack(kv._1) -> pack(kv._2)).toSeq: _*))
+        map(
+          collection.mutable
+            .Map(p.map(kv => pack(kv._1) -> pack(kv._2)).toSeq: _*)
+        )
       case p: SqlLambda => p
       case other        => string(other.toString)
     }
