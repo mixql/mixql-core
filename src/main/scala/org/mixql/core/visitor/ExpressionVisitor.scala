@@ -7,7 +7,7 @@ import org.mixql.core.function.FunctionInvoker
 import org.antlr.v4.runtime.misc.Interval
 
 import scala.util.{Failure, Success, Try}
-import scala.jdk.CollectionConverters._
+import scala.collection.JavaConverters._
 
 trait ExpressionVisitor extends BaseVisitor {
   def executeOther(stmt: String, engine: sql.Choose_engineContext): Try[Type] =
@@ -118,14 +118,14 @@ trait ExpressionVisitor extends BaseVisitor {
   override def visitExpr_case(ctx: sql.Expr_caseContext): Type = {
     val switch =
       if (ctx.case_r.ex_switch)
-        visit(ctx.case_r.ex_switch)
+        Some(visit(ctx.case_r.ex_switch))
       else
-        null
+        None
     ctx.case_r.case_when_then
       .forEach(case_r => {
         val condition: Boolean =
-          if (switch != null)
-            switch == visit(case_r.condition)
+          if (switch.nonEmpty)
+            switch.get == visit(case_r.condition)
           else
             visit(case_r.condition)
         if (condition) return visit(case_r.ex_do)
@@ -153,9 +153,9 @@ trait ExpressionVisitor extends BaseVisitor {
   override def visitExpr_func(ctx: sql.Expr_funcContext): Type = {
     val funcName = visit(ctx.func.ident(0)).toString
     // TODO: add the implicit cast
-    val params: Seq[Any] = ctx.func.expr.asScala
+    val params: Seq[Object] = ctx.func.expr.asScala
       .map(visit)
-      .map(unpack)
+      .map(unpack(_).asInstanceOf[Object])
       .toSeq
     pack(FunctionInvoker.invoke(context.functions.toMap, funcName, params))
   }

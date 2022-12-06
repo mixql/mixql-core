@@ -34,3 +34,5 @@ hs_err_pid*
 metals.sbt
 .bloop
 .antlr
+
+src/main/java/antlr4/

@@ -24,14 +24,14 @@ object FunctionInvoker {
                 )
 
               if (compareFunctionTypes(applyMethods(0), params)) {
-                return invokeFunc(f, params, paramsMap, funcName)
+                return invokeFunc(f.asInstanceOf[Object], params.map(a => a.asInstanceOf[Object]), paramsMap, funcName)
               }
             }
             throw new RuntimeException(
               s"Can't find function `$funcName` in $l [${l.length}] params=$params"
             )
           case _ =>
-            invokeFunc(func, params, paramsMap, funcName)
+            invokeFunc(func.asInstanceOf[Object], params.map(a => a.asInstanceOf[Object]), paramsMap, funcName)
         }
       case None =>
         throw new RuntimeException(s"Can't find function `$funcName`")
@@ -71,8 +71,8 @@ object FunctionInvoker {
   }
 
   private def invokeFunc(
-    obj: Any,
-    params: Seq[Any] = Nil,
+    obj: Object,
+    params: Seq[Object] = Nil,
     paramsMap: Map[String, Object] = Map.empty,
     funcName: String
   ): Any = {
@@ -105,7 +105,7 @@ object FunctionInvoker {
     }
   }
 
-  private def getDefParamsFor(obj: Any, i: Int): Any = {
+  private def getDefParamsFor(obj: Object, i: Int): Object = {
     val paramName = s"apply$$default$$$i"
     obj.getClass.getMethod(paramName).invoke(obj)
   }

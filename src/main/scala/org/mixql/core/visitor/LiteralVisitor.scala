@@ -6,7 +6,7 @@ import java.time.LocalDateTime
 import java.time.LocalDate
 import scala.collection.mutable.{Map => MutMap}
 
-import scala.jdk.CollectionConverters._
+import scala.collection.JavaConverters._
 
 trait LiteralVisitor extends BaseVisitor {
   override def visitSingle_quotedString(
@@ -111,6 +111,6 @@ trait LiteralVisitor extends BaseVisitor {
         k -> visit(item.value)
       })
       .toMap
-    map(res.to(MutMap))
+    map(collection.mutable.Map(res.toSeq: _*))
   }
 }

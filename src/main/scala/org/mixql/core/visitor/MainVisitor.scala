@@ -8,7 +8,8 @@ import org.mixql.core.function.SqlLambda
 import org.mixql.core.parser.sql
 
 import scala.util.{Failure, Success}
-import scala.jdk.CollectionConverters._
+import scala.collection.JavaConverters._
+//import scala.jdk.CollectionConverters._
 
 class MainVisitor(ctx: Context, tokens: TokenStream)
     extends ExpressionVisitor

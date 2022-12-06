@@ -61,6 +61,7 @@ class ExpressionTest extends MainVisitorBaseTest {
     val code =
       """
         |let res = case when 2 <= 1 then true else 'false' end;
+        |let check_case = case when 1 > 2 then 12 when 1 < 2 then 13 else '12g' end;
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
