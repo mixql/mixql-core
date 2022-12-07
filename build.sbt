@@ -1,50 +1,51 @@
-val Scala3 = "3.2.1"
-val Scala213 = "2.13.8"
-val Scala212 = "2.12.17"
-val ScalaVersions = Seq(Scala212, Scala213, Scala3)
-
-ThisBuild / scalaVersion := Scala212
-
-Antlr4 / antlr4Version := "4.8-1"
-Antlr4 / antlr4GenListener := false // default: true
-Antlr4 / antlr4GenVisitor := true // default: true
-
-inThisBuild(
-  List(
+lazy val root = (project in file("."))
+  .enablePlugins(Antlr4Plugin)
+  .settings(
+    credentials += Credentials(Path.userHome / ".sbt" / "sonatype_credentials"),
     organization := "org.mixql",
+    name := "mixql-core",
     version := "0.1.0-SNAPSHOT",
-    homepage := Some(url("https://github.com/mixql/mixql-protobuf.git")),
-    licenses := List(
-      "Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")
+    crossScalaVersions := ScalaVersions,
+    organizationName := "MixQL",
+    organizationHomepage := Some(url("https://mixql.org/")),
+    scmInfo := Some(
+      ScmInfo(
+        url("https://github.com/mixql/mixql-core"),
+        "scm:git@github.com:mixql/mixql-core.git"
+      )
     ),
     developers := List(
       Developer(
         "LavrVV",
-        "mixql team",
+        "MixQL team",
         "lavr3x@rambler.ru",
-        sbt.url("http://mixql.org/")
+        url("http://mixql.org/")
       ),
       Developer(
-        "wiikviz ",
-        "mixql team",
+        "wiikviz",
+        "Kostya Kviz",
         "kviz@outlook.com",
-        sbt.url("http://mixql.org/")
+        url("https://github.com/wiikviz")
       ),
       Developer(
         "mihan1235",
-        "mixql team",
+        "MixQL team",
         "mihan1235@yandex.ru",
-        sbt.url("http://mixql.org/")
+        url("http://mixql.org/")
       )
-    )
-  )
-)
-
-lazy val root = (project in file("."))
-  .enablePlugins(Antlr4Plugin)
-  .settings(
-    name := "mixql-core",
-    crossScalaVersions := ScalaVersions,
+    ),
+    description := "Mixed query language.",
+    licenses := List(
+      "Apache 2" -> new URL("http://www.apache.org/licenses/LICENSE-2.0.txt")
+    ),
+    homepage := Some(url("https://github.com/mixql/mixql-core")),
+    pomIncludeRepository := { _ => false },
+    publishTo := {
+      val nexus = "https://s01.oss.sonatype.org/"
+      if (isSnapshot.value)
+        Some("snapshots" at nexus + "content/repositories/snapshots")
+      else Some("releases" at nexus + "service/local/staging/deploy/maven2")
+    },
     libraryDependencies ++= Seq(
       "org.antlr"      % "antlr4-runtime" % "4.8-1",
       "org.scala-lang" % "scala-reflect" % {
@@ -56,9 +57,9 @@ lazy val root = (project in file("."))
       },
       "org.apache.logging.log4j" % "log4j-api"  % "2.19.0",
       "org.apache.logging.log4j" % "log4j-core" % "2.19.0",
-      "org.ow2.asm"              % "asm"        % "9.3",
-      "org.ow2.asm"              % "asm-tree"   % "9.3",
-      "org.scalatest"           %% "scalatest" % {
+      // "org.ow2.asm"              % "asm"        % "9.3",
+      // "org.ow2.asm"              % "asm-tree"   % "9.3",
+      "org.scalatest" %% "scalatest" % {
         CrossVersion.partialVersion(scalaVersion.value) match {
           case Some((2, 13)) => "3.1.1"
           case Some((2, 12)) => "3.1.1"
@@ -87,3 +88,15 @@ lazy val root = (project in file("."))
       }
     }
   )
+
+val Scala3 = "3.1.3"
+val Scala213 = "2.13.8"
+val Scala212 = "2.12.17"
+
+ThisBuild / scalaVersion := Scala212
+
+Antlr4 / antlr4Version := "4.8-1"
+Antlr4 / antlr4GenListener := false // default: true
+Antlr4 / antlr4GenVisitor := true // default: true
+
+val ScalaVersions = Seq(Scala212, Scala213, Scala3)

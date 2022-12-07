@@ -5,7 +5,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Run tests
-        run: sbt coverage test
+        run: sbt coverage +test
       - name: Coverage Report
         run: sbt coverageReport
       - name: Upload coverage to Codecov
