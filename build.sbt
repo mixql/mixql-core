@@ -4,12 +4,6 @@ Antlr4 / antlr4Version := "4.8-1"
 Antlr4 / antlr4GenListener := false // default: true
 Antlr4 / antlr4GenVisitor := true // default: true
 
-val Scala3 = "3.1.3"
-val Scala213 = "2.13.8"
-val Scala212 = "2.12.17"
-
-val ScalaVersions = Seq(Scala212, Scala213, Scala3)
-
 lazy val root = (project in file("."))
   .enablePlugins(Antlr4Plugin)
   .settings(
@@ -45,6 +39,12 @@ lazy val root = (project in file("."))
         "MixQL team",
         "mihan1235@yandex.ru",
         url("http://mixql.org/")
+      ),
+      Developer(
+        "ntlegion",
+        "MixQL team",
+        "ntlegion@outlook.com",
+        url("https://github.com/ntlegion")
       )
     ),
     description := "Mixed query language.",
@@ -56,10 +56,9 @@ lazy val root = (project in file("."))
       val nexus = "https://s01.oss.sonatype.org/"
       if (isSnapshot.value)
         Some("snapshots" at nexus + "content/repositories/snapshots")
-      else 
+      else
         Some("releases" at nexus + "service/local/staging/deploy/maven2")
     },
-
     libraryDependencies ++= Seq(
       "org.antlr"      % "antlr4-runtime" % "4.8-1",
       "org.scala-lang" % "scala-reflect" % {
@@ -81,7 +80,6 @@ lazy val root = (project in file("."))
         }
       } % Test
     ),
-
     scalacOptions := {
       val stdOptions = Seq("-feature", "-deprecation")
       CrossVersion.partialVersion(scalaVersion.value) match {
@@ -103,3 +101,7 @@ lazy val root = (project in file("."))
       }
     }
   )
+val Scala3 = "3.1.3"
+val Scala213 = "2.13.8"
+val Scala212 = "2.12.17"
+val ScalaVersions = Seq(Scala212, Scala213, Scala3)
