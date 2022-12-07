@@ -13,7 +13,8 @@ program: block EOF;
 block: statment*?;
 
 statment:
-      change_engine_stmt
+      empty_stmt
+    | change_engine_stmt
     | assigment_stmt
     | print_stmt
     | expr_stmt
@@ -25,6 +26,8 @@ statment:
     | try_catch_stmt
     | other_stmt
     ;
+
+empty_stmt: T_SEMICOLON;
 
 other_stmt: other (T_ON choose_engine)? T_SEMICOLON;
 

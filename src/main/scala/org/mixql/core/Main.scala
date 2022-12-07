@@ -2,7 +2,7 @@ package org.mixql.core
 
 import org.antlr.v4.runtime.{CharStreams, CommonTokenStream}
 import org.mixql.core.context.gtype._
-import org.mixql.core.run
+import org.mixql.core
 import org.mixql.core.context.Context
 import org.mixql.core.engine.Engine
 
@@ -26,7 +26,7 @@ object Main {
 
   def main(args: Array[String]): Unit = {
     val code =
-      """some code;
+      """some code;;
         |let gg = 12.4 - 11.2;
         |let wp.x = $gg > 11;
         |let res = 'one' + 'two';
@@ -66,7 +66,8 @@ object Main {
         |print($mapa["1"]);""".stripMargin
     val context =
       new Context(MutMap[String, Engine]("demo" -> new DemoEngine), "demo")
-    run(code, context)
+    val res = core.run(code, context)
     println(context.scope.head)
+    println(res)
   }
 }

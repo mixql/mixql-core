@@ -31,6 +31,8 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
     res
   }
 
+  override def visitEmpty_stmt(x: sql.Empty_stmtContext): Type = Null
+  
   override def visitReturn_stmt(ctx: sql.Return_stmtContext): Type = {
     val res = visit(ctx.expr)
     res.ret = true
