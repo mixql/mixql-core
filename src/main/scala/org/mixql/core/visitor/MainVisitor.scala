@@ -9,7 +9,6 @@ import org.mixql.core.parser.sql
 
 import scala.util.{Failure, Success}
 import scala.collection.JavaConverters._
-//import scala.jdk.CollectionConverters._
 
 class MainVisitor(ctx: Context, tokens: TokenStream)
     extends ExpressionVisitor
@@ -32,7 +31,7 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
   }
 
   override def visitEmpty_stmt(x: sql.Empty_stmtContext): Type = Null
-  
+
   override def visitReturn_stmt(ctx: sql.Return_stmtContext): Type = {
     val res = visit(ctx.expr)
     res.ret = true
