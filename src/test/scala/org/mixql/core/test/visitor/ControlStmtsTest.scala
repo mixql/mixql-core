@@ -276,4 +276,47 @@ class ControlStmtsTest extends MainVisitorBaseTest {
     assert(res.isInstanceOf[int])
     assert(res.asInstanceOf[int].value == 1)
   }
+
+  test("Test multiple assigment") {
+    val code =
+      """
+        |let res1, res2 = 1, 2, 3;
+                """.stripMargin
+    val context = runMainVisitor(code)
+    val res1 = context.getVar("res1")
+    assert(res1.isInstanceOf[int])
+    assert(res1.asInstanceOf[int].value == 1)
+    val res2 = context.getVar("res2")
+    assert(res2.isInstanceOf[int])
+    assert(res2.asInstanceOf[int].value == 2)
+  }
+
+  test("Test multiple assigment: unpack array") {
+    val code =
+      """
+        |let res1, res2 = [1, 2, 3];
+                """.stripMargin
+    val context = runMainVisitor(code)
+    val res1 = context.getVar("res1")
+    assert(res1.isInstanceOf[int])
+    assert(res1.asInstanceOf[int].value == 1)
+    val res2 = context.getVar("res2")
+    assert(res2.isInstanceOf[int])
+    assert(res2.asInstanceOf[int].value == 2)
+  }
+
+  test("Test multiple assigment: foreach") {
+    val code =
+      """
+        |let res = 0;
+        |let c = [[1, 2, 4], [3, 4, 8], [5, 6, 9]];
+        |for a, b in $c loop
+        | let res = $res + $a + $b;
+        |end loop
+                """.stripMargin
+    val context = runMainVisitor(code)
+    val res = context.getVar("res")
+    assert(res.isInstanceOf[int])
+    assert(res.asInstanceOf[int].value == 21)
+  }
 }

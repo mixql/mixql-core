@@ -81,6 +81,27 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
     Null
   }
 
+  override def visitAssigment_multiple(ctx: sql.Assigment_multipleContext): Type = {
+    if (ctx.expr.size > 1) {
+      if (ctx.ident.size > ctx.expr.size)
+        throw new IndexOutOfBoundsException("not enought argument for multiple assigment")
+      ctx.ident.asScala.zip(ctx.expr.asScala).foreach(variable =>
+        context.setVar(visit(variable._1).toString, visit(variable._2))
+      )
+    } else {
+      val res = visit(ctx.expr(0)) match {
+        case arr: array => 
+          if (ctx.ident.size > arr.size.value)
+            throw new IndexOutOfBoundsException("not enought argument for multiple assigment")
+          ctx.ident.asScala.zip(arr.arr).foreach(variable =>
+            context.setVar(visit(variable._1).toString, variable._2)
+          )
+        case _ => throw new IllegalArgumentException("cannot unpack non array expression") 
+      }
+    }
+    Null  
+  }
+
   override def visitPrint_stmt(ctx: sql.Print_stmtContext): Type = {
     println("[USER PRINT]: " + visit(ctx.expr).toString)
     Null

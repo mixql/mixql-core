@@ -4,6 +4,8 @@ import org.mixql.core.context.gtype._
 import org.mixql.core.parser.sql
 import scala.language.implicitConversions
 
+import scala.collection.JavaConverters._
+
 trait ControlStmtsVisitor extends BaseVisitor {
   override def visitTry_catch_stmt(ctx: sql.Try_catch_stmtContext): Type = {
     try {
@@ -97,29 +99,58 @@ trait ControlStmtsVisitor extends BaseVisitor {
     val cursor = visit(ctx.expr)
     cursor match {
       case array(arr) =>
-        if (ctx.ident.size != 1)
-          throw new IllegalStateException("array can have only 1 cursor")
-        val cursorName = visit(ctx.ident(0)).toString
-        val old = context.getVar(cursorName)
-        arr.foreach(el => {
-          context.setVar(cursorName, el)
-          visit(ctx.block)
-        })
-        context.setVar(cursorName, old)
+        ctx.ident.size match {
+          case 1 => 
+            val cursorName = visit(ctx.ident(0)).toString
+            val old = context.getVar(cursorName)
+            arr.foreach(el => {
+              context.setVar(cursorName, el)
+              visit(ctx.block)
+            })
+            context.setVar(cursorName, old)
+          case other => 
+            val cursors = ctx.ident.asScala.map(visit(_).toString).toList
+            val old = cursors.map(context.getVar(_))
+            arr.foreach(el => {
+              if (el.isInstanceOf[array]) {
+                val a = el.asInstanceOf[array]
+                if (a.arr.size < cursors.size)
+                  throw new IllegalStateException("not enough arguments to unpack")
+                cursors.zip(a.arr).foreach(kv => {
+                  context.setVar(kv._1, kv._2)
+                })
+                visit(ctx.block)
+              } else {
+                throw new IllegalStateException("not enough arguments to unpack")
+              }
+            })
+            cursors.zip(old).foreach(x => context.setVar(x._1, x._2))
+        }
       case map(m) =>
-        if (ctx.ident.size != 2)
-          throw new IllegalStateException("map can have only 2 cursors")
-        val cursorKeyName = visit(ctx.ident(0)).toString
-        val cursorValueName = visit(ctx.ident(1)).toString
-        val oldKey = context.getVar(cursorKeyName)
-        val oldValue = context.getVar(cursorValueName)
-        m.foreach(el => {
-          context.setVar(cursorKeyName, el._1)
-          context.setVar(cursorValueName, el._2)
-          visit(ctx.block)
-        })
-        context.setVar(cursorKeyName, oldKey)
-        context.setVar(cursorValueName, oldValue)
+        ctx.ident.size match {
+          case 2 =>
+            val cursorKeyName = visit(ctx.ident(0)).toString
+            val cursorValueName = visit(ctx.ident(1)).toString
+            val oldKey = context.getVar(cursorKeyName)
+            val oldValue = context.getVar(cursorValueName)
+            m.foreach(el => {
+              context.setVar(cursorKeyName, el._1)
+              context.setVar(cursorValueName, el._2)
+              visit(ctx.block)
+            })
+            context.setVar(cursorKeyName, oldKey)
+            context.setVar(cursorValueName, oldValue)
+          case 1 =>
+            val cursorName = visit(ctx.ident(0)).toString
+            val oldCursor = context.getVar(cursorName)
+            m.foreach(el => {
+              context.setVar(cursorName, el._2)
+              visit(ctx.block)
+            })
+            context.setVar(cursorName, oldCursor)
+          case _ =>
+            throw new IllegalStateException("too many cursors for map")
+        }        
       case other =>
         throw new IllegalArgumentException("cursor must be collection")
     }

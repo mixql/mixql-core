@@ -33,7 +33,7 @@ print_stmt: T_PRINT T_OPEN_P expr T_CLOSE_P T_SEMICOLON;
 assigment_stmt:
        T_LET ident T_COLON? T_EQUAL expr T_SEMICOLON                                       #assigment_default
      | T_LET ident T_OPEN_SB index=expr T_CLOSE_SB T_COLON? T_EQUAL value=expr T_SEMICOLON #assigment_by_index
-//    | T_SET ident (T_COMMA ident)* T_COLON? T_EQUAL  expr (T_COMMA expr)*
+     | T_LET ident (T_COMMA ident)* T_COLON? T_EQUAL expr (T_COMMA expr)* T_SEMICOLON      #assigment_multiple
      ;
 
 if_stmt: T_IF expr T_THEN block elseif_block* else_block? T_END T_IF;
