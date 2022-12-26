@@ -12,30 +12,30 @@ import scala.reflect.ClassTag
   * and functions
   *
   * @param engines
-  * map engineName -> engine
+  *   map engineName -> engine
   * @param defaultEngine
-  * name of current engine
+  *   name of current engine
   * @param variables
-  * map variableName -> variableValue
+  *   map variableName -> variableValue
   * @param function
-  * map functionName -> function
+  *   map functionName -> function
   */
 class Context(
-               val engines: MutMap[String, Engine],
-               defaultEngine: String,
-               variables: MutMap[String, Type] = MutMap[String, Type](),
-               val functions: MutMap[String, Any] = MutMap[String, Any](
-                 "ascii" -> StringFunction.ascii,
-                 "base64" -> StringFunction.base64,
-                 "concat" -> StringFunction.concat,
-                 "concat_ws" -> StringFunction.concat_ws,
-                 "length" -> StringFunction.length,
-                 "substr" -> StringFunction.substr,
-                 "format_number" -> StringFunction.formatNumber,
-                 "size" -> ArrayFunction.size,
-                 "sort" -> ArrayFunction.sort
-               )
-             ) extends java.lang.AutoCloseable {
+  val engines: MutMap[String, Engine],
+  defaultEngine: String,
+  variables: MutMap[String, Type] = MutMap[String, Type](),
+  val functions: MutMap[String, Any] = MutMap[String, Any](
+    "ascii" -> StringFunction.ascii,
+    "base64" -> StringFunction.base64,
+    "concat" -> StringFunction.concat,
+    "concat_ws" -> StringFunction.concat_ws,
+    "length" -> StringFunction.length,
+    "substr" -> StringFunction.substr,
+    "format_number" -> StringFunction.formatNumber,
+    "size" -> ArrayFunction.size,
+    "sort" -> ArrayFunction.sort
+  )
+) extends java.lang.AutoCloseable {
 
   var scope = List[MutMap[String, Type]](variables)
 
@@ -81,7 +81,7 @@ class Context(
     * [[java.util.NoSuchElementException]] if no engine with this name
     *
     * @param name
-    * of engine
+    *   of engine
     */
   def setCurrentEngine(name: String): Unit = {
     if (name == "interpolator")
@@ -102,7 +102,7 @@ class Context(
     * would be removed from context
     *
     * @param engine
-    * to register
+    *   to register
     */
   def addEngine(engine: Engine): Unit = {
     if (engine.name == "interpolator")
@@ -116,9 +116,9 @@ class Context(
     * was other engine with this name it would be removed from context
     *
     * @param name
-    * of engine to register. must not be "interpolator"
+    *   of engine to register. must not be "interpolator"
     * @param engine
-    * to register
+    *   to register
     */
   def addEngine(name: String, engine: Engine): Unit = {
     if (name == "interpolator")
@@ -131,9 +131,9 @@ class Context(
   /** get execution engine by name
     *
     * @param name
-    * of execution engine
+    *   of execution engine
     * @return
-    * engine
+    *   engine
     */
   def getEngine(name: String): Option[Engine] =
     engines.get(name)
@@ -141,12 +141,12 @@ class Context(
   /** get exectution engine by class
     *
     * @return
-    * the first engine isInstanceOf[T]
+    *   the first engine isInstanceOf[T]
     */
-  def getEngine[T <: Engine : ClassTag]: Option[T] = {
+  def getEngine[T <: Engine: ClassTag]: Option[T] = {
     val res = engines.values.flatMap {
       case e: T => Some(e)
-      case _ => None
+      case _    => None
     }
     if (res.isEmpty)
       None
@@ -157,9 +157,9 @@ class Context(
   /** execute statement on current engine
     *
     * @param stmt
-    * statement to execute
+    *   statement to execute
     * @return
-    * the result of execution
+    *   the result of execution
     */
   def execute(stmt: String): Type =
     currentEngine.execute(stmt)
@@ -167,11 +167,11 @@ class Context(
   /** execute statement on engine
     *
     * @param stmt
-    * statement to execute
+    *   statement to execute
     * @param engine
-    * engine name to execute
+    *   engine name to execute
     * @return
-    * the result of execution
+    *   the result of execution
     */
   def execute(stmt: String, engine: String): Type =
     getEngine(engine) match {
@@ -182,13 +182,13 @@ class Context(
   /** execute statement on engine with specific params
     *
     * @param stmt
-    * statement to execute
+    *   statement to execute
     * @param engine
-    * engine name to execute
+    *   engine name to execute
     * @param params
-    * params used to execute. old params sets after
+    *   params used to execute. old params sets after
     * @return
-    * the result of execution
+    *   the result of execution
     */
   def execute(stmt: String, engine: String, params: Map[String, Type]): Type =
     getEngine(engine) match {
@@ -205,9 +205,9 @@ class Context(
     * param updates by value
     *
     * @param key
-    * the variable or engine param name
+    *   the variable or engine param name
     * @param value
-    * the value of variable or param
+    *   the value of variable or param
     */
   def setVar(key: String, value: Type): Unit = {
     // set current engine param
@@ -238,15 +238,15 @@ class Context(
   /** get the variable value by name
     *
     * @param key
-    * variable name
+    *   variable name
     * @return
-    * variable value
+    *   variable value
     */
   def getVar(key: String): Type = {
     scope.foreach(vars => {
       val res = vars.getOrElse(key, Null)
       res match {
-        case Null =>
+        case Null  =>
         case other => return other
       }
     })
@@ -256,9 +256,9 @@ class Context(
   /** interpolate statement via current context
     *
     * @param stmt
-    * statement to interpolate
+    *   statement to interpolate
     * @return
-    * interpolated statement
+    *   interpolated statement
     */
   def interpolate(stmt: String): String = {
     interpolator.currentEngine = currentEngine
@@ -272,7 +272,7 @@ class Context(
     * name it would be removed from context
     *
     * @param name
-    * of funtion
+    *   of funtion
     * @param function
     */
   def addFunction(name: String, function: Any): Unit = {
@@ -291,9 +291,7 @@ class Context(
       import java.lang.AutoCloseable
       if (engine.isInstanceOf[AutoCloseable]) {
         val engineCloseable: AutoCloseable = engine.asInstanceOf[AutoCloseable]
-        println(
-          s"mixql core context: stopping engine " + engine.name
-        )
+        println(s"mixql core context: stopping engine " + engine.name)
         engineCloseable.close()
       }
     })

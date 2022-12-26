@@ -100,7 +100,7 @@ trait ControlStmtsVisitor extends BaseVisitor {
     cursor match {
       case array(arr) =>
         ctx.ident.size match {
-          case 1 => 
+          case 1 =>
             val cursorName = visit(ctx.ident(0)).toString
             val old = context.getVar(cursorName)
             arr.foreach(el => {
@@ -108,20 +108,26 @@ trait ControlStmtsVisitor extends BaseVisitor {
               visit(ctx.block)
             })
             context.setVar(cursorName, old)
-          case other => 
+          case other =>
             val cursors = ctx.ident.asScala.map(visit(_).toString).toList
             val old = cursors.map(context.getVar(_))
             arr.foreach(el => {
               if (el.isInstanceOf[array]) {
                 val a = el.asInstanceOf[array]
                 if (a.arr.size < cursors.size)
-                  throw new IllegalStateException("not enough arguments to unpack")
-                cursors.zip(a.arr).foreach(kv => {
-                  context.setVar(kv._1, kv._2)
-                })
+                  throw new IllegalStateException(
+                    "not enough arguments to unpack"
+                  )
+                cursors
+                  .zip(a.arr)
+                  .foreach(kv => {
+                    context.setVar(kv._1, kv._2)
+                  })
                 visit(ctx.block)
               } else {
-                throw new IllegalStateException("not enough arguments to unpack")
+                throw new IllegalStateException(
+                  "not enough arguments to unpack"
+                )
               }
             })
             cursors.zip(old).foreach(x => context.setVar(x._1, x._2))
@@ -150,7 +156,7 @@ trait ControlStmtsVisitor extends BaseVisitor {
             context.setVar(cursorName, oldCursor)
           case _ =>
             throw new IllegalStateException("too many cursors for map")
-        }        
+        }
       case other =>
         throw new IllegalArgumentException("cursor must be collection")
     }
