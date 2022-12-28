@@ -1,0 +1,6 @@
+.Get MixQL-Core
+* xref:linux-requirements.adoc[]
+* xref:windows-requirements.adoc[]
+* xref:install.adoc[]
+* xref:upgrade.adoc[]
+* xref:supported-platforms.adoc[]

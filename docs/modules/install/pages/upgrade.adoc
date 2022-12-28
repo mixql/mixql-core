@@ -1,0 +1,5 @@
+= Upgrade MixQL-Core
+
+On this page, you'll learn:
+
+* [x] How to upgrade NMixQL-Core.
