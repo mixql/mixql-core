@@ -1,0 +1,12 @@
+= Windows Requirements
+:url-choco: https://chocolatey.org
+:url-nvm-windows: https://github.com/coreybutler/nvm-windows
+
+On this page, you'll learn:
+
+* [x] How to install Chocolatey, the Windows package manager.
+* [x] How to install Scala.
+
+If you've never installed MixQL-Core before, you'll need to complete the steps ...
+
+== Scala

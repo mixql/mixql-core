@@ -1,0 +1,3 @@
+* xref:ref:index.adoc[]
+** xref:ref:assign.adoc[]
+** https://docs.spring.io/spring-cloud/docs/current/reference/html/[API Doc Outer Link]

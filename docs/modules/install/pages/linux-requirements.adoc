@@ -1,0 +1,12 @@
+= Linux Requirements
+:platform: Linux
+
+On this page, you'll learn:
+
+* [x] How to install Scala.
+
+Since MixQL is built on Scala, you'll need Scala installed on your machine to install and run MixQL.
+
+[#scala]
+== Scala
+

@@ -1,0 +1,16 @@
+= Install MixQL-Core
+
+Assumptions:
+
+* [x] You've installed ...
+
+On this page, you'll learn:
+
+* [x] How to run MixQL-Core without installing it.
+* [x] How to install MixQL-Core locally (recommended).
+
+== Try before you install
+
+
+
+

@@ -1,0 +1,18 @@
+name: mixql-core
+title: MixQL Core
+version: 'v0.1.0'
+prerelease: -alpha.1
+#display_version: '0.1.0 Spiny'
+#prerelease: false
+start_page: index.adoc
+
+nav:
+  - modules/ROOT/nav.adoc
+  - modules/install/nav.adoc
+  - modules/ref/nav.adoc
+
+asciidoc:
+  url-repo: https://github.com/ntlegion/mixql-core
+  release-date: 2022-11-28
+  release-tag: latest
+  release-version: '0.1.0'
