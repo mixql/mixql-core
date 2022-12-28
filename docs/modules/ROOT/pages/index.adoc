@@ -1,6 +1,16 @@
 = Overview
 :navtitle: Overview
 :keywords: sql, engine, spark, protobuf
-:description: Protobuf desc
+:description: MixQL-Core desc
 
-== Text
+== {description}
+
+
+////
+This is the start page of project's documentation, and therefore likely the first thing people read.
+
+Main links for editors:
+- AsciiDoc syntax https://docs.asciidoctor.org/asciidoc/latest/syntax-quick-reference/
+- Antora Pages https://docs.antora.org/antora/latest/page/
+
+////

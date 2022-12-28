@@ -1,6 +1,8 @@
 = Getting started
 :navtitle: Getting started
 :keywords: sql, engine, spark, protobuf
-:description: Protobuf Getting started
+:description: MixQL-Core Getting started
 
-== Getting started
+== {description}
+
+
