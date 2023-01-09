@@ -135,6 +135,8 @@ class ControlStmtsTest extends MainVisitorBaseTest {
 
       override def execute(stmt: String): Type = ???
 
+      override def executeFunc(name: String, params: Type*): Type = ???
+
       override def setParam(name: String, value: Type): Unit = ???
 
       override def getParam(name: String): Type = ???

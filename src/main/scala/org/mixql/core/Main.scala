@@ -17,6 +17,8 @@ object Main {
       Null
     }
 
+    override def executeFunc(name: String, params: Type*) = Null
+
     override def setParam(name: String, value: Type): Unit = {}
 
     override def getParam(name: String): Type = Null

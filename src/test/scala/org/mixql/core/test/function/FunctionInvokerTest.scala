@@ -93,23 +93,23 @@ class FunctionInvokerTest extends AnyFunSuite {
   )
 
   test("Invoke anonymous function") {
-    val res = FunctionInvoker.invoke(functions, "length", List("123"))
+    val res = FunctionInvoker.invoke(functions, "length", null, List("123"))
     assert(res == 3)
   }
 
   test("Invoke default argument function") {
-    val res = FunctionInvoker.invoke(functions, "def_arg_func", Nil)
+    val res = FunctionInvoker.invoke(functions, "def_arg_func", null, Nil)
     assert(res == "abc")
   }
 
   test("Invoke two default argument function") {
-    val res = FunctionInvoker.invoke(functions, "two_def_arg_func", Nil)
+    val res = FunctionInvoker.invoke(functions, "two_def_arg_func", null, Nil)
     assert(res == "abc1234")
   }
 
   test("Invoke function with default second argument") {
     val res =
-      FunctionInvoker.invoke(functions, "default_second_arg_func", List("abc"))
+      FunctionInvoker.invoke(functions, "default_second_arg_func", null, List("abc"))
     assert(res == "abc1234")
   }
 
@@ -117,6 +117,7 @@ class FunctionInvokerTest extends AnyFunSuite {
     val res = FunctionInvoker.invoke(
       functions,
       "two_def_arg_func",
+      null,
       Nil,
       Map("a" -> "qw", "b" -> "erty")
     )
@@ -125,13 +126,13 @@ class FunctionInvokerTest extends AnyFunSuite {
   }
 
   test("substr") {
-    val res = FunctionInvoker.invoke(functions, "substr", List("123545", 3, 5))
+    val res = FunctionInvoker.invoke(functions, "substr", null, List("123545", 3, 5))
 
     assert(res == "123545".substring(3, 5))
   }
 
   test("substr2") {
-    val res = FunctionInvoker.invoke(functions, "substr", List("123545", 3))
+    val res = FunctionInvoker.invoke(functions, "substr", null, List("123545", 3))
 
     assert(res == "123545".substring(3))
   }
@@ -140,6 +141,7 @@ class FunctionInvokerTest extends AnyFunSuite {
     val res = FunctionInvoker.invoke(
       functions,
       "variable_number_of_args",
+      null,
       List("1", "2", "3", "4")
     )
 
@@ -150,6 +152,7 @@ class FunctionInvokerTest extends AnyFunSuite {
     val res = FunctionInvoker.invoke(
       functions,
       "first_def_arg_and_second_variable_args",
+      null,
       List("ABC", 1, 2, 3)
     )
 
@@ -160,35 +163,28 @@ class FunctionInvokerTest extends AnyFunSuite {
     val res = FunctionInvoker.invoke(
       functions,
       "first_and_second_def_arg_and_third_variable_args",
+      null,
       List("ABC", "DE", 1, 2, 3, 4)
     )
 
     assert(res == "ABCDE10")
   }
 
-  test("Invoke undefined function") {
-    val thrown = intercept[RuntimeException] {
-      FunctionInvoker.invoke(functions, "foo", List("bar"))
-    }
-
-    assert(thrown.getMessage == "Can't find function `foo`")
-  }
-
   test("Invoke overloading function[Int]") {
-    val res = FunctionInvoker.invoke(functions, "dec", List(5))
+    val res = FunctionInvoker.invoke(functions, "dec", null, List(5))
     assert(res == 4)
   }
 
   test("Invoke overloading function[String]") {
     val res =
-      FunctionInvoker.invoke(functions, "dec", List("abc")).asInstanceOf[String]
+      FunctionInvoker.invoke(functions, "dec", null, List("abc")).asInstanceOf[String]
 
     assert(res == "ab")
   }
 
   test("Invoke overloading function[Double]") {
     val res =
-      FunctionInvoker.invoke(functions, "dec", List(1.1)).asInstanceOf[Double]
+      FunctionInvoker.invoke(functions, "dec", null, List(1.1)).asInstanceOf[Double]
 
     assert((res - 0.1) < 0.0000000001)
   }
@@ -196,7 +192,7 @@ class FunctionInvokerTest extends AnyFunSuite {
   test("Invoke overloading function[List[Int]]") {
     val res =
       FunctionInvoker
-        .invoke(functions, "dec", List(1, 2, 3))
+        .invoke(functions, "dec", null, List(1, 2, 3))
         .asInstanceOf[String]
 
     assert(res == "0 1 2")
@@ -205,7 +201,7 @@ class FunctionInvokerTest extends AnyFunSuite {
   ignore("Invoke overloading function[List[String]]") {
     val res =
       FunctionInvoker
-        .invoke(functions, "dec", List("ab", "cd", "ef"))
+        .invoke(functions, "dec", null, List("ab", "cd", "ef"))
         .asInstanceOf[String]
 
     assert(res == "a c e")
@@ -214,7 +210,7 @@ class FunctionInvokerTest extends AnyFunSuite {
   ignore("Invoke overloading function[List[List[String]]]") {
     val res =
       FunctionInvoker
-        .invoke(functions, "dec", List(List("ab", "cd"), List("ef")))
+        .invoke(functions, "dec", null, List(List("ab", "cd"), List("ef")))
         .asInstanceOf[String]
 
     assert(res == "a c e")

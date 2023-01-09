@@ -6,7 +6,6 @@ import org.mixql.core.engine.Engine
 import org.mixql.core.test.stub.StubEngine
 import org.mixql.core.visitor.MainVisitor
 import org.mixql.core.parser.{sql, token}
-import org.mixql.core.context.Context
 import org.scalatest.funsuite.AnyFunSuite
 
 import scala.collection.mutable.{Map => MutMap}

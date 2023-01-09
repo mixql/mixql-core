@@ -23,6 +23,7 @@ class ContextTest extends AnyFunSuite {
       query = stmt
       Null
     }
+    override def executeFunc(name: String, params: Type*): Type = ??? 
     override def getParam(name: String): Type = Null
     override def setParam(name: String, value: Type): Unit = {}
   }

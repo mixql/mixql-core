@@ -21,6 +21,16 @@ abstract class Engine {
     *   the result of exection
     */
   def execute(stmt: String): Type
+  
+  /** execute engine specific user function
+    *
+    * @param name
+    *   function name
+    * @param params
+    *   function params
+    * @return
+    */
+  def executeFunc(name: String, params: Type*): Type
 
   /** set param for engine
     *

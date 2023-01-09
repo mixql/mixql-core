@@ -3,6 +3,10 @@ package org.mixql.core.test.visitor
 import org.mixql.core.context.gtype._
 import org.mixql.core.test.MainVisitorBaseTest
 import org.mixql.core.test.stub.StubEngine
+import org.mixql.core.context.Context
+import org.mixql.core.engine.Engine
+
+import scala.collection.mutable.{Map => MutMap}
 
 class ExpressionTest extends MainVisitorBaseTest {
   test("Test arithmetic expression") {
@@ -402,5 +406,36 @@ class ExpressionTest extends MainVisitorBaseTest {
     val res2 = context.getVar("res")
     assert(res2.isInstanceOf[bool])
     assert((res2.asInstanceOf[bool] == bool(false)).asInstanceOf[bool].value)
+  }
+
+  test("Test call engine specific function") {
+    val code =
+      """
+        |let res = getnum();
+                """.stripMargin
+    val context = runMainVisitor(code)
+    val res = context.getVar("res")
+    assert(res.isInstanceOf[int])
+    assert(res.asInstanceOf[int].value == 42)
+  }
+
+  test("Test call function uses context") {
+    val code =
+      """
+        |let a = 32;
+        |let res = testcontext("gg, 10");
+                """.stripMargin
+    val context = new Context(MutMap[String, Engine]("stub" -> (new StubEngine)), "stub")
+    val testContext = new ((String, Int, Context) => Int) {
+      override def apply(str: String, num: Int, context: Context): Int = {
+        val a = context.getVar("a")
+        a.asInstanceOf[int].value + num
+      }
+    }
+    context.addFunction("testcontext", testContext)
+    runMainVisitor(code, context)
+    val res = context.getVar("res")
+    assert(res.isInstanceOf[int])
+    assert(res.asInstanceOf[int].value == 42)
   }
 }

@@ -1,12 +1,17 @@
 package org.mixql.core.function
 
+import org.mixql.core.context.Context
+import org.mixql.core.context.gtype._
 import java.lang.reflect.Method
 import scala.collection.mutable.ListBuffer
+
+import scala.reflect.runtime.{universe => ru}
 
 object FunctionInvoker {
   def invoke(
     functions: Map[String, Any],
     funcName: String,
+    context: Context,
     params: Seq[Any] = Nil,
     paramsMap: Map[String, Object] = Map.empty
   ): Any = {
@@ -26,6 +31,7 @@ object FunctionInvoker {
               if (compareFunctionTypes(applyMethods(0), params)) {
                 return invokeFunc(
                   f.asInstanceOf[Object],
+                  context,
                   params.map(a => a.asInstanceOf[Object]),
                   paramsMap,
                   funcName
@@ -38,13 +44,14 @@ object FunctionInvoker {
           case _ =>
             invokeFunc(
               func.asInstanceOf[Object],
+              context,
               params.map(a => a.asInstanceOf[Object]),
               paramsMap,
               funcName
             )
         }
       case None =>
-        throw new RuntimeException(s"Can't find function `$funcName`")
+        unpack(context.currentEngine.executeFunc(funcName.toLowerCase, params.map(pack): _*))
     }
   }
 
@@ -82,6 +89,7 @@ object FunctionInvoker {
 
   private def invokeFunc(
     obj: Object,
+    context: Context,
     params: Seq[Object] = Nil,
     paramsMap: Map[String, Object] = Map.empty,
     funcName: String
@@ -96,9 +104,13 @@ object FunctionInvoker {
           apply.invoke(obj, params: _*)
         else {
           val lb = ListBuffer(params.toIndexedSeq: _*)
+          // add default values
           for (i <- params.length + 1 to pc) {
             val paramName = apply.getParameters.apply(i - 1).getName
-            lb += paramsMap.getOrElse(paramName, getDefParamsFor(obj, i))
+            if(paramName.toLowerCase == "context")
+              lb += context
+            else
+              lb += paramsMap.getOrElse(paramName, getDefParamsFor(obj, i))
           }
           if (lb.length > pc) {
             val head = lb.take(pc - 1)
@@ -114,6 +126,8 @@ object FunctionInvoker {
         )
     }
   }
+
+  private def getType[T: ru.TypeTag](obj: T) = ru.typeOf[T]
 
   private def getDefParamsFor(obj: Object, i: Int): Object = {
     val paramName = s"apply$$default$$$i"
