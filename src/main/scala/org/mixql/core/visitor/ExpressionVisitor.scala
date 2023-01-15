@@ -157,7 +157,9 @@ trait ExpressionVisitor extends BaseVisitor {
       .map(visit)
       .map(unpack(_).asInstanceOf[Object])
       .toSeq
-    pack(FunctionInvoker.invoke(context.functions.toMap, funcName, context, params))
+    pack(
+      FunctionInvoker.invoke(context.functions.toMap, funcName, context, params)
+    )
   }
 
   override def visitExprSpecFuncCast(ctx: sql.ExprSpecFuncCastContext): Type = {

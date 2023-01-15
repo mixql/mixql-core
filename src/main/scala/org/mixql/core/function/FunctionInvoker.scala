@@ -51,7 +51,10 @@ object FunctionInvoker {
             )
         }
       case None =>
-        unpack(context.currentEngine.executeFunc(funcName.toLowerCase, params.map(pack): _*))
+        unpack(
+          context.currentEngine
+            .executeFunc(funcName.toLowerCase, params.map(pack): _*)
+        )
     }
   }
 
@@ -106,8 +109,13 @@ object FunctionInvoker {
           val lb = ListBuffer(params.toIndexedSeq: _*)
           // add default values
           for (i <- params.length + 1 to pc) {
+            val m = ru.runtimeMirror(this.getClass.getClassLoader)
+            val cl = m.classSymbol(obj.getClass).toType
+            val ap = cl.member(ru.TermName("apply")).asTerm.alternatives.head
+            val p = ap.asMethod.paramLists.head(i - 1).asTerm.typeSignature
+
             val paramName = apply.getParameters.apply(i - 1).getName
-            if(paramName.toLowerCase == "context")
+            if (p == ru.typeOf[Context])
               lb += context
             else
               lb += paramsMap.getOrElse(paramName, getDefParamsFor(obj, i))
@@ -126,8 +134,6 @@ object FunctionInvoker {
         )
     }
   }
-
-  private def getType[T: ru.TypeTag](obj: T) = ru.typeOf[T]
 
   private def getDefParamsFor(obj: Object, i: Int): Object = {
     val paramName = s"apply$$default$$$i"

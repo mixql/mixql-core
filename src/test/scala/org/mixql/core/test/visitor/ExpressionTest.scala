@@ -423,9 +423,10 @@ class ExpressionTest extends MainVisitorBaseTest {
     val code =
       """
         |let a = 32;
-        |let res = testcontext("gg, 10");
+        |let res = testcontext("gg", 10);
                 """.stripMargin
-    val context = new Context(MutMap[String, Engine]("stub" -> (new StubEngine)), "stub")
+    val context =
+      new Context(MutMap[String, Engine]("stub" -> (new StubEngine)), "stub")
     val testContext = new ((String, Int, Context) => Int) {
       override def apply(str: String, num: Int, context: Context): Int = {
         val a = context.getVar("a")

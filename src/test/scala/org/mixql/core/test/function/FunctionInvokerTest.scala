@@ -109,7 +109,12 @@ class FunctionInvokerTest extends AnyFunSuite {
 
   test("Invoke function with default second argument") {
     val res =
-      FunctionInvoker.invoke(functions, "default_second_arg_func", null, List("abc"))
+      FunctionInvoker.invoke(
+        functions,
+        "default_second_arg_func",
+        null,
+        List("abc")
+      )
     assert(res == "abc1234")
   }
 
@@ -126,13 +131,15 @@ class FunctionInvokerTest extends AnyFunSuite {
   }
 
   test("substr") {
-    val res = FunctionInvoker.invoke(functions, "substr", null, List("123545", 3, 5))
+    val res =
+      FunctionInvoker.invoke(functions, "substr", null, List("123545", 3, 5))
 
     assert(res == "123545".substring(3, 5))
   }
 
   test("substr2") {
-    val res = FunctionInvoker.invoke(functions, "substr", null, List("123545", 3))
+    val res =
+      FunctionInvoker.invoke(functions, "substr", null, List("123545", 3))
 
     assert(res == "123545".substring(3))
   }
@@ -177,14 +184,18 @@ class FunctionInvokerTest extends AnyFunSuite {
 
   test("Invoke overloading function[String]") {
     val res =
-      FunctionInvoker.invoke(functions, "dec", null, List("abc")).asInstanceOf[String]
+      FunctionInvoker
+        .invoke(functions, "dec", null, List("abc"))
+        .asInstanceOf[String]
 
     assert(res == "ab")
   }
 
   test("Invoke overloading function[Double]") {
     val res =
-      FunctionInvoker.invoke(functions, "dec", null, List(1.1)).asInstanceOf[Double]
+      FunctionInvoker
+        .invoke(functions, "dec", null, List(1.1))
+        .asInstanceOf[Double]
 
     assert((res - 0.1) < 0.0000000001)
   }

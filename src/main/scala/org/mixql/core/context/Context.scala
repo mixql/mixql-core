@@ -52,9 +52,11 @@ class Context(
       Null
     }
 
-    override def executeFunc(name: String, params: Type*) = 
-      throw new UnsupportedOperationException("interpolator dont have specific funcs")
-      
+    override def executeFunc(name: String, params: Type*) =
+      throw new UnsupportedOperationException(
+        "interpolator dont have specific funcs"
+      )
+
     override def setParam(name: String, value: Type): Unit = {}
 
     override def getParam(name: String): Type = currentEngine.getParam(name)
