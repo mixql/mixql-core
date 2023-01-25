@@ -439,4 +439,25 @@ class ExpressionTest extends MainVisitorBaseTest {
     assert(res.isInstanceOf[int])
     assert(res.asInstanceOf[int].value == 42)
   }
+
+  test("Test call function params by names") {
+    val code =
+      """
+        |let a = 32;
+        |let res = testcontext(num = 10, str="gg");
+                """.stripMargin
+    val context =
+      new Context(MutMap[String, Engine]("stub" -> (new StubEngine)), "stub")
+    val testContext = new ((String, Int, Context) => Int) {
+      override def apply(str: String, num: Int, context: Context): Int = {
+        val a = context.getVar("a")
+        a.asInstanceOf[int].value + num
+      }
+    }
+    context.addFunction("testcontext", testContext)
+    runMainVisitor(code, context)
+    val res = context.getVar("res")
+    assert(res.isInstanceOf[int])
+    assert(res.asInstanceOf[int].value == 42)
+  }
 }

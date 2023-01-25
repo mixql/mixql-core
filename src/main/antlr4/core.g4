@@ -114,7 +114,11 @@ interval_item :
      ;
 
 func:
-     ident T_OPEN_P ((ident T_EQUAL)? expr (T_COMMA (ident T_EQUAL)? expr)*)? T_CLOSE_P
+     ident T_OPEN_P (arg (T_COMMA arg)*)? T_CLOSE_P
+     ;
+
+arg: 
+     (ident T_EQUAL)? expr
      ;
 
 lambda:

@@ -6,14 +6,15 @@ import java.lang.reflect.Method
 import scala.collection.mutable.ListBuffer
 
 import scala.reflect.runtime.{universe => ru}
+import scala.annotation.meta.param
 
 object FunctionInvoker {
   def invoke(
     functions: Map[String, Any],
     funcName: String,
     context: Context,
-    params: Seq[Any] = Nil,
-    paramsMap: Map[String, Object] = Map.empty
+    args: Seq[Any] = Nil,
+    kwargs: Map[String, Object] = Map.empty
   ): Any = {
     functions.get(funcName.toLowerCase()) match {
       case Some(func) =>
@@ -28,32 +29,32 @@ object FunctionInvoker {
                   ) && x.getName == "apply"
                 )
 
-              if (compareFunctionTypes(applyMethods(0), params)) {
+              if (compareFunctionTypes(applyMethods(0), args)) {
                 return invokeFunc(
                   f.asInstanceOf[Object],
                   context,
-                  params.map(a => a.asInstanceOf[Object]),
-                  paramsMap,
+                  args.map(a => a.asInstanceOf[Object]),
+                  kwargs,
                   funcName
                 )
               }
             }
             throw new RuntimeException(
-              s"Can't find function `$funcName` in $l [${l.length}] params=$params"
+              s"Can't find function `$funcName` in $l [${l.length}] params=$args"
             )
           case _ =>
             invokeFunc(
               func.asInstanceOf[Object],
               context,
-              params.map(a => a.asInstanceOf[Object]),
-              paramsMap,
+              args.map(a => a.asInstanceOf[Object]),
+              kwargs,
               funcName
             )
         }
       case None =>
         unpack(
           context.currentEngine
-            .executeFunc(funcName.toLowerCase, params.map(pack): _*)
+            .executeFunc(funcName.toLowerCase, args.map(pack): _*)
         )
     }
   }
@@ -93,41 +94,45 @@ object FunctionInvoker {
   private def invokeFunc(
     obj: Object,
     context: Context,
-    params: Seq[Object] = Nil,
-    paramsMap: Map[String, Object] = Map.empty,
+    args: Seq[Object] = Nil,
+    kwargs: Map[String, Object] = Map.empty,
     funcName: String
   ): Any = {
     if (obj.isInstanceOf[SqlLambda])
-      return obj.asInstanceOf[SqlLambda].apply(params: _*)
+      return obj.asInstanceOf[SqlLambda].apply(args: _*)
     val a = obj.getClass.getMethods.find(_.getName == "apply")
     a match {
       case Some(apply) =>
-        val pc = apply.getParameters.length
-        if (pc == params.length)
-          apply.invoke(obj, params: _*)
-        else {
-          val lb = ListBuffer(params.toIndexedSeq: _*)
-          // add default values
-          for (i <- params.length + 1 to pc) {
-            val m = ru.runtimeMirror(this.getClass.getClassLoader)
-            val cl = m.classSymbol(obj.getClass).toType
-            val ap = cl.member(ru.TermName("apply")).asTerm.alternatives.head
-            val p = ap.asMethod.paramLists.head(i - 1).asTerm.typeSignature
-
-            val paramName = apply.getParameters.apply(i - 1).getName
-            if (p == ru.typeOf[Context])
-              lb += context
-            else
-              lb += paramsMap.getOrElse(paramName, getDefParamsFor(obj, i))
+        val mirror = ru.runtimeMirror(this.getClass.getClassLoader)
+        val cl = mirror.classSymbol(obj.getClass).toType
+        val applyMethod =
+          cl.member(ru.TermName("apply")).asTerm.alternatives.head.asMethod
+        val applyParams = applyMethod.paramLists.head
+        var lb: ListBuffer[Object] = ListBuffer()
+        var args1 = args
+        var kwargs1 = kwargs
+        var i = 1
+        val size = applyParams.length
+        applyParams.foreach(param => {
+          val pname = param.asTerm.name.toString
+          val ptype = param.asTerm.typeSignature.baseClasses.head
+          // argument is variable number of args like gg: String*
+          if (i == size && ptype == ru.typeOf[Seq[Object]].baseClasses.head) {
+            lb += args1
+          } else if (param.asTerm.typeSignature == ru.typeOf[Context]) {
+            lb += context
+          } else if (kwargs1.contains(pname)) {
+            lb += kwargs1(pname)
+            kwargs1 = kwargs1 - pname
+          } else if (args1.nonEmpty) {
+            lb += args1.head
+            args1 = args1.tail
+          } else {
+            lb += getDefParamsFor(obj, i)
           }
-          if (lb.length > pc) {
-            val head = lb.take(pc - 1)
-            val tail = lb.drop(pc - 1)
-            val bundle = head ++ Seq(tail.toSeq)
-            apply.invoke(obj, bundle.toArray: _*)
-          } else
-            apply.invoke(obj, lb.toArray: _*)
-        }
+          i += 1
+        })
+        apply.invoke(obj, lb.toArray: _*)
       case None =>
         throw new RuntimeException(
           s"Can't find method `apply` in function $funcName"

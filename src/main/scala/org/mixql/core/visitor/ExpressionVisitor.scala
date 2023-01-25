@@ -151,14 +151,27 @@ trait ExpressionVisitor extends BaseVisitor {
   }
 
   override def visitExpr_func(ctx: sql.Expr_funcContext): Type = {
-    val funcName = visit(ctx.func.ident(0)).toString
+    val funcName = visit(ctx.func.ident).toString
     // TODO: add the implicit cast
-    val params: Seq[Object] = ctx.func.expr.asScala
-      .map(visit)
-      .map(unpack(_).asInstanceOf[Object])
+    val args: Seq[Object] = ctx.func.arg.asScala
+      .flatMap(arg => {
+        if (arg.ident == null) Seq(unpack(visit(arg.expr)).asInstanceOf[Object])
+        else Nil
+      })
       .toSeq
+    val kwargs: Map[String, Object] = ctx.func.arg.asScala
+      .flatMap(arg => {
+        if (arg.ident != null)
+          Seq(
+            visit(arg.ident).toString -> unpack(visit(arg.expr))
+              .asInstanceOf[Object]
+          )
+        else Nil
+      })
+      .toMap
     pack(
-      FunctionInvoker.invoke(context.functions.toMap, funcName, context, params)
+      FunctionInvoker
+        .invoke(context.functions.toMap, funcName, context, args, kwargs)
     )
   }
 
