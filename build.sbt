@@ -4,7 +4,7 @@ Antlr4 / antlr4Version := "4.8-1"
 Antlr4 / antlr4GenListener := false // default: true
 Antlr4 / antlr4GenVisitor := true // default: true
 
-lazy val root = (project in file("."))
+lazy val mixQLCore = (project in file("."))
   .enablePlugins(Antlr4Plugin)
   .settings(
     credentials += Credentials(Path.userHome / ".sbt" / "sonatype_credentials"),
