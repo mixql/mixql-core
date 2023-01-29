@@ -6,6 +6,7 @@ import java.lang.reflect.Method
 import scala.collection.mutable.ListBuffer
 
 import scala.annotation.meta.param
+import scala.deriving.Mirror
 
 object FunctionInvoker {
   def invoke(
@@ -99,9 +100,14 @@ object FunctionInvoker {
   ): Any = {
     if (obj.isInstanceOf[SqlLambda])
       return obj.asInstanceOf[SqlLambda].apply(args: _*)
-    val a = obj.getClass.getMethods.findLast(_.getName == "apply") 
+    val a = obj.getClass.getMethods.find(p =>
+      p.getName == "apply" && (p.getParameters.length == 0 || p
+        .getParameters()(0)
+        .getName.toLowerCase != "v1")
+    )
     a match {
       case Some(apply) =>
+        val m = Mirror
         val applyParams = apply.getParameters
         var lb: ListBuffer[Object] = ListBuffer()
         var args1 = args
@@ -117,8 +123,10 @@ object FunctionInvoker {
           // argument is variable number of args like gg: String*
           if (i == size && ptype.getName == seqc) {
             lb += args1
-          } else if (ptype.getName == cc ||
-                     ptype == Context.getClass) {
+          } else if (
+            ptype.getName == cc ||
+            ptype == Context.getClass
+          ) {
             lb += context
           } else if (kwargs1.contains(pname)) {
             lb += kwargs1(pname)
