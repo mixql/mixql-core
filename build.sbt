@@ -1,4 +1,4 @@
-ThisBuild / scalaVersion := Scala212
+ThisBuild / scalaVersion := Scala213
 
 Antlr4 / antlr4Version := "4.8-1"
 Antlr4 / antlr4GenListener := false // default: true
@@ -101,7 +101,7 @@ lazy val root = (project in file("."))
       }
     }
   )
-val Scala3 = "3.2.1"
+val Scala3 = "3.1.2"
 val Scala213 = "2.13.8"
 val Scala212 = "2.12.17"
 val ScalaVersions = Seq(Scala212, Scala213, Scala3)

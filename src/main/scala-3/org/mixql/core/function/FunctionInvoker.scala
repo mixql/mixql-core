@@ -107,7 +107,6 @@ object FunctionInvoker {
     )
     a match {
       case Some(apply) =>
-        val m = Mirror
         val applyParams = apply.getParameters
         var lb: ListBuffer[Object] = ListBuffer()
         var args1 = args
@@ -138,6 +137,7 @@ object FunctionInvoker {
           }
           i += 1
         })
+        apply.setAccessible(true)
         apply.invoke(obj, lb.toArray: _*)
       case None =>
         throw new RuntimeException(
@@ -148,6 +148,8 @@ object FunctionInvoker {
 
   private def getDefParamsFor(obj: Object, i: Int): Object = {
     val paramName = s"apply$$default$$$i"
-    obj.getClass.getMethod(paramName).invoke(obj)
+    val defval = obj.getClass.getMethod(paramName)
+    defval.setAccessible(true)
+    defval.invoke(obj)
   }
 }
