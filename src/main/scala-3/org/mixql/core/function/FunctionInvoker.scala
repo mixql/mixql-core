@@ -117,7 +117,6 @@ object FunctionInvoker {
         applyParams.foreach(param => {
           val pname = param.getName
           val ptype = param.getType
-          println(ptype.getName)
           val cc = "org.mixql.core.context.Context"
           val seqc = "scala.collection.immutable.Seq"
           // argument is variable number of args like gg: String*
