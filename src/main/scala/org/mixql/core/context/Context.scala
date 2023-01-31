@@ -281,10 +281,10 @@ class Context(
     * @param function
     */
   def addFunction(name: String, function: Any): Unit = {
-    if (functions.contains(name))
+    if (functions.contains(name.toLowerCase()))
       throw new InstantiationException(s"function $name is already defined")
     else
-      functions.put(name, function)
+      functions.put(name.toLowerCase(), function)
   }
 
   override def close(): Unit = {

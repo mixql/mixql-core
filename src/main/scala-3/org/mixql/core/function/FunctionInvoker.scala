@@ -6,7 +6,6 @@ import java.lang.reflect.Method
 import scala.collection.mutable.ListBuffer
 
 import scala.annotation.meta.param
-import scala.deriving.Mirror
 
 object FunctionInvoker {
   def invoke(
@@ -137,7 +136,6 @@ object FunctionInvoker {
           }
           i += 1
         })
-        apply.setAccessible(true)
         apply.invoke(obj, lb.toArray: _*)
       case None =>
         throw new RuntimeException(
@@ -149,7 +147,6 @@ object FunctionInvoker {
   private def getDefParamsFor(obj: Object, i: Int): Object = {
     val paramName = s"apply$$default$$$i"
     val defval = obj.getClass.getMethod(paramName)
-    defval.setAccessible(true)
     defval.invoke(obj)
   }
 }
