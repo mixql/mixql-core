@@ -58,4 +58,11 @@ abstract class Engine {
     *   true if param, false if not
     */
   def isParam(name: String): Boolean = true
+
+  /** get list of defined functions names
+    *
+    * @return
+    *   list of defined functions names
+    */
+  def getDefinedFunctions: List[String] = Nil
 }

@@ -153,9 +153,9 @@ trait ExpressionVisitor extends BaseVisitor {
   override def visitExpr_func(ctx: sql.Expr_funcContext): Type = {
     val funcName = visit(ctx.func.ident).toString
     // TODO: add the implicit cast
-    val args: Seq[Object] = ctx.func.arg.asScala
+    val args: Seq[Type] = ctx.func.arg.asScala
       .flatMap(arg => {
-        if (arg.ident == null) Seq(unpack(visit(arg.expr)).asInstanceOf[Object])
+        if (arg.ident == null) Seq(visit(arg.expr))
         else Nil
       })
       .toSeq
@@ -169,10 +169,37 @@ trait ExpressionVisitor extends BaseVisitor {
         else Nil
       })
       .toMap
-    pack(
-      FunctionInvoker
-        .invoke(context.functions.toMap, funcName, context, args, kwargs)
-    )
+    if (context.functions.contains(funcName))
+      pack(
+        FunctionInvoker
+          .invoke(
+            context.functions.toMap,
+            funcName,
+            context,
+            args.map(unpack(_).asInstanceOf[Object]),
+            kwargs
+          )
+      )
+    else {
+      if (kwargs.nonEmpty)
+        throw new UnsupportedOperationException(
+          "named args for engine function not supported"
+        )
+      if (context.currentEngine.getDefinedFunctions.contains(funcName))
+        context.currentEngine.executeFunc(funcName, args: _*)
+      else {
+        val engine = context.engines.find(eng =>
+          eng._2.getDefinedFunctions.contains(funcName)
+        )
+        engine match {
+          case Some(value) => value._2.executeFunc(funcName, args: _*)
+          case None =>
+            throw new NoSuchMethodException(
+              s"no function $funcName found for any engine"
+            )
+        }
+      }
+    }
   }
 
   override def visitExprSpecFuncCast(ctx: sql.ExprSpecFuncCastContext): Type = {
