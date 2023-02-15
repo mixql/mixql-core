@@ -28,4 +28,6 @@ class StubEngine extends Engine {
   override def getParam(name: String): Type = {
     param.getOrElse(name, Null)
   }
+
+  override def getDefinedFunctions: List[String] = List("getnum", "getstr")
 }

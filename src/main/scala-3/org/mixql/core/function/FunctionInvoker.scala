@@ -51,10 +51,26 @@ object FunctionInvoker {
             )
         }
       case None =>
-        unpack(
-          context.currentEngine
-            .executeFunc(funcName.toLowerCase, args.map(pack): _*)
+        if (kwargs.nonEmpty)
+        throw new UnsupportedOperationException(
+          "named args for engine function not supported"
         )
+        if (
+          context.currentEngine.getDefinedFunctions.contains(funcName.toLowerCase)
+        )
+          unpack(context.currentEngine.executeFunc(funcName, args.map(pack): _*))
+        else {
+          val engine = context.engines.find(eng =>
+            eng._2.getDefinedFunctions.contains(funcName)
+          )
+          engine match {
+            case Some(value) => unpack(value._2.executeFunc(funcName, args.map(pack): _*))
+            case None =>
+              throw new NoSuchMethodException(
+                s"no function $funcName found for any engine"
+              )
+          }
+        }
     }
   }
 
