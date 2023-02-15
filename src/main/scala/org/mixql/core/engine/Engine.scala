@@ -59,10 +59,10 @@ abstract class Engine {
     */
   def isParam(name: String): Boolean = true
 
-  /** get list of defined functions names
+  /** get list of defined functions names in lower case
     *
     * @return
-    *   list of defined functions names
+    *   list of defined functions names in lower case
     */
   def getDefinedFunctions: List[String] = Nil
 }

@@ -169,7 +169,7 @@ trait ExpressionVisitor extends BaseVisitor {
         else Nil
       })
       .toMap
-    if (context.functions.contains(funcName))
+    if (context.functions.contains(funcName.toLowerCase))
       pack(
         FunctionInvoker
           .invoke(
@@ -185,7 +185,9 @@ trait ExpressionVisitor extends BaseVisitor {
         throw new UnsupportedOperationException(
           "named args for engine function not supported"
         )
-      if (context.currentEngine.getDefinedFunctions.contains(funcName))
+      if (
+        context.currentEngine.getDefinedFunctions.contains(funcName.toLowerCase)
+      )
         context.currentEngine.executeFunc(funcName, args: _*)
       else {
         val engine = context.engines.find(eng =>
