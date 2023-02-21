@@ -63,7 +63,12 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
     val value = visit(ctx.expr)
     value match {
       case v: SqlLambda => context.addFunction(visit(ctx.ident).toString, v)
-      case other => context.setVar(visit(ctx.ident).toString, visit(ctx.expr))
+      case other => {
+        val name = visit(ctx.ident).toString
+        val value = visit(ctx.expr)
+        context.setVar(name, value)
+        context.engines.foreach(e => e._2.setParam(name, value))
+      }
     }
     Null
   }
@@ -91,9 +96,12 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
         )
       ctx.ident.asScala
         .zip(ctx.expr.asScala)
-        .foreach(variable =>
-          context.setVar(visit(variable._1).toString, visit(variable._2))
-        )
+        .foreach(variable => {
+          val name = visit(variable._1).toString
+          val value = visit(variable._2)
+          context.setVar(name, value)
+          context.engines.foreach(e => e._2.setParam(name, value))
+        })
     } else {
       val res = visit(ctx.expr(0)) match {
         case arr: array =>
@@ -103,9 +111,11 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
             )
           ctx.ident.asScala
             .zip(arr.arr)
-            .foreach(variable =>
-              context.setVar(visit(variable._1).toString, variable._2)
-            )
+            .foreach(variable => {
+              val name = visit(variable._1).toString
+              context.setVar(name, variable._2)
+              context.engines.foreach(e => e._2.setParam(name, variable._2))
+            })
         case _ =>
           throw new IllegalArgumentException(
             "cannot unpack non array expression"
