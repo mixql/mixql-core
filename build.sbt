@@ -1,4 +1,4 @@
-ThisBuild / scalaVersion := Scala213
+scalaVersion := Scala212
 
 Antlr4 / antlr4Version := "4.8-1"
 Antlr4 / antlr4GenListener := false // default: true
@@ -10,7 +10,7 @@ lazy val mixQLCore = (project in file("."))
     credentials += Credentials(Path.userHome / ".sbt" / "sonatype_credentials"),
     organization := "org.mixql",
     name := "mixql-core",
-    version := "0.1.0-SNAPSHOT",
+    version := "0.2.0-SNAPSHOT",
     crossScalaVersions := ScalaVersions,
     organizationName := "MixQL",
     organizationHomepage := Some(url("https://mixql.org/")),
