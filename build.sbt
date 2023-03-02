@@ -1,4 +1,4 @@
-ThisBuild / scalaVersion := Scala212
+scalaVersion := Scala212
 
 Antlr4 / antlr4Version := "4.8-1"
 Antlr4 / antlr4GenListener := false // default: true
