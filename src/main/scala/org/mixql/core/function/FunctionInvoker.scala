@@ -1,7 +1,7 @@
 package org.mixql.core.function
 
 import org.mixql.core.context.Context
-import org.mixql.core.context.gtype.*
+import org.mixql.core.context.gtype._
 
 import java.lang.reflect.Method
 import scala.annotation.meta.param
