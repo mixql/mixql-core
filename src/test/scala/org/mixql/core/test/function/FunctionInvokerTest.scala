@@ -1,15 +1,31 @@
 package org.mixql.core.test.function
 
+import org.mixql.core.context.Context
+import org.mixql.core.context.gtype.int
+import org.mixql.core.engine.Engine
 import org.mixql.core.function.FunctionInvoker
+import org.mixql.core.test.stub.StubEngine
 import org.scalatest.Ignore
 import org.scalatest.funsuite.AnyFunSuite
 
 import scala.collection.Seq
 
+class CustomTestContext {
+  def length = 100500
+}
+
 class FunctionInvokerTest extends AnyFunSuite {
 
   val length: Any = new (String => Int) {
     def apply(str: String): Int = str.length
+  }
+
+  val lengthCustomContext: Any = new ((CustomTestContext, String) => Int) {
+    def apply(ctx: CustomTestContext, str: String): Int = str.length + ctx.length
+  }
+
+  val lengthMixQlCoreContext: Any = new ((Context, String) => Int) {
+    def apply(ctx: Context, str: String): Int = str.length + ctx.getVar("a").asInstanceOf[int].value
   }
 
   val defArgFunc = new Object {
@@ -82,6 +98,8 @@ class FunctionInvokerTest extends AnyFunSuite {
 
   val functions: Map[String, Any] = Map.apply(
     "length" -> length,
+    "length_of_custom_context" -> lengthCustomContext,
+    "length_with_mixql_core_context" -> lengthMixQlCoreContext,
     "def_arg_func" -> defArgFunc,
     "two_def_arg_func" -> twoDefaultArgFunc,
     "default_second_arg_func" -> defaultSecondArgFunc,
@@ -95,6 +113,22 @@ class FunctionInvokerTest extends AnyFunSuite {
   test("Invoke anonymous function") {
     val res = FunctionInvoker.invoke(functions, "length", null, List("123"))
     assert(res == 3)
+  }
+
+  test("Invoke anonymous function length_of_custom_context with not mixql-core context") {
+    val res = FunctionInvoker.invoke(functions, "length_of_custom_context", new CustomTestContext,
+      List("123"), cc = "org.mixql.core.test.function.CustomTestContext")
+    assert(res == 100503)
+  }
+
+  test("Invoke anonymous function length_with_mixql_core_context with mixql-core context") {
+    import scala.collection.mutable.{Map => MutMap}
+    val context =
+      new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
+    context.setVar("a", int(12))
+    val res = FunctionInvoker.invoke(functions, "length_with_mixql_core_context", context,
+      List("123"))
+    assert(res == 15)
   }
 
   test("Invoke default argument function") {
