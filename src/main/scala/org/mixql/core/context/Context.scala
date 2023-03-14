@@ -5,6 +5,7 @@ import org.mixql.core.engine.Engine
 import org.mixql.core.function.{ArrayFunction, StringFunction}
 import org.mixql.core.context.gtype._
 import org.mixql.core
+import com.typesafe.config.ConfigFactory
 
 import scala.reflect.ClassTag
 
@@ -15,15 +16,14 @@ import scala.reflect.ClassTag
   *   map engineName -> engine
   * @param defaultEngine
   *   name of current engine
-  * @param variables
-  *   map variableName -> variableValue
   * @param function
   *   map functionName -> function
+  * @param variables
+  *   map variableName -> variableValue
   */
 class Context(
   val engines: MutMap[String, Engine],
   defaultEngine: String,
-  variables: MutMap[String, Type] = MutMap[String, Type](),
   val functions: MutMap[String, Any] = MutMap[String, Any](
     "ascii" -> StringFunction.ascii,
     "base64" -> StringFunction.base64,
@@ -34,10 +34,18 @@ class Context(
     "format_number" -> StringFunction.formatNumber,
     "size" -> ArrayFunction.size,
     "sort" -> ArrayFunction.sort
-  )
+  ),
+  variables: MutMap[String, Type] = MutMap[String, Type]()
 ) extends java.lang.AutoCloseable {
 
-  var scope = List[MutMap[String, Type]](variables)
+  var scope: List[MutMap[String, Type]] = null
+  var currentEngine: Engine = null
+  var currentEngineAllias: String = ""
+  var errorSkip: Boolean = false
+  private var engineVariablesUpdate: String = ""
+  private val interpolator = new Interpolator()
+
+  _init_(defaultEngine, variables)
 
   private sealed class Interpolator extends Engine {
 
@@ -64,11 +72,28 @@ class Context(
     override def isParam(name: String): Boolean = true
   }
 
-  var currentEngine: Engine = engines(defaultEngine)
-  var currentEngineAllias: String = defaultEngine
-  var grenkiErrorSkip: Boolean = false
-
-  private val interpolator = new Interpolator()
+  private def _init_(
+    defaultEngine: String,
+    variables: MutMap[String, Type] = MutMap[String, Type]()
+  ) = {
+    scope = List[MutMap[String, Type]](variables)
+    currentEngine = engines(defaultEngine)
+    currentEngineAllias = defaultEngine
+    val config = ConfigFactory.load()
+    errorSkip = config.getBoolean("mixql.error.skip")
+    val evu = config.getString("mixql.engine.variables.update")
+    if (!(Set("all", "current", "none") contains evu))
+      throw new IllegalArgumentException(
+        "mixql.engine.variables.update must be one of: all, current, none"
+      )
+    engineVariablesUpdate = evu
+    engineVariablesUpdate match {
+      case "all" =>
+        variables.foreach(v => engines.foreach(e => e._2.setParam(v._1, v._2)))
+      case "current" =>
+        variables.foreach(v => currentEngine.setParam(v._1, v._2))
+    }
+  }
 
   /** add variable scope
     */
@@ -95,7 +120,7 @@ class Context(
       )
     currentEngine = engines.get(name) match {
       case Some(value) =>
-        variables.put("grenki.execution.engine", string(name))
+        variables.put("mixql.execution.engine", string(name))
         value
       case None =>
         throw new NoSuchElementException(s"no engine with name $name")
@@ -215,20 +240,23 @@ class Context(
     *   the value of variable or param
     */
   def setVar(key: String, value: Type): Unit = {
-    // set current engine param
-    // if (currentEngine.isParam(key))
-    //  currentEngine.setParam(key, value)
-    // set grenki param
+    // set mixql param
     key match {
-      case "grenki.execution.engine" =>
+      case "mixql.execution.engine" =>
         setCurrentEngine(value.toString) // WARN as deprecated
-      case "grenki.error.skip" =>
+      case "mixql.error.skip" =>
         value match {
           case bool(value) =>
-            grenkiErrorSkip = value
+            errorSkip = value
           case _ =>
-            throw new IllegalArgumentException("grenki.error.skip must be bool")
+            throw new IllegalArgumentException("mixql.error.skip must be bool")
         }
+      case "mixql.engine.variables.update" =>
+        if (!(Set("all", "current", "none") contains value.toString))
+          throw new IllegalArgumentException(
+            "mixql.engine.variables.update must be one of: all, current, none"
+          )
+        engineVariablesUpdate = value.toString
       case _ =>
     }
     // set variable value
@@ -237,6 +265,10 @@ class Context(
         scope.head.remove(key)
       case _ =>
         scope.head.put(key, value)
+    }
+    engineVariablesUpdate match {
+      case "all"     => engines.foreach(e => e._2.setParam(key, value))
+      case "current" => currentEngine.setParam(key, value)
     }
   }
 

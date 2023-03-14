@@ -63,12 +63,7 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
     val value = visit(ctx.expr)
     value match {
       case v: SqlLambda => context.addFunction(visit(ctx.ident).toString, v)
-      case other => {
-        val name = visit(ctx.ident).toString
-        val value = visit(ctx.expr)
-        context.setVar(name, value)
-        context.engines.foreach(e => e._2.setParam(name, value))
-      }
+      case other => context.setVar(visit(ctx.ident).toString, visit(ctx.expr))
     }
     Null
   }
@@ -96,12 +91,9 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
         )
       ctx.ident.asScala
         .zip(ctx.expr.asScala)
-        .foreach(variable => {
-          val name = visit(variable._1).toString
-          val value = visit(variable._2)
-          context.setVar(name, value)
-          context.engines.foreach(e => e._2.setParam(name, value))
-        })
+        .foreach(variable =>
+          context.setVar(visit(variable._1).toString, visit(variable._2))
+        )
     } else {
       val res = visit(ctx.expr(0)) match {
         case arr: array =>
@@ -111,11 +103,9 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
             )
           ctx.ident.asScala
             .zip(arr.arr)
-            .foreach(variable => {
-              val name = visit(variable._1).toString
-              context.setVar(name, variable._2)
-              context.engines.foreach(e => e._2.setParam(name, variable._2))
-            })
+            .foreach(variable =>
+              context.setVar(visit(variable._1).toString, variable._2)
+            )
         case _ =>
           throw new IllegalArgumentException(
             "cannot unpack non array expression"
@@ -134,7 +124,7 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
     executeOther(visit(ctx.other).toString, ctx.choose_engine) match {
       case Success(value) => value
       case Failure(exception) =>
-        if (context.grenkiErrorSkip) Null else throw exception
+        if (context.errorSkip) Null else throw exception
     }
   }
 

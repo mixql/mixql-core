@@ -110,7 +110,7 @@ class ContextTest extends AnyFunSuite {
     context.execute("select a from b")
     assert(context.currentEngine == e)
     assert(e.query == "select a from b")
-    val engine_name = context.getVar("grenki.execution.engine")
+    val engine_name = context.getVar("mixql.execution.engine")
     assert(engine_name.toString == "MyEngine")
   }
 
