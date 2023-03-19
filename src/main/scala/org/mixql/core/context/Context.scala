@@ -249,6 +249,7 @@ class Context(
     engineVariablesUpdate match {
       case "all"     => engines.foreach(e => e._2.setParam(key, value))
       case "current" => currentEngine.setParam(key, value)
+      case _         =>
     }
   }
 
