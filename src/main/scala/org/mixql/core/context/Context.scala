@@ -5,9 +5,12 @@ import org.mixql.core.engine.Engine
 import org.mixql.core.function.{ArrayFunction, StringFunction}
 import org.mixql.core.context.gtype._
 import org.mixql.core
-import com.typesafe.config.ConfigFactory
+import com.typesafe.config.{ConfigFactory, ConfigObject}
+import com.typesafe.config.ConfigValueType._
 
+import java.{util => ju}
 import scala.reflect.ClassTag
+import scala.collection.JavaConverters._
 
 /** the entry point to gsql api. Context stores registered engines, variables
   * and functions
@@ -72,29 +75,6 @@ class Context(
     override def isParam(name: String): Boolean = true
   }
 
-  private def _init_(
-    defaultEngine: String,
-    variables: MutMap[String, Type] = MutMap[String, Type]()
-  ) = {
-    scope = List[MutMap[String, Type]](variables)
-    currentEngine = engines(defaultEngine)
-    currentEngineAllias = defaultEngine
-    val config = ConfigFactory.load()
-    errorSkip = config.getBoolean("mixql.error.skip")
-    val evu = config.getString("mixql.engine.variables.update")
-    if (!(Set("all", "current", "none") contains evu))
-      throw new IllegalArgumentException(
-        "mixql.engine.variables.update must be one of: all, current, none"
-      )
-    engineVariablesUpdate = evu
-    engineVariablesUpdate match {
-      case "all" =>
-        variables.foreach(v => engines.foreach(e => e._2.setParam(v._1, v._2)))
-      case "current" =>
-        variables.foreach(v => currentEngine.setParam(v._1, v._2))
-    }
-  }
-
   /** add variable scope
     */
   def push_scope(): Unit = {
@@ -120,7 +100,7 @@ class Context(
       )
     currentEngine = engines.get(name) match {
       case Some(value) =>
-        variables.put("mixql.execution.engine", string(name))
+        scope.head.put("mixql.execution.engine", string(name))
         value
       case None =>
         throw new NoSuchElementException(s"no engine with name $name")
@@ -332,5 +312,75 @@ class Context(
         engineCloseable.close()
       }
     })
+  }
+
+  private def _init_(
+    defaultEngine: String,
+    variables: MutMap[String, Type] = MutMap[String, Type]()
+  ) = {
+    val config = ConfigFactory.load()
+    val initVars = MutMap[String, Type]()
+    if (config.hasPath("mixql.variables.init")) {
+      val confVars = recurseParseParams(
+        config.getObject("mixql.variables.init")
+      )
+      confVars ++ variables
+      scope = List[MutMap[String, Type]](confVars)
+    } else
+      scope = List[MutMap[String, Type]](variables)
+    currentEngine = engines(defaultEngine)
+    currentEngineAllias = defaultEngine
+    errorSkip = config.getBoolean("mixql.error.skip")
+    val evu = config.getString("mixql.engine.variables.update")
+    if (!(Set("all", "current", "none") contains evu))
+      throw new IllegalArgumentException(
+        "mixql.engine.variables.update must be one of: all, current, none"
+      )
+    engineVariablesUpdate = evu
+    engineVariablesUpdate match {
+      case "all" =>
+        scope.head.foreach(v => engines.foreach(e => e._2.setParam(v._1, v._2)))
+      case "current" =>
+        scope.head.foreach(v => currentEngine.setParam(v._1, v._2))
+    }
+  }
+
+  private def recurseParseParams(
+    params: ConfigObject,
+    scope: String = ""
+  ): MutMap[String, Type] = {
+    val res = MutMap[String, Type]()
+    params.asScala.foreach(kv => {
+      if (kv._2.valueType() == OBJECT)
+        res ++= recurseParseParams(
+          kv._2.asInstanceOf[ConfigObject],
+          scope + kv._1 + "."
+        )
+      else
+        res += scope + kv._1 -> convertConfigValue(kv._2.unwrapped)
+    })
+    res
+  }
+
+  private def convertConfigValue(value: Object): Type = {
+    if (value == null)
+      Null
+    else if (value.isInstanceOf[Boolean])
+      bool(value.asInstanceOf[Boolean])
+    else if (value.isInstanceOf[String])
+      string(value.asInstanceOf[String])
+    else if (value.isInstanceOf[Integer])
+      int(value.asInstanceOf[Integer])
+    else if (value.isInstanceOf[Double])
+      double(value.asInstanceOf[Double])
+    else if (value.isInstanceOf[ju.List[Object]]) {
+      array(
+        value
+          .asInstanceOf[ju.List[Object]]
+          .asScala
+          .map(convertConfigValue)
+          .toArray
+      )
+    } else throw new Exception("unknown param type")
   }
 }
