@@ -5,7 +5,7 @@ import org.mixql.core.engine.Engine
 import org.mixql.core.function.{ArrayFunction, StringFunction}
 import org.mixql.core.context.gtype._
 import org.mixql.core
-import com.typesafe.config.{ConfigFactory, ConfigObject}
+import com.typesafe.config.{ConfigFactory, ConfigObject, Config}
 import com.typesafe.config.ConfigValueType._
 
 import java.{util => ju}
@@ -41,39 +41,34 @@ class Context(
   variables: MutMap[String, Type] = MutMap[String, Type]()
 ) extends java.lang.AutoCloseable {
 
-  var scope: List[MutMap[String, Type]] = null
   var currentEngine: Engine = null
-  var currentEngineAllias: String = ""
-  var errorSkip: Boolean = false
-  private var engineVariablesUpdate: String = ""
-  private val interpolator = new Interpolator()
 
-  _init_(defaultEngine, variables)
+  /** current engine name
+    *
+    * @return
+    *   mixql.execution.engine param value
+    */
+  def currentEngineAllias: String = getVar("mixql.execution.engine").toString
 
-  private sealed class Interpolator extends Engine {
-
-    var interpolated: String = ""
-
-    override def name: String = ""
-
-    var currentEngine: Engine = null
-
-    override def execute(stmt: String): Type = {
-      interpolated = stmt
-      Null
-    }
-
-    override def executeFunc(name: String, params: Type*) =
-      throw new UnsupportedOperationException(
-        "interpolator dont have specific funcs"
-      )
-
-    override def setParam(name: String, value: Type): Unit = {}
-
-    override def getParam(name: String): Type = currentEngine.getParam(name)
-
-    override def isParam(name: String): Boolean = true
+  /** mixql.error.skip
+    *
+    * @return
+    *   mixql.error.skip param value
+    */
+  def errorSkip: Boolean = getVar("mixql.error.skip") match {
+    case bool(value) => value
+    case _: Type =>
+      throw new Exception("something wrong mixql.error.skip must be bool")
   }
+
+  /** mixql.engine.variables.update: one of "all", "current", "none"
+    *
+    * @return
+    *   mixql.engine.variables.update param value
+    */
+  def engineVariablesUpdate: String = getVar(
+    "mixql.engine.variables.update"
+  ).toString
 
   /** add variable scope
     */
@@ -84,7 +79,16 @@ class Context(
   /** remove top variable scope
     */
   def pop_scope(): Unit = {
+    val head = scope.head
     scope = scope.tail
+    engineVariablesUpdate match {
+      case "all" =>
+        head.foreach(v => engines.foreach(e => e._2.setParam(v._1, getVar(v._1))))
+      case "current" =>
+        head.foreach(v => currentEngine.setParam(v._1, getVar(v._1)))
+      case _ => 
+    }
+    setVar("mixql.execution.engine", getVar("mixql.execution.engine"))
   }
 
   /** Set current engine by name that registered in this context. Throws
@@ -105,7 +109,15 @@ class Context(
       case None =>
         throw new NoSuchElementException(s"no engine with name $name")
     }
-    currentEngineAllias = name
+    engineVariablesUpdate match {
+      case "all" =>
+        engines.foreach(e =>
+          e._2.setParam("mixql.execution.engine", string(name))
+        )
+      case "current" =>
+        currentEngine.setParam("mixql.execution.engine", string(name))
+      case _ =>
+    }
   }
 
   /** register engine by this name. If there was other engine with this name it
@@ -223,11 +235,11 @@ class Context(
     // set mixql param
     key match {
       case "mixql.execution.engine" =>
-        setCurrentEngine(value.toString) // WARN as deprecated
+        setCurrentEngine(value.toString)
+        return // WARN as deprecated
       case "mixql.error.skip" =>
         value match {
           case bool(value) =>
-            errorSkip = value
           case _ =>
             throw new IllegalArgumentException("mixql.error.skip must be bool")
         }
@@ -236,7 +248,6 @@ class Context(
           throw new IllegalArgumentException(
             "mixql.engine.variables.update must be one of: all, current, none"
           )
-        engineVariablesUpdate = value.toString
       case _ =>
     }
     // set variable value
@@ -315,35 +326,61 @@ class Context(
     })
   }
 
+  private var scope: List[MutMap[String, Type]] = null
+  private val interpolator = new Interpolator()
+
+  _init_(defaultEngine, variables)
+
   private def _init_(
     defaultEngine: String,
     variables: MutMap[String, Type] = MutMap[String, Type]()
   ) = {
     val config = ConfigFactory.load()
-    val initVars = MutMap[String, Type]()
+
+    val mixqlParams = initMixqlParams(config, defaultEngine)
     if (config.hasPath("mixql.variables.init")) {
       val confVars = recurseParseParams(
         config.getObject("mixql.variables.init")
       )
-      confVars ++ variables
-      scope = List[MutMap[String, Type]](confVars)
-    } else
-      scope = List[MutMap[String, Type]](variables)
+      mixqlParams ++= confVars
+    }
+    mixqlParams ++= variables
+    scope = List[MutMap[String, Type]](mixqlParams)
+
     currentEngine = engines(defaultEngine)
-    currentEngineAllias = defaultEngine
-    errorSkip = config.getBoolean("mixql.error.skip")
-    val evu = config.getString("mixql.engine.variables.update")
-    if (!(Set("all", "current", "none") contains evu))
-      throw new IllegalArgumentException(
-        "mixql.engine.variables.update must be one of: all, current, none"
-      )
-    engineVariablesUpdate = evu
     engineVariablesUpdate match {
       case "all" =>
         scope.head.foreach(v => engines.foreach(e => e._2.setParam(v._1, v._2)))
       case "current" =>
         scope.head.foreach(v => currentEngine.setParam(v._1, v._2))
+      case _ => 
     }
+  }
+
+  private def initMixqlParams(
+    config: Config,
+    defaultEngine: String
+  ): MutMap[String, Type] = {
+    val result: MutMap[String, Type] = MutMap[String, Type]()
+
+    val errorSkip = config.getBoolean("mixql.error.skip")
+    result += "mixql.error.skip" -> bool(errorSkip)
+
+    val evu = config.getString("mixql.engine.variables.update")
+    if (!(Set("all", "current", "none") contains evu))
+      throw new IllegalArgumentException(
+        "mixql.engine.variables.update must be one of: all, current, none"
+      )
+    result += "mixql.engine.variables.update" -> string(evu)
+
+    val currentEngineAllias =
+      if (config.hasPath("mixql.execution.engine"))
+        config.getString("mixql.execution.engine")
+      else
+        defaultEngine
+    result += "mixql.execution.engine" -> string(currentEngineAllias)
+
+    result
   }
 
   private def recurseParseParams(
@@ -383,5 +420,30 @@ class Context(
           .toArray
       )
     } else throw new Exception("unknown param type")
+  }
+
+  private sealed class Interpolator extends Engine {
+
+    var interpolated: String = ""
+
+    override def name: String = ""
+
+    var currentEngine: Engine = null
+
+    override def execute(stmt: String): Type = {
+      interpolated = stmt
+      Null
+    }
+
+    override def executeFunc(name: String, params: Type*) =
+      throw new UnsupportedOperationException(
+        "interpolator dont have specific funcs"
+      )
+
+    override def setParam(name: String, value: Type): Unit = {}
+
+    override def getParam(name: String): Type = currentEngine.getParam(name)
+
+    override def isParam(name: String): Boolean = true
   }
 }

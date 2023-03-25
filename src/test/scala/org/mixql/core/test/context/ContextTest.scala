@@ -280,4 +280,75 @@ class ContextTest extends AnyFunSuite {
       )
     )
   }
+
+  test("Test scope engine.variables.update = all") {
+    val context =
+      new Context(
+        MutMap[String, Engine](
+          "stub1" -> new StubEngine,
+          "stub2" -> new StubEngine
+        ),
+        "stub1"
+      )
+    context.setVar("mixql.engine.variables.update", string("all"))
+    context.setVar("a", int(12))
+    context.push_scope()
+    context.setVar("a", int(15))
+    context.pop_scope()
+    assert(context.getVar("a").isInstanceOf[int])
+    assert(context.getVar("a").asInstanceOf[int].value == 12)
+    assert(
+      context
+        .getEngine("stub1")
+        .get
+        .asInstanceOf[StubEngine]
+        .param("a")
+        .isInstanceOf[int]
+    )
+    assert(
+      context
+        .getEngine("stub1")
+        .get
+        .asInstanceOf[StubEngine]
+        .param("a")
+        .asInstanceOf[int]
+        .value == 12
+    )
+    assert(
+      context
+        .getEngine("stub2")
+        .get
+        .asInstanceOf[StubEngine]
+        .param("a")
+        .isInstanceOf[int]
+    )
+    assert(
+      context
+        .getEngine("stub2")
+        .get
+        .asInstanceOf[StubEngine]
+        .param("a")
+        .asInstanceOf[int]
+        .value == 12
+    )
+  }
+
+  test("Test change current engine with scope") {
+    val e1 = new StubEngine()
+    val e2 = new MyEngine()
+    val context =
+      new Context(MutMap[String, Engine]("stub" -> e1), "stub")
+    context.addEngine(e2)
+    context.push_scope()
+    context.setCurrentEngine("MyEngine")
+    context.execute("select a from b")
+    assert(context.currentEngine == e2)
+    assert(e2.query == "select a from b")
+    val engine_name = context.getVar("mixql.execution.engine")
+    assert(engine_name.toString == "MyEngine")
+    context.pop_scope()
+    assert(context.currentEngine == e1)
+    val engine_name1 = context.getVar("mixql.execution.engine")
+    assert(engine_name1.toString == "stub")
+  }
 }

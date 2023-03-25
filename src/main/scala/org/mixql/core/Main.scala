@@ -70,7 +70,7 @@ object Main {
     val context =
       new Context(MutMap[String, Engine]("demo" -> new DemoEngine), "demo")
     val res = core.run(code, context)
-    println(context.scope.head)
+    // println(context.scope.head)
     println(res)
   }
 }
