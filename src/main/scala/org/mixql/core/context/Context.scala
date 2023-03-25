@@ -83,10 +83,12 @@ class Context(
     scope = scope.tail
     engineVariablesUpdate match {
       case "all" =>
-        head.foreach(v => engines.foreach(e => e._2.setParam(v._1, getVar(v._1))))
+        head.foreach(v =>
+          engines.foreach(e => e._2.setParam(v._1, getVar(v._1)))
+        )
       case "current" =>
         head.foreach(v => currentEngine.setParam(v._1, getVar(v._1)))
-      case _ => 
+      case _ =>
     }
     setVar("mixql.execution.engine", getVar("mixql.execution.engine"))
   }
@@ -353,7 +355,7 @@ class Context(
         scope.head.foreach(v => engines.foreach(e => e._2.setParam(v._1, v._2)))
       case "current" =>
         scope.head.foreach(v => currentEngine.setParam(v._1, v._2))
-      case _ => 
+      case _ =>
     }
   }
 
