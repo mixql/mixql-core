@@ -110,7 +110,7 @@ trait ExpressionVisitor extends BaseVisitor {
       executeOther(visit(ctx.other).toString, ctx.choose_engine) match {
         case Success(value) => value
         case Failure(exception) =>
-          if (context.grenkiErrorSkip) Null else throw exception
+          if (context.errorSkip) Null else throw exception
       }
     else
       throw new UnsupportedOperationException("unknown operator")

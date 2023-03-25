@@ -9,6 +9,17 @@ import org.mixql.core.engine.Engine
 import scala.collection.mutable.{Map => MutMap}
 
 class ExpressionTest extends MainVisitorBaseTest {
+  test("Test empty string") {
+    val code =
+      """
+        |let res = "";
+                """.stripMargin
+    val context = runMainVisitor(code)
+    val res = context.getVar("res")
+    assert(res.isInstanceOf[string])
+    assert(res.asInstanceOf[string].value == "")
+  }
+
   test("Test arithmetic expression") {
     val code =
       """

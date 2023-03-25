@@ -21,11 +21,13 @@ class FunctionInvokerTest extends AnyFunSuite {
   }
 
   val lengthCustomContext: Any = new ((CustomTestContext, String) => Int) {
-    def apply(ctx: CustomTestContext, str: String): Int = str.length + ctx.length
+    def apply(ctx: CustomTestContext, str: String): Int =
+      str.length + ctx.length
   }
 
   val lengthMixQlCoreContext: Any = new ((Context, String) => Int) {
-    def apply(ctx: Context, str: String): Int = str.length + ctx.getVar("a").asInstanceOf[int].value
+    def apply(ctx: Context, str: String): Int =
+      str.length + ctx.getVar("a").asInstanceOf[int].value
   }
 
   val defArgFunc = new Object {
@@ -115,19 +117,32 @@ class FunctionInvokerTest extends AnyFunSuite {
     assert(res == 3)
   }
 
-  test("Invoke anonymous function length_of_custom_context with not mixql-core context") {
-    val res = FunctionInvoker.invoke(functions, "length_of_custom_context", new CustomTestContext,
-      List("123"), cc = "org.mixql.core.test.function.CustomTestContext")
+  test(
+    "Invoke anonymous function length_of_custom_context with not mixql-core context"
+  ) {
+    val res = FunctionInvoker.invoke(
+      functions,
+      "length_of_custom_context",
+      new CustomTestContext,
+      List("123"),
+      cc = "org.mixql.core.test.function.CustomTestContext"
+    )
     assert(res == 100503)
   }
 
-  test("Invoke anonymous function length_with_mixql_core_context with mixql-core context") {
+  test(
+    "Invoke anonymous function length_with_mixql_core_context with mixql-core context"
+  ) {
     import scala.collection.mutable.{Map => MutMap}
     val context =
       new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
     context.setVar("a", int(12))
-    val res = FunctionInvoker.invoke(functions, "length_with_mixql_core_context", context,
-      List("123"))
+    val res = FunctionInvoker.invoke(
+      functions,
+      "length_with_mixql_core_context",
+      context,
+      List("123")
+    )
     assert(res == 15)
   }
 

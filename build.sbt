@@ -61,6 +61,7 @@ lazy val mixQLCore = (project in file("."))
     },
     libraryDependencies ++= Seq(
       "org.antlr"      % "antlr4-runtime" % "4.8-1",
+      "com.typesafe"   % "config"         % "1.4.2",
       "org.scala-lang" % "scala-reflect" % {
         CrossVersion.partialVersion(scalaVersion.value) match {
           case Some((2, 13)) => scalaVersion.value
