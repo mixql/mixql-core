@@ -1,9 +1,9 @@
 package org.mixql.core.visitor
 
 import org.mixql.core.context.gtype._
-import org.mixql.core.parser.sql
-import scala.language.implicitConversions
+import org.mixql.core.generated.sql
 
+import scala.language.implicitConversions
 import scala.collection.JavaConverters._
 
 trait ControlStmtsVisitor extends BaseVisitor {

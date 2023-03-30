@@ -1,7 +1,7 @@
 package org.mixql.core.function
 
 import org.mixql.core.context.gtype._
-import org.mixql.core.parser.sql.BlockContext
+import org.mixql.core.generated.sql.BlockContext
 import org.mixql.core.visitor.BaseVisitor
 
 final class SqlLambda(

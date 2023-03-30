@@ -35,4 +35,5 @@ metals.sbt
 .bloop
 .antlr
 
-src/main/java/antlr4/
+/src/main/java/org/mixql/core/generated
+/src/main/antlr4/gen

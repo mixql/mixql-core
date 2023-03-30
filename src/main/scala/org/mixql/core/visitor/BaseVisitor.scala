@@ -4,7 +4,7 @@ import org.antlr.v4.runtime.TokenStream
 import org.antlr.v4.runtime.tree.{ParseTree, TerminalNode}
 import org.mixql.core.context.Context
 import org.mixql.core.context.gtype._
-import org.mixql.core.parser.{sqlBaseVisitor, token}
+import org.mixql.core.generated.{sqlBaseVisitor, token}
 
 import scala.language.implicitConversions
 

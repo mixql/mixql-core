@@ -3,8 +3,8 @@ package org.mixql
 import org.antlr.v4.runtime.{CharStreams, CommonTokenStream}
 import org.mixql.core.context.gtype._
 import org.mixql.core.context.Context
+import org.mixql.core.generated.{sql, token}
 import org.mixql.core.visitor.MainVisitor
-import org.mixql.core.parser.{token, sql}
 
 package object core {
 

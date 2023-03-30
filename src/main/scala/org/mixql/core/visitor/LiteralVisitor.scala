@@ -1,11 +1,11 @@
 package org.mixql.core.visitor
 
 import org.mixql.core.context.gtype._
-import org.mixql.core.parser.sql
+import org.mixql.core.generated.sql
+
 import java.time.LocalDateTime
 import java.time.LocalDate
 import scala.collection.mutable.{Map => MutMap}
-
 import scala.collection.JavaConverters._
 
 trait LiteralVisitor extends BaseVisitor {

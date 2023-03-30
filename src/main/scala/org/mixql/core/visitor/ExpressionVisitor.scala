@@ -1,10 +1,10 @@
 package org.mixql.core.visitor
 
 import org.mixql.core.context.gtype._
-import org.mixql.core.parser.sql
 import org.mixql.core.function.SqlLambda
 import org.mixql.core.function.FunctionInvoker
 import org.antlr.v4.runtime.misc.Interval
+import org.mixql.core.generated.sql
 
 import scala.util.{Failure, Success, Try}
 import scala.collection.JavaConverters._
