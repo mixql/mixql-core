@@ -328,6 +328,12 @@ class Context(
     })
   }
 
+
+  def getScope(): List[Map[String, Type]] = {
+    for {w <- scope}
+      yield Map(w.toSeq: _*)
+  }
+
   private var scope: List[MutMap[String, Type]] = null
   private val interpolator = new Interpolator()
 
