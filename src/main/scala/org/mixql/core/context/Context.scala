@@ -5,8 +5,9 @@ import org.mixql.core.engine.Engine
 import org.mixql.core.function.{ArrayFunction, StringFunction}
 import org.mixql.core.context.gtype._
 import org.mixql.core
-import com.typesafe.config.{ConfigFactory, ConfigObject, Config}
+import com.typesafe.config.{Config, ConfigFactory, ConfigObject}
 import com.typesafe.config.ConfigValueType._
+import org.mixql.core.logger.logDebug
 
 import java.{util => ju}
 import scala.reflect.ClassTag
@@ -314,15 +315,15 @@ class Context(
   }
 
   override def close(): Unit = {
-    println("mixql core context: starting close")
-    println(
+    logDebug("mixql core context: starting close")
+    logDebug(
       "mixql core context: stop engines, if they were not closed before by shutdown command"
     )
     engines.values.foreach(engine => {
       import java.lang.AutoCloseable
       if (engine.isInstanceOf[AutoCloseable]) {
         val engineCloseable: AutoCloseable = engine.asInstanceOf[AutoCloseable]
-        println(s"mixql core context: stopping engine " + engine.name)
+        logDebug(s"mixql core context: stopping engine " + engine.name)
         engineCloseable.close()
       }
     })

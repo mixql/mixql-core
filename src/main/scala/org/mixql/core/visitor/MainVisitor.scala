@@ -6,6 +6,7 @@ import org.mixql.core.context.Context
 import org.mixql.core.context.gtype._
 import org.mixql.core.function.SqlLambda
 import org.mixql.core.generated.sql
+import org.mixql.core.logger.logInfo
 
 import scala.util.{Failure, Success}
 import scala.collection.JavaConverters._

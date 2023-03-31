@@ -5,6 +5,7 @@ import org.mixql.core.context.gtype._
 import org.mixql.core
 import org.mixql.core.context.Context
 import org.mixql.core.engine.Engine
+import org.mixql.core.logger.{logDebug, logInfo}
 
 import scala.collection.mutable.{Map => MutMap}
 
@@ -13,7 +14,7 @@ object Main {
     override def name: String = "demo"
 
     override def execute(stmt: String): Type = {
-      println("execute: " + stmt)
+      println("[DemoEngine] execute: " + stmt)
       Null
     }
 
@@ -70,7 +71,7 @@ object Main {
     val context =
       new Context(MutMap[String, Engine]("demo" -> new DemoEngine), "demo")
     val res = core.run(code, context)
-    // println(context.scope.head)
-    println(res)
+    logDebug(context.getScope().head.toString())
+    logDebug(res.toString)
   }
 }
