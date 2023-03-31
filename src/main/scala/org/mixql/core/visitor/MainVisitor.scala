@@ -133,15 +133,17 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
     var res = ""
     var from = ctx.start.getTokenIndex
     var to = from
-    ctx.children.forEach(child => {
-      to = child.getSourceInterval.a - 1
-      val ch = visit(child) match {
-        case s: string => s.quoted
-        case other     => other.toString
-      }
-      res += tokenStream.getText(new Interval(from, to)) + ch
-      from = child.getSourceInterval.b + 1
-    })
+    if (ctx.children != null) {
+      ctx.children.forEach(child => {
+        to = child.getSourceInterval.a - 1
+        val ch = visit(child) match {
+          case s: string => s.quoted
+          case other => other.toString
+        }
+        res += tokenStream.getText(new Interval(from, to)) + ch
+        from = child.getSourceInterval.b + 1
+      })
+    }
     string(res)
   }
 
