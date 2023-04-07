@@ -64,4 +64,79 @@ object StringFunction {
       numberFormat.format(number)
     }
   }
+
+  val startsWith = new ((String, String) => Boolean) {
+    def apply(str: String, prefix: String): Boolean = {
+      str.startsWith(prefix)
+    }
+  }
+
+  val endsWith = new ((String, String) => Boolean) {
+    def apply(str: String, suffix: String): Boolean = {
+      str.endsWith(suffix)
+    }
+  }
+
+  val isEmpty = new ((String) => Boolean) {
+    def apply(str: String): Boolean = {
+      str.isEmpty
+    }
+  }
+
+  val nonEmpty = new ((String) => Boolean) {
+    def apply(str: String): Boolean = {
+      str.nonEmpty
+    }
+  }
+
+  val findFirstIn = new ((String, String) => Any) {
+    def apply(str: String, findPattern: String): Any = {
+      findPattern.r.findFirstIn(str) match {
+        case None => null
+        case Some(v) => v
+      }
+    }
+  }
+
+  val findAllIn = new ((String, String) => Array[String]) {
+    def apply(str: String, findPattern: String): Array[String] = {
+      findPattern.r.findAllIn(str).toList.toArray
+    }
+  }
+
+  val replaceAllIn = new ((String, String, String) => String) {
+    def apply(str: String, pattern: String, replacement: String): String = {
+      pattern.r.replaceAllIn(str,replacement)
+    }
+  }
+
+  val replaceFirstIn = new ((String, String, String) => String) {
+    def apply(str: String, pattern: String, replacement: String): String = {
+      pattern.r.replaceFirstIn(str, replacement)
+    }
+  }
+
+  val split = new ((String, String) => Array[String]) {
+    def apply(str: String, pattern: String): Array[String] = {
+      str.split(pattern)
+    }
+  }
+
+  val toLowerCase = new ((String) => String) {
+    def apply(str: String): String = {
+      str.toLowerCase
+    }
+  }
+
+  val toUpperCase = new ((String) => String) {
+    def apply(str: String): String = {
+      str.toUpperCase
+    }
+  }
+
+  val trim = new ((String) => String) {
+    def apply(str: String): String = {
+      str.trim
+    }
+  }
 }

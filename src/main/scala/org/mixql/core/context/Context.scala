@@ -13,6 +13,32 @@ import java.{util => ju}
 import scala.reflect.ClassTag
 import scala.collection.JavaConverters._
 
+object Context{
+  val defaultFunctions: MutMap[String, Any] = MutMap[String, Any](
+    "ascii" -> StringFunction.ascii,
+    "base64" -> StringFunction.base64,
+    "concat" -> StringFunction.concat,
+    "concat_ws" -> StringFunction.concat_ws,
+    "length" -> StringFunction.length,
+    "substr" -> StringFunction.substr,
+    "format_number" -> StringFunction.formatNumber,
+    "size" -> ArrayFunction.size,
+    "sort" -> ArrayFunction.sort,
+    "startsWith" -> StringFunction.startsWith,
+    "endsWith" -> StringFunction.endsWith,
+    "isEmpty" -> StringFunction.isEmpty,
+    "nonEmpty" -> StringFunction.nonEmpty,
+    "findFirstIn" -> StringFunction.findFirstIn,
+    "findAllIn" -> StringFunction.findAllIn,
+    "replaceAllIn" -> StringFunction.replaceAllIn,
+    "replaceFirstIn" -> StringFunction.replaceFirstIn,
+    "split" -> StringFunction.split,
+    "toLowerCase" -> StringFunction.toLowerCase,
+    "toUpperCase" -> StringFunction.toUpperCase,
+    "trim" -> StringFunction.trim,
+  )
+}
+
 /** the entry point to gsql api. Context stores registered engines, variables
   * and functions
   *
@@ -28,19 +54,12 @@ import scala.collection.JavaConverters._
 class Context(
   val engines: MutMap[String, Engine],
   defaultEngine: String,
-  val functions: MutMap[String, Any] = MutMap[String, Any](
-    "ascii" -> StringFunction.ascii,
-    "base64" -> StringFunction.base64,
-    "concat" -> StringFunction.concat,
-    "concat_ws" -> StringFunction.concat_ws,
-    "length" -> StringFunction.length,
-    "substr" -> StringFunction.substr,
-    "format_number" -> StringFunction.formatNumber,
-    "size" -> ArrayFunction.size,
-    "sort" -> ArrayFunction.sort
-  ),
+  functionsInit: MutMap[String, Any] = MutMap[String, Any](),
   variables: MutMap[String, Type] = MutMap[String, Type]()
 ) extends java.lang.AutoCloseable {
+  import Context.defaultFunctions
+
+  def functions: MutMap[String, Any] = defaultFunctions ++ functionsInit
 
   var currentEngine: Engine = null
 
