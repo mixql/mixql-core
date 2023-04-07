@@ -150,6 +150,6 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
   override def visitInterpolation_expr(
     ctx: sql.Interpolation_exprContext
   ): Type = {
-    visit(ctx.expr)
+    string(visit(ctx.expr).toString)
   }
 }

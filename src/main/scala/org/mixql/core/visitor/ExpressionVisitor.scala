@@ -38,7 +38,11 @@ trait ExpressionVisitor extends BaseVisitor {
     }
 
   override def visitVar(ctx: sql.VarContext): Type = {
-    context.getVar(visit(ctx.ident).toString)
+    val res = context.getVar(visit(ctx.ident).toString)
+    if (res.isInstanceOf[string])
+      string(res.toString)
+    else
+      res
   }
 
   override def visitExpr_concat(ctx: sql.Expr_concatContext): Type =
