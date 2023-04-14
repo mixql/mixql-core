@@ -22,7 +22,7 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
     visit(ctx.block)
 
   override def visitBlock(ctx: sql.BlockContext): Type = {
-    var res: Type = Null
+    var res: Type = new Null()
     ctx.statment.asScala.foreach(stmt => {
       res = visit(stmt)
       if (res.ret)
@@ -31,7 +31,7 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
     res
   }
 
-  override def visitEmpty_stmt(x: sql.Empty_stmtContext): Type = Null
+  override def visitEmpty_stmt(x: sql.Empty_stmtContext): Type = new Null()
 
   override def visitReturn_stmt(ctx: sql.Return_stmtContext): Type = {
     val res = visit(ctx.expr)
@@ -55,7 +55,7 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
         .map(visit)
         .zip(ctx.choose_engine.engine_params.expr.asScala.map(visit))
         .foreach(p => context.currentEngine.setParam(p._1.toString, p._2))
-    Null
+    new Null()
   }
 
   override def visitAssigment_default(
@@ -66,7 +66,7 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
       case v: SqlLambda => context.addFunction(visit(ctx.ident).toString, v)
       case other => context.setVar(visit(ctx.ident).toString, visit(ctx.expr))
     }
-    Null
+    new Null()
   }
 
   override def visitAssigment_by_index(
@@ -79,7 +79,7 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
           "only collections supports access by index"
         )
     }
-    Null
+    new Null()
   }
 
   override def visitAssigment_multiple(
@@ -98,12 +98,12 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
     } else {
       val res = visit(ctx.expr(0)) match {
         case arr: array =>
-          if (ctx.ident.size > arr.size.value)
+          if (ctx.ident.size > arr.size.getValue)
             throw new IndexOutOfBoundsException(
               "not enought argument for multiple assigment"
             )
           ctx.ident.asScala
-            .zip(arr.arr)
+            .zip(arr.getArr)
             .foreach(variable =>
               context.setVar(visit(variable._1).toString, variable._2)
             )
@@ -113,19 +113,19 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
           )
       }
     }
-    Null
+    new Null()
   }
 
   override def visitPrint_stmt(ctx: sql.Print_stmtContext): Type = {
     println("[USER PRINT]: " + visit(ctx.expr).toString)
-    Null
+    new Null()
   }
 
   override def visitOther_stmt(ctx: sql.Other_stmtContext): Type = {
     executeOther(visit(ctx.other).toString, ctx.choose_engine) match {
       case Success(value) => value
       case Failure(exception) =>
-        if (context.errorSkip) Null else throw exception
+        if (context.errorSkip) new Null() else throw exception
     }
   }
 
@@ -144,12 +144,12 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
         from = child.getSourceInterval.b + 1
       })
     }
-    string(res)
+    new string(res)
   }
 
   override def visitInterpolation_expr(
     ctx: sql.Interpolation_exprContext
   ): Type = {
-    string(visit(ctx.expr).toString)
+    new string(visit(ctx.expr).toString)
   }
 }

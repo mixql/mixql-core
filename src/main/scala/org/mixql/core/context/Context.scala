@@ -78,7 +78,7 @@ class Context(
     *   mixql.error.skip param value
     */
   def errorSkip: Boolean = getVar("mixql.error.skip") match {
-    case bool(value) => value
+    case t: bool => t.getValue
     case _: Type =>
       throw new Exception("something wrong mixql.error.skip must be bool")
   }
@@ -128,7 +128,7 @@ class Context(
       )
     currentEngine = engines.get(name) match {
       case Some(value) =>
-        scope.head.put("mixql.execution.engine", string(name))
+        scope.head.put("mixql.execution.engine", new string(name))
         value
       case None =>
         throw new NoSuchElementException(s"no engine with name $name")
@@ -136,10 +136,10 @@ class Context(
     engineVariablesUpdate match {
       case "all" =>
         engines.foreach(e =>
-          e._2.setParam("mixql.execution.engine", string(name))
+          e._2.setParam("mixql.execution.engine", new string(name))
         )
       case "current" =>
-        currentEngine.setParam("mixql.execution.engine", string(name))
+        currentEngine.setParam("mixql.execution.engine", new string(name))
       case _ =>
     }
   }
@@ -263,7 +263,7 @@ class Context(
         return // WARN as deprecated
       case "mixql.error.skip" =>
         value match {
-          case bool(value) =>
+          case _: bool =>
           case _ =>
             throw new IllegalArgumentException("mixql.error.skip must be bool")
         }
@@ -276,7 +276,7 @@ class Context(
     }
     // set variable value
     value match {
-      case Null =>
+      case _: Null =>
         scope.head.remove(key)
       case _ =>
         scope.head.put(key, value)
@@ -297,13 +297,13 @@ class Context(
     */
   def getVar(key: String): Type = {
     scope.foreach(vars => {
-      val res = vars.getOrElse(key, Null)
+      val res = vars.getOrElse(key, new Null())
       res match {
-        case Null  =>
+        case _:  Null  =>
         case other => return other
       }
     })
-    Null
+    new Null()
   }
 
   /** interpolate statement via current context
@@ -394,21 +394,21 @@ class Context(
     val result: MutMap[String, Type] = MutMap[String, Type]()
 
     val errorSkip = config.getBoolean("mixql.error.skip")
-    result += "mixql.error.skip" -> bool(errorSkip)
+    result += "mixql.error.skip" -> new bool(errorSkip)
 
     val evu = config.getString("mixql.engine.variables.update")
     if (!(Set("all", "current", "none") contains evu))
       throw new IllegalArgumentException(
         "mixql.engine.variables.update must be one of: all, current, none"
       )
-    result += "mixql.engine.variables.update" -> string(evu)
+    result += "mixql.engine.variables.update" -> new string(evu)
 
     val currentEngineAllias =
       if (config.hasPath("mixql.execution.engine"))
         config.getString("mixql.execution.engine")
       else
         defaultEngine
-    result += "mixql.execution.engine" -> string(currentEngineAllias)
+    result += "mixql.execution.engine" -> new string(currentEngineAllias)
 
     result
   }
@@ -432,17 +432,17 @@ class Context(
 
   private def convertConfigValue(value: Object): Type = {
     if (value == null)
-      Null
+      new Null()
     else if (value.isInstanceOf[Boolean])
-      bool(value.asInstanceOf[Boolean])
+      new bool(value.asInstanceOf[Boolean])
     else if (value.isInstanceOf[String])
-      string(value.asInstanceOf[String])
+      new string(value.asInstanceOf[String])
     else if (value.isInstanceOf[Integer])
-      gInt(value.asInstanceOf[Integer])
+      new gInt(value.asInstanceOf[Integer])
     else if (value.isInstanceOf[Double])
-      gDouble(value.asInstanceOf[Double])
+      new gDouble(value.asInstanceOf[Double])
     else if (value.isInstanceOf[ju.List[Object]]) {
-      array(
+      new array(
         value
           .asInstanceOf[ju.List[Object]]
           .asScala
@@ -462,7 +462,7 @@ class Context(
 
     override def execute(stmt: String): Type = {
       interpolated = stmt
-      Null
+      new Null()
     }
 
     override def executeFunc(name: String, params: Type*) =

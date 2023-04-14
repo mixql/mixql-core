@@ -28,7 +28,7 @@ trait LiteralVisitor extends BaseVisitor {
     var res = ""
     if (ctx.children != null)
       ctx.children.forEach(ch => res += visit(ch).toString)
-    string(res, "'")
+    new string(res, "'")
   }
 
   override def visitS_interpolation_expr(
@@ -40,7 +40,7 @@ trait LiteralVisitor extends BaseVisitor {
     var res = ""
     if (ctx.children != null)
       ctx.children.forEach(ch => res += visit(ch).toString)
-    string(res, "`")
+    new string(res, "`")
   }
 
   override def visitB_interpolation_expr(
@@ -52,7 +52,7 @@ trait LiteralVisitor extends BaseVisitor {
     var res = ""
     if (ctx.children != null)
       ctx.children.forEach(ch => res += visit(ch).toString)
-    string(res, "\"")
+    new string(res, "\"")
   }
 
   override def visitD_interpolation_expr(
@@ -65,41 +65,41 @@ trait LiteralVisitor extends BaseVisitor {
 
   override def visitLiteral_int(ctx: sql.Literal_intContext): Type =
     if (ctx.int_number.T_SUB)
-      gInt(-ctx.int_number.L_INT.getText.toInt)
+      new gInt(-ctx.int_number.L_INT.getText.toInt)
     else
-      gInt(ctx.int_number.L_INT.getText.toInt)
+      new gInt(ctx.int_number.L_INT.getText.toInt)
 
   override def visitLiteral_double(ctx: sql.Literal_doubleContext): Type =
     if (ctx.dec_number.T_SUB)
-      gDouble(-ctx.dec_number.L_DEC.getText.toDouble)
+      new gDouble(-ctx.dec_number.L_DEC.getText.toDouble)
     else
-      gDouble(ctx.dec_number.L_DEC.getText.toDouble)
+      new gDouble(ctx.dec_number.L_DEC.getText.toDouble)
 
   override def visitLiteral_bool(ctx: sql.Literal_boolContext): Type =
     if (ctx.bool_literal.T_FALSE)
-      bool(false)
+      new bool(false)
     else if (ctx.bool_literal.T_TRUE)
-      bool(true)
+      new bool(true)
     else
       throw new IllegalArgumentException("unknown bool literal")
 
   override def visitLiteral_null(ctx: sql.Literal_nullContext): Type =
-    Null
+    new Null()
 
   override def visitLiteral_current_date(
     ctx: sql.Literal_current_dateContext
   ): Type = {
-    string(LocalDate.now().toString)
+    new string(LocalDate.now().toString)
   }
 
   override def visitLiteral_current_timestamp(
     ctx: sql.Literal_current_timestampContext
   ): Type = {
-    string(LocalDateTime.now().toString)
+    new string(LocalDateTime.now().toString)
   }
 
   override def visitLiteral_array(ctx: sql.Literal_arrayContext): Type = {
-    array(ctx.array_literal.expr.asScala.map(visit).toArray)
+    new array(ctx.array_literal.expr.asScala.map(visit).toArray)
   }
 
   override def visitLiteral_map(ctx: sql.Literal_mapContext): Type = {
@@ -111,6 +111,7 @@ trait LiteralVisitor extends BaseVisitor {
         k -> visit(item.value)
       })
       .toMap
-    map(collection.mutable.Map(res.toSeq: _*))
+    import scala.collection.JavaConverters._
+    new map(scala.collection.mutable.Map(res.toSeq: _*).asJava)
   }
 }

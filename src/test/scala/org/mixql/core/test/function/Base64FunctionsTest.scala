@@ -13,6 +13,6 @@ class Base64FunctionsTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
 
     val foo = context.getVar("foo").asInstanceOf[string]
-    assert(foo.value == "U3BhcmsgU1FM")
+    assert(foo.getValue == "U3BhcmsgU1FM")
   }
 }

@@ -15,14 +15,14 @@ object Main {
 
     override def execute(stmt: String): Type = {
       println("[DemoEngine] execute: " + stmt)
-      Null
+      new Null()
     }
 
-    override def executeFunc(name: String, params: Type*) = Null
+    override def executeFunc(name: String, params: Type*) = new Null()
 
     override def setParam(name: String, value: Type): Unit = {}
 
-    override def getParam(name: String): Type = Null
+    override def getParam(name: String): Type = new Null()
 
     override def isParam(name: String): Boolean = true
   }

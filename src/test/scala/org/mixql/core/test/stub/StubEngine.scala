@@ -11,7 +11,7 @@ class StubEngine extends Engine {
   override def name: String = "stub"
   override def execute(stmt: String): Type = {
     queue += stmt
-    Null
+    new Null()
   }
 
   override def executeFunc(name: String, params: Type*): Type = {
@@ -26,7 +26,7 @@ class StubEngine extends Engine {
   }
 
   override def getParam(name: String): Type = {
-    param.getOrElse(name, Null)
+    param.getOrElse(name, new Null())
   }
 
   override def getDefinedFunctions: List[String] = List("getnum", "getstr")

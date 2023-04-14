@@ -27,7 +27,7 @@ class FunctionInvokerTest extends AnyFunSuite {
 
   val lengthMixQlCoreContext: Any = new ((Context, String) => Int) {
     def apply(ctx: Context, str: String): Int =
-      str.length + ctx.getVar("a").asInstanceOf[gInt].value
+      str.length + ctx.getVar("a").asInstanceOf[gInt].getValue
   }
 
   val defArgFunc = new Object {
@@ -136,7 +136,7 @@ class FunctionInvokerTest extends AnyFunSuite {
     import scala.collection.mutable.{Map => MutMap}
     val context =
       new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
-    context.setVar("a", gInt(12))
+    context.setVar("a", new gInt(12))
     val res = FunctionInvoker.invoke(
       functions,
       "length_with_mixql_core_context",

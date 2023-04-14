@@ -5,6 +5,7 @@ import org.mixql.core.generated.sql
 
 import scala.language.implicitConversions
 import scala.collection.JavaConverters._
+import scala.collection.convert.ImplicitConversions.`map AsScala`
 
 trait ControlStmtsVisitor extends BaseVisitor {
   override def visitTry_catch_stmt(ctx: sql.Try_catch_stmtContext): Type = {
@@ -25,13 +26,13 @@ trait ControlStmtsVisitor extends BaseVisitor {
         if (old_exc.nonEmpty) {
           context.setVar(
             visit(ctx.exc).toString,
-            string(e.getClass.getSimpleName)
+            new string(e.getClass.getSimpleName)
           )
         }
         if (old_message.nonEmpty) {
           context.setVar(
             visit(ctx.exc).toString + ".message",
-            string(e.getMessage)
+            new string(e.getMessage)
           )
         }
         visit(ctx.catch_block)
@@ -42,7 +43,7 @@ trait ControlStmtsVisitor extends BaseVisitor {
           context.setVar(visit(ctx.exc).toString + ".message", old_message.get)
         }
     }
-    Null
+    new Null()
   }
 
   override def visitIf_stmt(ctx: sql.If_stmtContext): Type = {
@@ -61,7 +62,7 @@ trait ControlStmtsVisitor extends BaseVisitor {
       if (ctx.else_block)
         visit(ctx.else_block.block)
       else
-        Null
+        new Null()
     }
   }
 
@@ -73,37 +74,37 @@ trait ControlStmtsVisitor extends BaseVisitor {
     var i = if (!ctx.T_REVERSE) visit(ctx.from) else visit(ctx.to)
     val to = if (!ctx.T_REVERSE) visit(ctx.to) else visit(ctx.from)
     val step =
-      (if (ctx.T_REVERSE) gInt(-1) else gInt(1)) * (if (ctx.step) visit(ctx.step)
-                                                  else gInt(1))
+      (if (ctx.T_REVERSE) new gInt(-1) else new gInt(1)).Multiply(if (ctx.step) visit(ctx.step)
+                                                  else new gInt(1))
     context.setVar(i_name, i)
     while (
-      (!ctx.T_REVERSE && i < to) ||
-      (ctx.T_REVERSE && i > to)
+      (!ctx.T_REVERSE && i.LessThen(to)) ||
+      (ctx.T_REVERSE && i.MoreThen(to))
     ) {
       visit(ctx.block)
-      i = i + step
+      i = i.Add(step)
       context.setVar(i_name, i)
     }
     if (
-      (!ctx.T_REVERSE && i >= to) ||
-      (ctx.T_REVERSE && i <= to)
+      (!ctx.T_REVERSE && i.MoreEqualThen(to)) ||
+      (ctx.T_REVERSE && i.LessEqualThen(to))
     ) {
       context.setVar(i_name, to)
       visit(ctx.block)
     }
     context.setVar(i_name, old)
-    Null
+    new Null()
   }
 
   override def visitFor_cursor_stmt(ctx: sql.For_cursor_stmtContext): Type = {
     val cursor = visit(ctx.expr)
     cursor match {
-      case array(arr) =>
+      case c: array =>
         ctx.ident.size match {
           case 1 =>
             val cursorName = visit(ctx.ident(0)).toString
             val old = context.getVar(cursorName)
-            arr.foreach(el => {
+            c.getArr.foreach(el => {
               context.setVar(cursorName, el)
               visit(ctx.block)
             })
@@ -111,15 +112,15 @@ trait ControlStmtsVisitor extends BaseVisitor {
           case other =>
             val cursors = ctx.ident.asScala.map(visit(_).toString).toList
             val old = cursors.map(context.getVar(_))
-            arr.foreach(el => {
+            c.getArr.foreach(el => {
               if (el.isInstanceOf[array]) {
                 val a = el.asInstanceOf[array]
-                if (a.arr.size < cursors.size)
+                if (a.getArr.size < cursors.size)
                   throw new IllegalStateException(
                     "not enough arguments to unpack"
                   )
                 cursors
-                  .zip(a.arr)
+                  .zip(a.getArr)
                   .foreach(kv => {
                     context.setVar(kv._1, kv._2)
                   })
@@ -132,14 +133,14 @@ trait ControlStmtsVisitor extends BaseVisitor {
             })
             cursors.zip(old).foreach(x => context.setVar(x._1, x._2))
         }
-      case map(m) =>
+      case c: map =>
         ctx.ident.size match {
           case 2 =>
             val cursorKeyName = visit(ctx.ident(0)).toString
             val cursorValueName = visit(ctx.ident(1)).toString
             val oldKey = context.getVar(cursorKeyName)
             val oldValue = context.getVar(cursorValueName)
-            m.foreach(el => {
+            c.getMap.foreach(el => {
               context.setVar(cursorKeyName, el._1)
               context.setVar(cursorValueName, el._2)
               visit(ctx.block)
@@ -149,7 +150,7 @@ trait ControlStmtsVisitor extends BaseVisitor {
           case 1 =>
             val cursorName = visit(ctx.ident(0)).toString
             val oldCursor = context.getVar(cursorName)
-            m.foreach(el => {
+            c.getMap.foreach(el => {
               context.setVar(cursorName, el._2)
               visit(ctx.block)
             })
@@ -160,7 +161,7 @@ trait ControlStmtsVisitor extends BaseVisitor {
       case other =>
         throw new IllegalArgumentException("cursor must be collection")
     }
-    Null
+    new Null()
   }
 
   override def visitWhile_stmt(ctx: sql.While_stmtContext): Type = {
@@ -169,6 +170,6 @@ trait ControlStmtsVisitor extends BaseVisitor {
       visit(ctx.block)
       condition = visit(ctx.expr)
     }
-    Null
+    new Null()
   }
 }

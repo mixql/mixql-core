@@ -13,7 +13,7 @@ class FormatFunctionTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
 
     val foo = context.getVar("foo").asInstanceOf[string]
-    assert(foo.value == "12,332.1235")
+    assert(foo.getValue == "12,332.1235")
   }
 
   ignore("Test `format_number(12332.123456, '#.###') == '12332.123'`") {
@@ -25,6 +25,6 @@ class FormatFunctionTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
 
     val foo = context.getVar("foo").asInstanceOf[string]
-    assert(foo.value == "12332.123")
+    assert(foo.getValue == "12332.123")
   }
 }

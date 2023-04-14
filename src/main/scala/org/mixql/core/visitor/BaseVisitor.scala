@@ -17,7 +17,7 @@ trait BaseVisitor extends sqlBaseVisitor[Type] {
 
   protected implicit def to_bool(base: Type): Boolean = {
     base match {
-      case ok: bool => ok.value
+      case ok: bool => ok.getValue
       case other: Type =>
         throw new IllegalArgumentException(
           s"type mismatch: condition bool expected but got ${other.getClass.getSimpleName}"
@@ -27,21 +27,21 @@ trait BaseVisitor extends sqlBaseVisitor[Type] {
 
   override def visitTerminal(node: TerminalNode): Type = {
     node.getSymbol().getType() match {
-      case token.T_ESCAPED_SYMBOLS => string(node.getText().substring(1))
-      case token.T_SS_ESC          => string(node.getText().substring(1))
-      case token.T_DS_ESC          => string(node.getText().substring(1))
-      case token.T_BS_ESC          => string(node.getText().substring(1))
+      case token.T_ESCAPED_SYMBOLS => new string(node.getText().substring(1))
+      case token.T_SS_ESC          => new string(node.getText().substring(1))
+      case token.T_DS_ESC          => new string(node.getText().substring(1))
+      case token.T_BS_ESC          => new string(node.getText().substring(1))
       case token.T_SS_VAR_INTERPOLATION =>
         context.getVar(node.getText().substring(1))
       case token.T_DS_VAR_INTERPOLATION =>
         context.getVar(node.getText().substring(1))
       case token.T_BS_VAR_INTERPOLATION =>
         context.getVar(node.getText().substring(1))
-      case _ => string(node.getText())
+      case _ => new string(node.getText())
     }
   }
 
-  override def defaultResult(): Type = Null
+  override def defaultResult(): Type = new Null()
 
   override def aggregateResult(aggregate: Type, nextResult: Type): Type =
     nextResult
