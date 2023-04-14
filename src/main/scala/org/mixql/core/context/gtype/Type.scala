@@ -89,15 +89,15 @@ case class bool(value: Boolean) extends Type {
     }
 }
 
-case class int(value: Int) extends Type {
+case class gInt(value: Int) extends Type {
   def this(v: String) = this(v.toInt)
 
   override def toString: String = value.toString
 
   override def +(other: Type): Type =
     other match {
-      case int(oval)    => int(value + oval)
-      case double(oval) => double(value + oval)
+      case gInt(oval)    => gInt(value + oval)
+      case gDouble(oval) => gDouble(value + oval)
       case oval: string => string(value.toString + other.toString, oval.quote)
       case array(arr)   => array(this +: arr)
       case _            => super.+(other)
@@ -105,72 +105,72 @@ case class int(value: Int) extends Type {
 
   override def -(other: Type): Type =
     other match {
-      case int(oval)    => int(value - oval)
-      case double(oval) => double(value - oval)
+      case gInt(oval)    => gInt(value - oval)
+      case gDouble(oval) => gDouble(value - oval)
       case _            => super.-(other)
     }
 
   override def *(other: Type): Type =
     other match {
-      case int(oval)    => int(value * oval)
-      case double(oval) => double(value * oval)
+      case gInt(oval)    => gInt(value * oval)
+      case gDouble(oval) => gDouble(value * oval)
       case _            => super.*(other)
     }
 
   override def /(other: Type): Type =
     other match {
-      case int(oval)    => int(value / oval)
-      case double(oval) => double(value / oval)
+      case gInt(oval)    => gInt(value / oval)
+      case gDouble(oval) => gDouble(value / oval)
       case _            => super./(other)
     }
 
   override def >(other: Type): Type =
     other match {
-      case int(oval)    => bool(value > oval)
-      case double(oval) => bool(value > oval)
+      case gInt(oval)    => bool(value > oval)
+      case gDouble(oval) => bool(value > oval)
       case _            => super.>(other)
     }
   override def >=(other: Type): Type =
     other match {
-      case int(oval)    => bool(value >= oval)
-      case double(oval) => bool(value >= oval)
+      case gInt(oval)    => bool(value >= oval)
+      case gDouble(oval) => bool(value >= oval)
       case _            => super.>=(other)
     }
   override def <(other: Type): Type =
     other match {
-      case int(oval)    => bool(value < oval)
-      case double(oval) => bool(value < oval)
+      case gInt(oval)    => bool(value < oval)
+      case gDouble(oval) => bool(value < oval)
       case _            => super.<(other)
     }
   override def <=(other: Type): Type =
     other match {
-      case int(oval)    => bool(value <= oval)
-      case double(oval) => bool(value <= oval)
+      case gInt(oval)    => bool(value <= oval)
+      case gDouble(oval) => bool(value <= oval)
       case _            => super.<=(other)
     }
   override def ==(other: Type): Type =
     other match {
-      case int(oval)    => bool(value == oval)
-      case double(oval) => bool(value == oval)
+      case gInt(oval)    => bool(value == oval)
+      case gDouble(oval) => bool(value == oval)
       case _            => super.==(other)
     }
   override def !=(other: Type): Type =
     other match {
-      case int(oval)    => bool(value != oval)
-      case double(oval) => bool(value != oval)
+      case gInt(oval)    => bool(value != oval)
+      case gDouble(oval) => bool(value != oval)
       case _            => super.!=(other)
     }
 }
 
-case class double(value: Double) extends Type {
+case class gDouble(value: Double) extends Type {
   def this(v: String) = this(v.toDouble)
 
   override def toString: String = value.toString
 
   override def +(other: Type): Type =
     other match {
-      case int(oval)    => double(value + oval)
-      case double(oval) => double(value + oval)
+      case gInt(oval)    => gDouble(value + oval)
+      case gDouble(oval) => gDouble(value + oval)
       case array(arr)   => array(this +: arr)
       case oval: string => string(value.toString + other.toString, oval.quote)
       case _            => super.+(other)
@@ -178,59 +178,59 @@ case class double(value: Double) extends Type {
 
   override def -(other: Type): Type =
     other match {
-      case int(oval)    => double(value - oval)
-      case double(oval) => double(value - oval)
+      case gInt(oval)    => gDouble(value - oval)
+      case gDouble(oval) => gDouble(value - oval)
       case _            => super.-(other)
     }
 
   override def *(other: Type): Type =
     other match {
-      case int(oval)    => double(value * oval)
-      case double(oval) => double(value * oval)
+      case gInt(oval)    => gDouble(value * oval)
+      case gDouble(oval) => gDouble(value * oval)
       case _            => super.*(other)
     }
 
   override def /(other: Type): Type =
     other match {
-      case int(oval)    => double(value / oval)
-      case double(oval) => double(value / oval)
+      case gInt(oval)    => gDouble(value / oval)
+      case gDouble(oval) => gDouble(value / oval)
       case _            => super./(other)
     }
 
   override def >(other: Type): Type =
     other match {
-      case int(oval)    => bool(value > oval)
-      case double(oval) => bool(value > oval)
+      case gInt(oval)    => bool(value > oval)
+      case gDouble(oval) => bool(value > oval)
       case _            => super.>(other)
     }
   override def >=(other: Type): Type =
     other match {
-      case int(oval)    => bool(value >= oval)
-      case double(oval) => bool(value >= oval)
+      case gInt(oval)    => bool(value >= oval)
+      case gDouble(oval) => bool(value >= oval)
       case _            => super.>=(other)
     }
   override def <(other: Type): Type =
     other match {
-      case int(oval)    => bool(value < oval)
-      case double(oval) => bool(value < oval)
+      case gInt(oval)    => bool(value < oval)
+      case gDouble(oval) => bool(value < oval)
       case _            => super.<(other)
     }
   override def <=(other: Type): Type =
     other match {
-      case int(oval)    => bool(value <= oval)
-      case double(oval) => bool(value <= oval)
+      case gInt(oval)    => bool(value <= oval)
+      case gDouble(oval) => bool(value <= oval)
       case _            => super.<=(other)
     }
   override def ==(other: Type): Type =
     other match {
-      case int(oval)    => bool(value == oval)
-      case double(oval) => bool(value == oval)
+      case gInt(oval)    => bool(value == oval)
+      case gDouble(oval) => bool(value == oval)
       case _            => super.==(other)
     }
   override def !=(other: Type): Type =
     other match {
-      case int(oval)    => bool(value != oval)
-      case double(oval) => bool(value != oval)
+      case gInt(oval)    => bool(value != oval)
+      case gDouble(oval) => bool(value != oval)
       case _            => super.!=(other)
     }
 }
@@ -276,7 +276,7 @@ case class string(value: String, quote: String = "") extends Type {
 abstract class collection extends Type {
   def apply(index: Type): Type
   def update(index: Type, value: Type): Unit
-  def size: int
+  def size: gInt
 }
 
 case class array(arr: Array[Type]) extends collection {
@@ -303,17 +303,17 @@ case class array(arr: Array[Type]) extends collection {
       case _            => bool(false)
     }
 
-  override def size: int = int(arr.size)
+  override def size: gInt = gInt(arr.size)
 
   override def apply(index: Type): Type =
     index match {
-      case int(i) => arr(i)
+      case gInt(i) => arr(i)
       case _ => throw new IllegalArgumentException("array index must be int")
     }
 
   override def update(index: Type, value: Type): Unit =
     index match {
-      case int(i) => arr.update(i, value)
+      case gInt(i) => arr.update(i, value)
       case _ => throw new IllegalArgumentException("array index must be int")
     }
 }
@@ -329,7 +329,7 @@ case class map(m: MutMap[Type, Type]) extends collection {
 
   override def update(index: Type, value: Type): Unit = m.update(index, value)
 
-  override def size: int = int(m.size)
+  override def size: gInt = gInt(m.size)
 
   override def toString: String = {
     m

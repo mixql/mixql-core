@@ -9,13 +9,13 @@ package object gtype {
   /** implicit conversions from scala types to gtypes or gtypes to scala types
     */
   object implicitGtypeConversions {
-    implicit def from_int(a: Int): int = int(a)
+    implicit def from_int(a: Int): gInt = gInt(a)
 
-    implicit def to_int(a: int): Int = a.value
+    implicit def to_int(a: gInt): Int = a.value
 
-    implicit def from_double(a: Double): double = double(a)
+    implicit def from_double(a: Double): gDouble = gDouble(a)
 
-    implicit def to_double(a: double): Double = a.value
+    implicit def to_double(a: gDouble): Double = a.value
 
     implicit def from_bool(a: Boolean): bool = bool(a)
 
@@ -42,8 +42,8 @@ package object gtype {
     def to_bool(a: Type): bool = {
       a match {
         case value: bool   => value
-        case double(value) => value != 0
-        case int(value)    => value != 0
+        case gDouble(value) => value != 0
+        case gInt(value)    => value != 0
         case string(value, _) =>
           if (value.toLowerCase == "true")
             true
@@ -64,12 +64,12 @@ package object gtype {
       }
     }
 
-    def to_int(a: Type): int = {
+    def to_int(a: Type): gInt = {
       a match {
         case bool(value)      => if (value) 1 else 0
-        case double(value)    => int(value.toInt)
-        case value: int       => value
-        case string(value, _) => int(value.toInt)
+        case gDouble(value)    => gInt(value.toInt)
+        case value: gInt       => value
+        case string(value, _) => gInt(value.toInt)
         case Null =>
           throw new NullPointerException("cannot convert null to int")
         case value =>
@@ -79,11 +79,11 @@ package object gtype {
       }
     }
 
-    def to_double(a: Type): double = {
+    def to_double(a: Type): gDouble = {
       a match {
         case bool(value)      => if (value) 1 else 0
-        case value: double    => value
-        case int(value)       => value.toDouble
+        case value: gDouble    => value
+        case gInt(value)       => value.toDouble
         case string(value, _) => value.toDouble
         case Null =>
           throw new NullPointerException("cannot convert null to double")
@@ -105,8 +105,8 @@ package object gtype {
     a match {
       case null          => Null
       case p: String     => string(p)
-      case p: Int        => int(p)
-      case p: Double     => double(p)
+      case p: Int        => gInt(p)
+      case p: Double     => gDouble(p)
       case p: Boolean    => bool(p)
       case p: Array[Any] => array(p.map(pack))
       case p: Map[Any, Any] =>
@@ -123,8 +123,8 @@ package object gtype {
     a match {
       case Null         => null
       case string(v, q) => v
-      case int(v)       => v
-      case double(v)    => v
+      case gInt(v)       => v
+      case gDouble(v)    => v
       case bool(v)      => v
       case array(v)     => v.map(unpack)
       case map(v)       => v.map(kv => unpack(kv._1) -> unpack(kv._2)).toMap

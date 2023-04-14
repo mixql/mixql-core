@@ -73,8 +73,8 @@ trait ControlStmtsVisitor extends BaseVisitor {
     var i = if (!ctx.T_REVERSE) visit(ctx.from) else visit(ctx.to)
     val to = if (!ctx.T_REVERSE) visit(ctx.to) else visit(ctx.from)
     val step =
-      (if (ctx.T_REVERSE) int(-1) else int(1)) * (if (ctx.step) visit(ctx.step)
-                                                  else int(1))
+      (if (ctx.T_REVERSE) gInt(-1) else gInt(1)) * (if (ctx.step) visit(ctx.step)
+                                                  else gInt(1))
     context.setVar(i_name, i)
     while (
       (!ctx.T_REVERSE && i < to) ||

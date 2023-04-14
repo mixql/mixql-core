@@ -259,8 +259,8 @@ class ControlStmtsTest extends MainVisitorBaseTest {
       code,
       new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
     )
-    assert(res.isInstanceOf[int])
-    assert(res.asInstanceOf[int].value == 1)
+    assert(res.isInstanceOf[gInt])
+    assert(res.asInstanceOf[gInt].value == 1)
   }
 
   test("Test return from lambda") {
@@ -275,8 +275,8 @@ class ControlStmtsTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[int])
-    assert(res.asInstanceOf[int].value == 1)
+    assert(res.isInstanceOf[gInt])
+    assert(res.asInstanceOf[gInt].value == 1)
   }
 
   test("Test multiple assigment") {
@@ -286,11 +286,11 @@ class ControlStmtsTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res1 = context.getVar("res1")
-    assert(res1.isInstanceOf[int])
-    assert(res1.asInstanceOf[int].value == 1)
+    assert(res1.isInstanceOf[gInt])
+    assert(res1.asInstanceOf[gInt].value == 1)
     val res2 = context.getVar("res2")
-    assert(res2.isInstanceOf[int])
-    assert(res2.asInstanceOf[int].value == 2)
+    assert(res2.isInstanceOf[gInt])
+    assert(res2.asInstanceOf[gInt].value == 2)
   }
 
   test("Test multiple assigment: unpack array") {
@@ -300,11 +300,11 @@ class ControlStmtsTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res1 = context.getVar("res1")
-    assert(res1.isInstanceOf[int])
-    assert(res1.asInstanceOf[int].value == 1)
+    assert(res1.isInstanceOf[gInt])
+    assert(res1.asInstanceOf[gInt].value == 1)
     val res2 = context.getVar("res2")
-    assert(res2.isInstanceOf[int])
-    assert(res2.asInstanceOf[int].value == 2)
+    assert(res2.isInstanceOf[gInt])
+    assert(res2.asInstanceOf[gInt].value == 2)
   }
 
   test("Test multiple assigment: foreach") {
@@ -318,7 +318,7 @@ class ControlStmtsTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[int])
-    assert(res.asInstanceOf[int].value == 21)
+    assert(res.isInstanceOf[gInt])
+    assert(res.asInstanceOf[gInt].value == 21)
   }
 }

@@ -34,10 +34,10 @@ class ContextTest extends AnyFunSuite {
     assert(isNull(context.getVar("nullVariable")))
     assert(context.getVar("boolVariable").isInstanceOf[bool])
     assert(context.getVar("boolVariable").asInstanceOf[bool].value == true)
-    assert(context.getVar("intVariable").isInstanceOf[int])
-    assert(context.getVar("intVariable").asInstanceOf[int].value == 42)
-    assert(context.getVar("doubleVariable").isInstanceOf[double])
-    assert(context.getVar("doubleVariable").asInstanceOf[double].value == 42.42)
+    assert(context.getVar("intVariable").isInstanceOf[gInt])
+    assert(context.getVar("intVariable").asInstanceOf[gInt].value == 42)
+    assert(context.getVar("doubleVariable").isInstanceOf[gDouble])
+    assert(context.getVar("doubleVariable").asInstanceOf[gDouble].value == 42.42)
     assert(context.getVar("strVariable").isInstanceOf[string])
     assert(context.getVar("strVariable").asInstanceOf[string].value == "str")
     assert(context.getVar("variable.with.points").isInstanceOf[string])
@@ -47,25 +47,25 @@ class ContextTest extends AnyFunSuite {
         .asInstanceOf[string]
         .value == "var with pt"
     )
-    assert(context.getVar("variable.with.points2").isInstanceOf[int])
+    assert(context.getVar("variable.with.points2").isInstanceOf[gInt])
     assert(
-      context.getVar("variable.with.points2").asInstanceOf[int].value == 1725
+      context.getVar("variable.with.points2").asInstanceOf[gInt].value == 1725
     )
     assert(context.getVar("listVariable").isInstanceOf[array])
     val arr = context.getVar("listVariable").asInstanceOf[array]
-    assert(arr.size == int(4))
-    assert(arr(int(0)).isInstanceOf[bool])
-    assert(arr(int(1)).isInstanceOf[int])
-    assert(arr(int(2)).isInstanceOf[double])
-    assert(arr(int(3)).isInstanceOf[string])
+    assert(arr.size == gInt(4))
+    assert(arr(gInt(0)).isInstanceOf[bool])
+    assert(arr(gInt(1)).isInstanceOf[gInt])
+    assert(arr(gInt(2)).isInstanceOf[gDouble])
+    assert(arr(gInt(3)).isInstanceOf[string])
   }
 
   test("Test add var value to context") {
     val context =
       new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
-    context.setVar("a", int(12))
-    assert(context.getVar("a").isInstanceOf[int])
-    assert(context.getVar("a").asInstanceOf[int].value == 12)
+    context.setVar("a", gInt(12))
+    assert(context.getVar("a").isInstanceOf[gInt])
+    assert(context.getVar("a").asInstanceOf[gInt].value == 12)
   }
 
   test("Test add null var to context") {
@@ -84,7 +84,7 @@ class ContextTest extends AnyFunSuite {
   test("Test change var value in context") {
     val context =
       new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
-    context.setVar("a", int(12))
+    context.setVar("a", gInt(12))
     context.setVar("a", string("value"))
     assert(context.getVar("a").isInstanceOf[string])
     assert(context.getVar("a").asInstanceOf[string].value == "value")
@@ -149,8 +149,8 @@ class ContextTest extends AnyFunSuite {
   test("Test interpolator") {
     val context =
       new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
-    context.setVar("stub.a", int(12))
-    context.setVar("a", int(25))
+    context.setVar("stub.a", gInt(12))
+    context.setVar("a", gInt(25))
     val res = context.interpolate("select ${$a + $stub.a}")
     assert(res == "select 37")
   }
@@ -165,16 +165,16 @@ class ContextTest extends AnyFunSuite {
         "stub1"
       )
     context.setVar("mixql.engine.variables.update", string("all"))
-    context.setVar("a", int(12))
-    assert(context.getVar("a").isInstanceOf[int])
-    assert(context.getVar("a").asInstanceOf[int].value == 12)
+    context.setVar("a", gInt(12))
+    assert(context.getVar("a").isInstanceOf[gInt])
+    assert(context.getVar("a").asInstanceOf[gInt].value == 12)
     assert(
       context
         .getEngine("stub1")
         .get
         .asInstanceOf[StubEngine]
         .param("a")
-        .isInstanceOf[int]
+        .isInstanceOf[gInt]
     )
     assert(
       context
@@ -182,7 +182,7 @@ class ContextTest extends AnyFunSuite {
         .get
         .asInstanceOf[StubEngine]
         .param("a")
-        .asInstanceOf[int]
+        .asInstanceOf[gInt]
         .value == 12
     )
     assert(
@@ -191,7 +191,7 @@ class ContextTest extends AnyFunSuite {
         .get
         .asInstanceOf[StubEngine]
         .param("a")
-        .isInstanceOf[int]
+        .isInstanceOf[gInt]
     )
     assert(
       context
@@ -199,7 +199,7 @@ class ContextTest extends AnyFunSuite {
         .get
         .asInstanceOf[StubEngine]
         .param("a")
-        .asInstanceOf[int]
+        .asInstanceOf[gInt]
         .value == 12
     )
   }
@@ -214,16 +214,16 @@ class ContextTest extends AnyFunSuite {
         "stub1"
       )
     context.setVar("mixql.engine.variables.update", string("current"))
-    context.setVar("a", int(12))
-    assert(context.getVar("a").isInstanceOf[int])
-    assert(context.getVar("a").asInstanceOf[int].value == 12)
+    context.setVar("a", gInt(12))
+    assert(context.getVar("a").isInstanceOf[gInt])
+    assert(context.getVar("a").asInstanceOf[gInt].value == 12)
     assert(
       context
         .getEngine("stub1")
         .get
         .asInstanceOf[StubEngine]
         .param("a")
-        .isInstanceOf[int]
+        .isInstanceOf[gInt]
     )
     assert(
       context
@@ -231,7 +231,7 @@ class ContextTest extends AnyFunSuite {
         .get
         .asInstanceOf[StubEngine]
         .param("a")
-        .asInstanceOf[int]
+        .asInstanceOf[gInt]
         .value == 12
     )
     assert(
@@ -256,9 +256,9 @@ class ContextTest extends AnyFunSuite {
         "stub1"
       )
     context.setVar("mixql.engine.variables.update", string("none"))
-    context.setVar("a", int(12))
-    assert(context.getVar("a").isInstanceOf[int])
-    assert(context.getVar("a").asInstanceOf[int].value == 12)
+    context.setVar("a", gInt(12))
+    assert(context.getVar("a").isInstanceOf[gInt])
+    assert(context.getVar("a").asInstanceOf[gInt].value == 12)
     assert(
       isNull(
         context
@@ -291,19 +291,19 @@ class ContextTest extends AnyFunSuite {
         "stub1"
       )
     context.setVar("mixql.engine.variables.update", string("all"))
-    context.setVar("a", int(12))
+    context.setVar("a", gInt(12))
     context.push_scope()
-    context.setVar("a", int(15))
+    context.setVar("a", gInt(15))
     context.pop_scope()
-    assert(context.getVar("a").isInstanceOf[int])
-    assert(context.getVar("a").asInstanceOf[int].value == 12)
+    assert(context.getVar("a").isInstanceOf[gInt])
+    assert(context.getVar("a").asInstanceOf[gInt].value == 12)
     assert(
       context
         .getEngine("stub1")
         .get
         .asInstanceOf[StubEngine]
         .param("a")
-        .isInstanceOf[int]
+        .isInstanceOf[gInt]
     )
     assert(
       context
@@ -311,7 +311,7 @@ class ContextTest extends AnyFunSuite {
         .get
         .asInstanceOf[StubEngine]
         .param("a")
-        .asInstanceOf[int]
+        .asInstanceOf[gInt]
         .value == 12
     )
     assert(
@@ -320,7 +320,7 @@ class ContextTest extends AnyFunSuite {
         .get
         .asInstanceOf[StubEngine]
         .param("a")
-        .isInstanceOf[int]
+        .isInstanceOf[gInt]
     )
     assert(
       context
@@ -328,7 +328,7 @@ class ContextTest extends AnyFunSuite {
         .get
         .asInstanceOf[StubEngine]
         .param("a")
-        .asInstanceOf[int]
+        .asInstanceOf[gInt]
         .value == 12
     )
   }

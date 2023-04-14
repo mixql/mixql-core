@@ -12,7 +12,7 @@ class AsciFunctionsTest extends MainVisitorBaseTest {
 
     val context = runMainVisitor(code)
 
-    val foo = context.getVar("foo").asInstanceOf[int]
+    val foo = context.getVar("foo").asInstanceOf[gInt]
     assert(foo.value == 0)
   }
 
@@ -24,7 +24,7 @@ class AsciFunctionsTest extends MainVisitorBaseTest {
 
     val context = runMainVisitor(code)
 
-    val foo = context.getVar("foo").asInstanceOf[int]
+    val foo = context.getVar("foo").asInstanceOf[gInt]
     assert(foo.value == 50)
   }
 }

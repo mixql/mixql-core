@@ -12,7 +12,7 @@ class StringFunctionsTest extends MainVisitorBaseTest {
 
     val context = runMainVisitor(code)
 
-    val foo = context.getVar("foo").asInstanceOf[int]
+    val foo = context.getVar("foo").asInstanceOf[gInt]
     assert(foo.value == 10)
   }
 

@@ -438,9 +438,9 @@ class Context(
     else if (value.isInstanceOf[String])
       string(value.asInstanceOf[String])
     else if (value.isInstanceOf[Integer])
-      int(value.asInstanceOf[Integer])
+      gInt(value.asInstanceOf[Integer])
     else if (value.isInstanceOf[Double])
-      double(value.asInstanceOf[Double])
+      gDouble(value.asInstanceOf[Double])
     else if (value.isInstanceOf[ju.List[Object]]) {
       array(
         value

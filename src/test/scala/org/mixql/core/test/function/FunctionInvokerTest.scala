@@ -1,7 +1,7 @@
 package org.mixql.core.test.function
 
 import org.mixql.core.context.Context
-import org.mixql.core.context.gtype.int
+import org.mixql.core.context.gtype.gInt
 import org.mixql.core.engine.Engine
 import org.mixql.core.function.FunctionInvoker
 import org.mixql.core.test.stub.StubEngine
@@ -27,7 +27,7 @@ class FunctionInvokerTest extends AnyFunSuite {
 
   val lengthMixQlCoreContext: Any = new ((Context, String) => Int) {
     def apply(ctx: Context, str: String): Int =
-      str.length + ctx.getVar("a").asInstanceOf[int].value
+      str.length + ctx.getVar("a").asInstanceOf[gInt].value
   }
 
   val defArgFunc = new Object {
@@ -136,7 +136,7 @@ class FunctionInvokerTest extends AnyFunSuite {
     import scala.collection.mutable.{Map => MutMap}
     val context =
       new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
-    context.setVar("a", int(12))
+    context.setVar("a", gInt(12))
     val res = FunctionInvoker.invoke(
       functions,
       "length_with_mixql_core_context",

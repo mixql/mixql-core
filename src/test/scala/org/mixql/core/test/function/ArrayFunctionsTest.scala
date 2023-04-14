@@ -13,8 +13,8 @@ class ArrayFunctionsTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
 
     val res = context.getVar("res")
-    assert(res.isInstanceOf[int])
-    assert(res.asInstanceOf[int].value == 3)
+    assert(res.isInstanceOf[gInt])
+    assert(res.asInstanceOf[gInt].value == 3)
   }
 
   test("Test sort") {
@@ -28,8 +28,8 @@ class ArrayFunctionsTest extends MainVisitorBaseTest {
     val res = context.getVar("res")
     assert(res.isInstanceOf[array])
     assert(res.asInstanceOf[array].arr.size == 3)
-    assert(res.asInstanceOf[array](int(0)).asInstanceOf[int].value == 1)
-    assert(res.asInstanceOf[array](int(1)).asInstanceOf[int].value == 2)
-    assert(res.asInstanceOf[array](int(2)).asInstanceOf[int].value == 3)
+    assert(res.asInstanceOf[array](gInt(0)).asInstanceOf[gInt].value == 1)
+    assert(res.asInstanceOf[array](gInt(1)).asInstanceOf[gInt].value == 2)
+    assert(res.asInstanceOf[array](gInt(2)).asInstanceOf[gInt].value == 3)
   }
 }
