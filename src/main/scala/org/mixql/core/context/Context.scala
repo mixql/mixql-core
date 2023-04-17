@@ -61,7 +61,7 @@ class Context(
 ) extends java.lang.AutoCloseable {
   import Context.defaultFunctions
 
-  def functions: MutMap[String, Any] = defaultFunctions ++ functionsInit
+  var functions: MutMap[String, Any] = defaultFunctions ++ functionsInit
 
   var currentEngine: Engine = null
 
@@ -333,7 +333,8 @@ class Context(
       throw new InstantiationException(s"function $name is already defined")
     else {
       logDebug("Functions map after adding function: " + functions.keySet.toList.sorted.toString())
-      functions.put(name.toLowerCase(), function)
+      val map = Map(name.toLowerCase() -> function)
+      functions = functions ++ map;
       logDebug("Functions map after adding function: " + functions.keySet.toList.sorted.toString())
     }
   }

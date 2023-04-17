@@ -377,6 +377,7 @@ class ExpressionTest extends MainVisitorBaseTest {
     val code =
       """
         |let res = {1: 1, "1": 2};
+        |print($res);
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
@@ -415,6 +416,7 @@ class ExpressionTest extends MainVisitorBaseTest {
         |end;
         |let mapa1 = foo($mapa);
         |let res = $mapa1[1.1];
+        |print($res);
                 """.stripMargin
     val context = runMainVisitor(code)
     val res2 = context.getVar("res")
