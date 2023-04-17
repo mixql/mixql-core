@@ -13,7 +13,7 @@ object FunctionInvoker {
     functions: Map[String, Any],
     funcName: String,
     context: Object, // To support not only mixql-core context
-    args: Seq[Any] = Nil,
+    args: List[Any] = Nil,
     kwargs: Map[String, Object] = Map.empty,
     cc: String =
       "org.mixql.core.context.Context" // To support not only mixql-core context

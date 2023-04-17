@@ -175,7 +175,7 @@ trait ExpressionVisitor extends BaseVisitor {
       .toMap
     pack(
       FunctionInvoker
-        .invoke(context.functions.toMap, funcName, context, args, kwargs)
+        .invoke(context.functions.toMap, funcName, context, args.toList, kwargs)
     )
   }
 
