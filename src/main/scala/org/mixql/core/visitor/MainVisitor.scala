@@ -6,7 +6,7 @@ import org.mixql.core.context.Context
 import org.mixql.core.context.gtype._
 import org.mixql.core.function.SqlLambda
 import org.mixql.core.generated.sql
-import org.mixql.core.logger.logInfo
+import org.mixql.core.logger.{logDebug, logInfo}
 
 import scala.util.{Failure, Success}
 import scala.collection.JavaConverters._
@@ -63,8 +63,12 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
   ): Type = {
     val value = visit(ctx.expr)
     value match {
-      case v: SqlLambda => context.addFunction(visit(ctx.ident).toString, v)
-      case other => context.setVar(visit(ctx.ident).toString, visit(ctx.expr))
+      case v: SqlLambda =>
+        val lambdaFuncName = visit(ctx.ident).toString;
+        logDebug("Adding lambda function " + lambdaFuncName + " to context")
+        context.addFunction(lambdaFuncName, v)
+
+      case _ => context.setVar(visit(ctx.ident).toString, visit(ctx.expr))
     }
     new Null()
   }

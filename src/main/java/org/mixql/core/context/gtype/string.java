@@ -1,17 +1,19 @@
 package org.mixql.core.context.gtype;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class string extends Type {
     String value;
 
-    public String getValue(){
+    public String getValue() {
         return value;
     }
 
     String quote = "";
 
-    public String getQuote(){
+    public String getQuote() {
         return quote;
     }
 
@@ -47,9 +49,20 @@ public class string extends Type {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof string) {
-            return ((string) obj).value.equals(value);
+            int res = ((string) obj).value.compareTo(value);
+            if (res == 0)
+                return true;
+            else
+                return false;
         }
-        return false;// TODO mb String too?
+        if (obj instanceof String) {
+            int res = ((String) obj).compareTo(value);
+            if (res == 0)
+                return true;
+            else
+                return false;
+        }
+        return false;
     }
 
     @Override
@@ -62,8 +75,10 @@ public class string extends Type {
         }
 
         if (other instanceof array) {
-            Type[] otherList = ((array) other).getArr();
-            return new array(otherList).Add(this);
+            Type[] _t = ((array) other).getArr();
+            ArrayList<Type> t = new ArrayList<>(Arrays.asList(_t));
+            t.add(0, this);
+            return (new array(t.toArray(_t)));
         }
 
         return new string(value + other.toString(), quote);
@@ -72,7 +87,7 @@ public class string extends Type {
     @Override
     // TODO attention do we need type check?
     public Type Equal(Type other) {
-        return new bool(value == other.toString());
+        return new bool(this.equals(other));
     }
 
 

@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.Map;
 
 public abstract class Type {
-
     public boolean ret = false;
 
     //+

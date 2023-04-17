@@ -1,5 +1,9 @@
 package org.mixql.core.context.gtype;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class gInt extends Type {
     int value;
 
@@ -37,9 +41,12 @@ public class gInt extends Type {
         }
 
         if (other instanceof array) {
-            Type[] t = ((array) other).getArr();
-            return (new array(t)).Add(this);
+            Type[] _t = ((array) other).getArr();
+            ArrayList<Type> t = new ArrayList<>(Arrays.asList(_t));
+            t.add(0, this);
+            return (new array(t.toArray(_t)));
         }
+
         return super.Add(other);
     }
 
@@ -121,12 +128,20 @@ public class gInt extends Type {
     }
 
     @Override
-    public Type Equal(Type other) {
+    public boolean equals(Object other) {
         if (other instanceof gInt) {
-            return new bool(value == ((gInt) other).value);
+            return value == ((gInt) other).value;
         }
         if (other instanceof gDouble) {
-            return new bool(value == ((gDouble) other).value);
+            return value == ((gDouble) other).value;
+        }
+        return super.equals(other);
+    }
+
+    @Override
+    public Type Equal(Type other) {
+        if (other instanceof gInt || other instanceof gDouble) {
+            return new bool(this.equals(other));
         }
         return super.Equal(other);
     }

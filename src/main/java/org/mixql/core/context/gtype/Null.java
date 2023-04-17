@@ -1,6 +1,8 @@
 package org.mixql.core.context.gtype;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class Null extends Type {
     @Override
@@ -11,8 +13,10 @@ public class Null extends Type {
     @Override
     public Type Add(Type other) {
         if (other instanceof array) {
-            Type[] t = ((array) other).getArr();
-            return new array(t).Add(this);
+            Type[] _t = ((array) other).getArr();
+            ArrayList<Type> t = new ArrayList<>(Arrays.asList(_t));
+            t.add(0, this);
+            return (new array(t.toArray(_t)));
         } else
             return super.Add(other);
     }

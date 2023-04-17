@@ -1,5 +1,9 @@
 package org.mixql.core.context.gtype;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class bool extends Type {
     boolean value;
 
@@ -24,8 +28,10 @@ public class bool extends Type {
         }
 
         if (other instanceof array) {
-            Type[] t = ((array) other).getArr();
-            return (new array(t)).Add(this);
+            Type[] _t = ((array) other).getArr();
+            ArrayList<Type> t = new ArrayList<>(Arrays.asList(_t));
+            t.add(0, this);
+            return (new array(t.toArray(_t)));
         }
 
         return super.Add(other);
@@ -37,9 +43,20 @@ public class bool extends Type {
     }
 
     @Override
+    public boolean equals(Object other) {
+        if (other instanceof bool) {
+            return value == ((bool) other).value;
+        }
+        if (other instanceof Boolean) {
+            return value == (Boolean) other;
+        }
+        return super.equals(other);
+    }
+
+    @Override
     public Type Equal(Type other) {
         if (other instanceof bool) {
-            return new bool(value == ((bool) other).value);
+            return new bool(this.equals(other));
         }
         return super.Equal(other);
     }

@@ -24,12 +24,15 @@ public class array extends collection {
     public String toString() {
         StringBuffer buffer = new StringBuffer();
         buffer.append("[");
-        for (Type a : arr) {
+        for (int i = 0; i <= arr.size() - 1; i++) {
+            Type a = arr.get(i);
             if (a instanceof string)
                 buffer.append(((string) a).asLiteral());
             else
                 buffer.append(a.toString());
-            buffer.append(", ");
+            if (i != arr.size() - 1) {
+                buffer.append(", ");
+            }
         }
         buffer.append("]");
         return buffer.toString();
@@ -37,12 +40,15 @@ public class array extends collection {
 
     @Override
     public Type Add(Type other) {
+        Type[] simpleArray = new Type[arr.size()];
+        simpleArray = arr.toArray(simpleArray);
+        ArrayList<Type> simpleList = new ArrayList<>(Arrays.asList(simpleArray));
         if (other instanceof array) {
-            arr.addAll(Arrays.asList(((array) other).getArr()));
-            return new array(getArr());
+            simpleList.addAll(Arrays.asList(((array) other).getArr()));
+            return new array(simpleList.toArray(simpleArray));
         } else {
-            arr.add(other);
-            return new array(getArr());
+            simpleList.add(other);
+            return new array(simpleList.toArray(simpleArray));
         }
     }
 

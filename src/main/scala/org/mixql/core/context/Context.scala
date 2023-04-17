@@ -331,8 +331,11 @@ class Context(
   def addFunction(name: String, function: Any): Unit = {
     if (functions.contains(name.toLowerCase()))
       throw new InstantiationException(s"function $name is already defined")
-    else
+    else {
+      logDebug("Functions map after adding function: " + functions.keySet.toList.sorted.toString())
       functions.put(name.toLowerCase(), function)
+      logDebug("Functions map after adding function: " + functions.keySet.toList.sorted.toString())
+    }
   }
 
   override def close(): Unit = {
