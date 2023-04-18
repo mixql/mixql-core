@@ -1,3 +1,10 @@
+//Use if sbt-antlr4 plugin with snapshot version is used
+resolvers ++=
+  Seq(
+    "Sonatype OSS Snapshots" at "https://s01.oss.sonatype.org/content/repositories/snapshots",
+    "Sonatype OSS Snapshots" at "https://s01.oss.sonatype.org/content/repositories/releases"
+  )
+
 addSbtPlugin("org.jetbrains.scala" % "sbt-ide-settings" % "1.1.1")
 addSbtPlugin("org.scoverage"       % "sbt-scoverage"    % "2.0.6")
 addSbtPlugin("org.mixql"           % "sbt-antlr4"       % "0.8.7-SNAPSHOT")
