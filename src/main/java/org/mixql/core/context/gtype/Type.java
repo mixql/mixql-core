@@ -6,9 +6,13 @@ import java.util.Arrays;
 import java.util.Map;
 
 public abstract class Type {
-    public boolean ret = false;
+    public enum Control {
+        RETURN, BREAK, CONTINUE, NONE
+    }
+    
+    public Control control = Control.NONE;
 
-    //+
+    // +
     public Type Add(Type other) {
         throw new UnsupportedOperationException(
                 String.format(
@@ -19,7 +23,7 @@ public abstract class Type {
         );
     }
 
-    //-
+    // -
     public Type Subtract(Type other) {
         throw new UnsupportedOperationException(
                 String.format(
@@ -29,7 +33,7 @@ public abstract class Type {
         );
     }
 
-    //*
+    // *
     public Type Multiply(Type other) {
         throw new UnsupportedOperationException(
                 String.format(
@@ -39,7 +43,7 @@ public abstract class Type {
         );
     }
 
-    ///
+    // /
     public Type Divide(Type other) {
         throw new UnsupportedOperationException(
                 String.format(
@@ -49,7 +53,7 @@ public abstract class Type {
         );
     }
 
-    //||
+    // ||
     public Type Or(Type other) {
         throw new UnsupportedOperationException(
                 String.format(
@@ -59,7 +63,7 @@ public abstract class Type {
         );
     }
 
-    //&&
+    // &&
     public Type And(Type other) {
         throw new UnsupportedOperationException(
                 String.format(
@@ -69,7 +73,7 @@ public abstract class Type {
         );
     }
 
-    //<
+    // <
     public Type LessThen(Type other) {
         throw new UnsupportedOperationException(
                 String.format(
@@ -79,7 +83,7 @@ public abstract class Type {
         );
     }
 
-    //<=
+    // <=
     public Type LessEqualThen(Type other) {
         throw new UnsupportedOperationException(
                 String.format(
@@ -89,7 +93,7 @@ public abstract class Type {
         );
     }
 
-    //>
+    // >
     public Type MoreThen(Type other) {
         throw new UnsupportedOperationException(
                 String.format(
@@ -99,7 +103,7 @@ public abstract class Type {
         );
     }
 
-    //>=
+    // >=
     public Type MoreEqualThen(Type other) {
         throw new UnsupportedOperationException(
                 String.format(
@@ -109,7 +113,7 @@ public abstract class Type {
         );
     }
 
-    //==
+    // ==
     public Type Equal(Type other) {
         throw new UnsupportedOperationException(
                 String.format(
@@ -119,7 +123,7 @@ public abstract class Type {
         );
     }
 
-    //!=
+    // !=
     public Type NotEqual(Type other) {
         throw new UnsupportedOperationException(
                 String.format(
@@ -129,7 +133,7 @@ public abstract class Type {
         );
     }
 
-    //!=
+    // !=
     public Type Not() {
         throw new UnsupportedOperationException(
                 String.format(

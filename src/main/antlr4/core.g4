@@ -54,6 +54,10 @@ for_range_stmt :        // FOR (Integer range) statement
        T_FOR ident T_IN T_REVERSE? from=expr T_DOT2 to=expr ((T_BY | T_STEP) step=expr)? T_LOOP block T_END T_LOOP
      ;
 
+break_stmt : T_BREAK T_SEMICOLON;
+
+continue_stmt : T_CONTINUE T_SEMICOLON;
+
 expr_stmt:
      expr T_SEMICOLON
      ;
