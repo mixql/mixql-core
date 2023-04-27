@@ -54,9 +54,9 @@ trait ExpressionVisitor extends BaseVisitor {
     val left = visit(ctx.expr(0))
     val right = visit(ctx.expr(1))
     if (ctx.T_DIV)
-      left.Divide(right)
+      left / right
     else if (ctx.T_MUL)
-      left.Multiply(right)
+      left * right
     else
       throw new UnsupportedOperationException("unknown operator")
   }
@@ -67,9 +67,9 @@ trait ExpressionVisitor extends BaseVisitor {
     val left = visit(ctx.expr(0))
     val right = visit(ctx.expr(1))
     if (ctx.T_ADD)
-      left.Add(right)
+      left + right
     else if (ctx.T_SUB)
-      left.Subtract(right)
+      left - right
     else
       throw new UnsupportedOperationException("unknown operator")
   }
@@ -78,17 +78,17 @@ trait ExpressionVisitor extends BaseVisitor {
     val left = visit(ctx.expr(0))
     val right = visit(ctx.expr(1))
     if (ctx.compare_operator.T_EQUAL || ctx.compare_operator.T_EQUAL2)
-      left.Equal(right)
+      left == right
     else if (ctx.compare_operator.T_NOTEQUAL)
-      left.NotEqual(right)
+      left != right
     else if (ctx.compare_operator.T_GREATER)
-      left.MoreThen(right)
+      left > right
     else if (ctx.compare_operator.T_GREATEREQUAL)
-      left.MoreEqualThen(right)
+      left >= right
     else if (ctx.compare_operator.T_LESS)
-      left.LessThen(right)
+      left < right
     else if (ctx.compare_operator.T_LESSEQUAL)
-      left.LessEqualThen(right)
+      left <= right
     else
       throw new UnsupportedOperationException("unknown compare operator")
   }
@@ -97,15 +97,15 @@ trait ExpressionVisitor extends BaseVisitor {
     val left = visit(ctx.expr(0))
     val right = visit(ctx.expr(1))
     if (ctx.logical_operator.T_OR)
-      left.Or(right)
+      left || right
     else if (ctx.logical_operator.T_AND)
-      left.And(right)
+      left && right
     else
       throw new UnsupportedOperationException("unknown operator")
   }
 
   override def visitExpr_not(ctx: sql.Expr_notContext): Type =
-    visit(ctx.expr).Not()
+    visit(ctx.expr).!()
 
   override def visitExpr_recurse(ctx: sql.Expr_recurseContext): Type =
     if (ctx.expr)
@@ -114,7 +114,7 @@ trait ExpressionVisitor extends BaseVisitor {
       executeOther(visit(ctx.other).toString, ctx.choose_engine) match {
         case Success(value) => value
         case Failure(exception) =>
-          if (context.errorSkip) new Null() else throw exception
+          if (context.errorSkip) Null else throw exception
       }
     else
       throw new UnsupportedOperationException("unknown operator")
@@ -135,7 +135,7 @@ trait ExpressionVisitor extends BaseVisitor {
         if (condition) return visit(case_r.ex_do)
       })
     if (ctx.case_r.ex_else) return visit(ctx.case_r.ex_else)
-    new Null() // TODO default result if no condition matched (mb exception?)
+    Null // TODO default result if no condition matched (mb exception?)
   }
 
   override def visitExpr_index(ctx: sql.Expr_indexContext): Type = {

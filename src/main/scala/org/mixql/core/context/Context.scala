@@ -78,7 +78,7 @@ class Context(
     *   mixql.error.skip param value
     */
   def errorSkip: Boolean = getVar("mixql.error.skip") match {
-    case t: bool => t.getValue
+    case t: bool => t.value
     case _: Type =>
       throw new Exception("something wrong mixql.error.skip must be bool")
   }
@@ -276,7 +276,7 @@ class Context(
     }
     // set variable value
     value match {
-      case _: Null =>
+      case Null =>
         scope.head.remove(key)
       case _ =>
         scope.head.put(key, value)
@@ -297,13 +297,13 @@ class Context(
     */
   def getVar(key: String): Type = {
     scope.foreach(vars => {
-      val res = vars.getOrElse(key, new Null())
+      val res = vars.getOrElse(key, Null)
       res match {
-        case _:  Null  =>
+        case Null  =>
         case other => return other
       }
     })
-    new Null()
+    Null
   }
 
   /** interpolate statement via current context
@@ -436,15 +436,15 @@ class Context(
 
   private def convertConfigValue(value: Object): Type = {
     if (value == null)
-      new Null()
+      Null
     else if (value.isInstanceOf[Boolean])
       new bool(value.asInstanceOf[Boolean])
     else if (value.isInstanceOf[String])
       new string(value.asInstanceOf[String])
     else if (value.isInstanceOf[Integer])
-      new gInt(value.asInstanceOf[Integer])
+      new int(value.asInstanceOf[Integer])
     else if (value.isInstanceOf[Double])
-      new gDouble(value.asInstanceOf[Double])
+      new double(value.asInstanceOf[Double])
     else if (value.isInstanceOf[ju.List[Object]]) {
       new array(
         value
@@ -466,7 +466,7 @@ class Context(
 
     override def execute(stmt: String): Type = {
       interpolated = stmt
-      new Null()
+      Null
     }
 
     override def executeFunc(name: String, params: Type*) =

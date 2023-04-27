@@ -13,7 +13,7 @@ class ConcatFunctionsTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
 
     val foo = context.getVar("foo").asInstanceOf[string]
-    assert(foo.getValue == "SparkSQL")
+    assert(foo.value == "SparkSQL")
   }
 
   test("Test `concat_ws('|','A','B','C') == 'A|B|C'`") {
@@ -25,7 +25,7 @@ class ConcatFunctionsTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
 
     val foo = context.getVar("foo").asInstanceOf[string]
-    assert(foo.getValue == "A|B|C")
+    assert(foo.value == "A|B|C")
   }
 
   test("Test `concat_ws('|','A','B','C',NULL,'D') == 'A|B|C|D'`") {
@@ -37,6 +37,6 @@ class ConcatFunctionsTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
 
     val foo = context.getVar("foo").asInstanceOf[string]
-    assert(foo.getValue == "A|B|C|D")
+    assert(foo.value == "A|B|C|D")
   }
 }

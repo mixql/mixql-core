@@ -12,8 +12,8 @@ class StringFunctionsTest extends MainVisitorBaseTest {
 
     val context = runMainVisitor(code)
 
-    val foo = context.getVar("foo").asInstanceOf[gInt]
-    assert(foo.getValue == 10)
+    val foo = context.getVar("foo").asInstanceOf[int]
+    assert(foo.value == 10)
   }
 
   test("Test `substr('Spark SQL', 5)`") {
@@ -25,7 +25,7 @@ class StringFunctionsTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
 
     val foo = context.getVar("foo").asInstanceOf[string]
-    assert(foo.getValue == "k SQL")
+    assert(foo.value == "k SQL")
   }
 
   test("Test `substr('Spark SQL', -3)`") {
@@ -37,7 +37,7 @@ class StringFunctionsTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
 
     val foo = context.getVar("foo").asInstanceOf[string]
-    assert(foo.getValue == "SQL")
+    assert(foo.value == "SQL")
   }
 
   test("Test `substring('Spark SQL', 5, 1)`") {
@@ -49,7 +49,7 @@ class StringFunctionsTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
 
     val foo = context.getVar("foo").asInstanceOf[string]
-    assert(foo.getValue == "k")
+    assert(foo.value == "k")
   }
 
   test("Test `substring('Spark SQL', -10, 5)`") {
@@ -61,7 +61,7 @@ class StringFunctionsTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
 
     val foo = context.getVar("foo").asInstanceOf[string]
-    assert(foo.getValue == "Spar")
+    assert(foo.value == "Spar")
   }
 
   test("Test `substring('Spark SQL', -10, 0)`") {
@@ -73,6 +73,6 @@ class StringFunctionsTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
 
     val foo = context.getVar("foo").asInstanceOf[string]
-    assert(foo.getValue == "")
+    assert(foo.value == "")
   }
 }

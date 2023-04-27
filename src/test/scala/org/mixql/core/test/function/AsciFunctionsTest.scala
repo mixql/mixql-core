@@ -12,8 +12,8 @@ class AsciFunctionsTest extends MainVisitorBaseTest {
 
     val context = runMainVisitor(code)
 
-    val foo = context.getVar("foo").asInstanceOf[gInt]
-    assert(foo.getValue == 0)
+    val foo = context.getVar("foo").asInstanceOf[int]
+    assert(foo.value == 0)
   }
 
   test("Test `ascii('234') == 50`") {
@@ -24,7 +24,7 @@ class AsciFunctionsTest extends MainVisitorBaseTest {
 
     val context = runMainVisitor(code)
 
-    val foo = context.getVar("foo").asInstanceOf[gInt]
-    assert(foo.getValue == 50)
+    val foo = context.getVar("foo").asInstanceOf[int]
+    assert(foo.value == 50)
   }
 }

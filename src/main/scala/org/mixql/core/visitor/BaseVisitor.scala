@@ -17,7 +17,7 @@ trait BaseVisitor extends sqlBaseVisitor[Type] {
 
   protected implicit def to_bool(base: Type): Boolean = {
     base match {
-      case ok: bool => ok.getValue
+      case ok: bool => ok.value
       case other: Type =>
         throw new IllegalArgumentException(
           s"type mismatch: condition bool expected but got ${other.getClass.getSimpleName}"
@@ -41,7 +41,7 @@ trait BaseVisitor extends sqlBaseVisitor[Type] {
     }
   }
 
-  override def defaultResult(): Type = new Null()
+  override def defaultResult(): Type = Null
 
   override def aggregateResult(aggregate: Type, nextResult: Type): Type =
     nextResult

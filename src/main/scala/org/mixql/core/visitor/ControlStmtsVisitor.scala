@@ -43,7 +43,7 @@ trait ControlStmtsVisitor extends BaseVisitor {
           context.setVar(visit(ctx.exc).toString + ".message", old_message.get)
         }
     }
-    new Null()
+    Null
   }
 
   override def visitIf_stmt(ctx: sql.If_stmtContext): Type = {
@@ -62,7 +62,7 @@ trait ControlStmtsVisitor extends BaseVisitor {
       if (ctx.else_block)
         visit(ctx.else_block.block)
       else
-        new Null()
+        Null
     }
   }
 
@@ -74,26 +74,26 @@ trait ControlStmtsVisitor extends BaseVisitor {
     var i = if (!ctx.T_REVERSE) visit(ctx.from) else visit(ctx.to)
     val to = if (!ctx.T_REVERSE) visit(ctx.to) else visit(ctx.from)
     val step =
-      (if (ctx.T_REVERSE) new gInt(-1) else new gInt(1)).Multiply(if (ctx.step) visit(ctx.step)
-                                                  else new gInt(1))
+      (if (ctx.T_REVERSE) new int(-1) else new int(1)) * (if (ctx.step) visit(ctx.step)
+                                                  else new int(1))
     context.setVar(i_name, i)
     while (
-      (!ctx.T_REVERSE && i.LessThen(to)) ||
-      (ctx.T_REVERSE && i.MoreThen(to))
+      (!ctx.T_REVERSE && i < to) ||
+      (ctx.T_REVERSE && i > to)
     ) {
       visit(ctx.block)
-      i = i.Add(step)
+      i = i + step
       context.setVar(i_name, i)
     }
     if (
-      (!ctx.T_REVERSE && i.MoreEqualThen(to)) ||
-      (ctx.T_REVERSE && i.LessEqualThen(to))
+      (!ctx.T_REVERSE && i >= to) ||
+      (ctx.T_REVERSE && i <= to)
     ) {
       context.setVar(i_name, to)
       visit(ctx.block)
     }
     context.setVar(i_name, old)
-    new Null()
+    Null
   }
 
   override def visitFor_cursor_stmt(ctx: sql.For_cursor_stmtContext): Type = {
@@ -104,7 +104,7 @@ trait ControlStmtsVisitor extends BaseVisitor {
           case 1 =>
             val cursorName = visit(ctx.ident(0)).toString
             val old = context.getVar(cursorName)
-            c.getArr.foreach(el => {
+            c.arr.foreach(el => {
               context.setVar(cursorName, el)
               visit(ctx.block)
             })
@@ -112,15 +112,15 @@ trait ControlStmtsVisitor extends BaseVisitor {
           case other =>
             val cursors = ctx.ident.asScala.map(visit(_).toString).toList
             val old = cursors.map(context.getVar(_))
-            c.getArr.foreach(el => {
+            c.arr.foreach(el => {
               if (el.isInstanceOf[array]) {
                 val a = el.asInstanceOf[array]
-                if (a.getArr.size < cursors.size)
+                if (a.arr.size < cursors.size)
                   throw new IllegalStateException(
                     "not enough arguments to unpack"
                   )
                 cursors
-                  .zip(a.getArr)
+                  .zip(a.arr)
                   .foreach(kv => {
                     context.setVar(kv._1, kv._2)
                   })
@@ -140,7 +140,7 @@ trait ControlStmtsVisitor extends BaseVisitor {
             val cursorValueName = visit(ctx.ident(1)).toString
             val oldKey = context.getVar(cursorKeyName)
             val oldValue = context.getVar(cursorValueName)
-            c.getMap.foreach(el => {
+            c.m.foreach(el => {
               context.setVar(cursorKeyName, el._1)
               context.setVar(cursorValueName, el._2)
               visit(ctx.block)
@@ -150,7 +150,7 @@ trait ControlStmtsVisitor extends BaseVisitor {
           case 1 =>
             val cursorName = visit(ctx.ident(0)).toString
             val oldCursor = context.getVar(cursorName)
-            c.getMap.foreach(el => {
+            c.m.foreach(el => {
               context.setVar(cursorName, el._2)
               visit(ctx.block)
             })
@@ -161,7 +161,7 @@ trait ControlStmtsVisitor extends BaseVisitor {
       case other =>
         throw new IllegalArgumentException("cursor must be collection")
     }
-    new Null()
+    Null
   }
 
   override def visitWhile_stmt(ctx: sql.While_stmtContext): Type = {
@@ -170,6 +170,6 @@ trait ControlStmtsVisitor extends BaseVisitor {
       visit(ctx.block)
       condition = visit(ctx.expr)
     }
-    new Null()
+    Null
   }
 }

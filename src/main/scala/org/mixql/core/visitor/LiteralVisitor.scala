@@ -65,15 +65,15 @@ trait LiteralVisitor extends BaseVisitor {
 
   override def visitLiteral_int(ctx: sql.Literal_intContext): Type =
     if (ctx.int_number.T_SUB)
-      new gInt(-ctx.int_number.L_INT.getText.toInt)
+      new int(-ctx.int_number.L_INT.getText.toInt)
     else
-      new gInt(ctx.int_number.L_INT.getText.toInt)
+      new int(ctx.int_number.L_INT.getText.toInt)
 
   override def visitLiteral_double(ctx: sql.Literal_doubleContext): Type =
     if (ctx.dec_number.T_SUB)
-      new gDouble(-ctx.dec_number.L_DEC.getText.toDouble)
+      new double(-ctx.dec_number.L_DEC.getText.toDouble)
     else
-      new gDouble(ctx.dec_number.L_DEC.getText.toDouble)
+      new double(ctx.dec_number.L_DEC.getText.toDouble)
 
   override def visitLiteral_bool(ctx: sql.Literal_boolContext): Type =
     if (ctx.bool_literal.T_FALSE)
@@ -84,7 +84,7 @@ trait LiteralVisitor extends BaseVisitor {
       throw new IllegalArgumentException("unknown bool literal")
 
   override def visitLiteral_null(ctx: sql.Literal_nullContext): Type =
-    new Null()
+    Null
 
   override def visitLiteral_current_date(
     ctx: sql.Literal_current_dateContext
@@ -112,6 +112,6 @@ trait LiteralVisitor extends BaseVisitor {
       })
       .toMap
     import scala.collection.JavaConverters._
-    new map(scala.collection.mutable.Map(res.toSeq: _*).asJava)
+    new map(scala.collection.mutable.Map(res.toSeq: _*))
   }
 }
