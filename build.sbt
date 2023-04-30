@@ -4,7 +4,7 @@ Antlr4 / antlr4Version := "4.8-1"
 Antlr4 / antlr4GenListener := false // default: true
 Antlr4 / antlr4GenVisitor := true // default: true
 Antlr4 / antlr4PackageName := Some("org.mixql.core.generated")
-Antlr4 / antlr4FolderToClean := (Antlr4 / javaSource).value / "org" / "mixql"/  "core" / "generated"
+Antlr4 / antlr4FolderToClean := (Antlr4 / javaSource).value / "org" / "mixql" / "core" / "generated"
 
 lazy val mixQLCore = (project in file("."))
   .enablePlugins(Antlr4Plugin)

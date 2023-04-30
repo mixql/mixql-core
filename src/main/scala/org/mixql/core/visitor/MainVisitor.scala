@@ -25,7 +25,7 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
     var res: Type = new Null()
     ctx.statment.asScala.foreach(stmt => {
       res = visit(stmt)
-      if (res.ret)
+      if (res.control != Type.Control.NONE)
         return res
     })
     res
@@ -35,7 +35,19 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
 
   override def visitReturn_stmt(ctx: sql.Return_stmtContext): Type = {
     val res = visit(ctx.expr)
-    res.ret = true
+    res.control = Type.Control.RETURN
+    res
+  }
+
+  override def visitBreak_stmt(ctx: sql.Break_stmtContext): Type = {
+    val res = new Null
+    res.control = Type.Control.BREAK
+    res
+  }
+
+  override def visitContinue_stmt(ctx: sql.Continue_stmtContext): Type = {
+    val res = new Null
+    res.control = Type.Control.CONTINUE
     res
   }
 
@@ -142,7 +154,7 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
         to = child.getSourceInterval.a - 1
         val ch = visit(child) match {
           case s: string => s.quoted
-          case other => other.toString
+          case other     => other.toString
         }
         res += tokenStream.getText(new Interval(from, to)) + ch
         from = child.getSourceInterval.b + 1

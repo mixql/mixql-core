@@ -77,6 +77,43 @@ class ControlStmtsTest extends MainVisitorBaseTest {
     assert(res.asInstanceOf[string].getValue == "01234")
   }
 
+  test("Test while, continue") {
+    val code =
+      """
+        |let x = 0;
+        |let res = "";
+        |while $x < 5 do
+        |  let x = $x + 1;
+        |  continue;
+        |  let res = $res || $x;
+        |end while
+                """.stripMargin
+    val context = runMainVisitor(code)
+    val res = context.getVar("res")
+    assert(res.isInstanceOf[string])
+    assert(res.asInstanceOf[string].getValue == "")
+    val x = context.getVar("x")
+    assert(x.isInstanceOf[gInt])
+    assert(x.asInstanceOf[gInt].getValue == 5)
+  }
+
+  test("Test while break") {
+    val code =
+      """
+        |let x = 0;
+        |let res = "";
+        |while $x < 5 do
+        |  let x = $x + 1;
+        |  break;
+        |  let res = $res || $x;
+        |end while
+                """.stripMargin
+    val context = runMainVisitor(code)
+    val res = context.getVar("x")
+    assert(res.isInstanceOf[gInt])
+    assert(res.asInstanceOf[gInt].getValue == 1)
+  }
+
   test("Test for range") {
     val code =
       """
@@ -109,6 +146,46 @@ class ControlStmtsTest extends MainVisitorBaseTest {
     assert(res.asInstanceOf[string].getValue == "20181614121086421")
   }
 
+  test("Test for range continue") {
+    val code =
+      """
+        |let res = "";
+        |let count = 0;
+        |for i in 1..20 step 2 loop
+        |  let count = $count + 1;
+        |  continue;
+        |  let res = $res || $i;
+        |end loop
+                """.stripMargin
+    val context = runMainVisitor(code)
+    val i = context.getVar("count")
+    assert(i.isInstanceOf[gInt])
+    assert(i.asInstanceOf[gInt].getValue == 11)
+    val res = context.getVar("res")
+    assert(res.isInstanceOf[string])
+    assert(res.asInstanceOf[string].getValue == "")
+  }
+
+  test("Test for range break") {
+    val code =
+      """
+        |let res = "";
+        |let count = 0;
+        |for i in 1..20 step 2 loop
+        |  let count = $count + 1;
+        |  break;
+        |  let res = $res || $i;
+        |end loop
+                """.stripMargin
+    val context = runMainVisitor(code)
+    val i = context.getVar("count")
+    assert(i.isInstanceOf[gInt])
+    assert(i.asInstanceOf[gInt].getValue == 1)
+    val res = context.getVar("res")
+    assert(res.isInstanceOf[string])
+    assert(res.asInstanceOf[string].getValue == "")
+  }
+
   test("Test for in cursor: array") {
     val code =
       """
@@ -123,6 +200,46 @@ class ControlStmtsTest extends MainVisitorBaseTest {
     val res = context.getVar("res")
     assert(res.isInstanceOf[string])
     assert(res.asInstanceOf[string].getValue == "135")
+  }
+
+  test("Test for in cursor continue: array") {
+    val code =
+      """
+        |let res = "";
+        |let count = 0;
+        |for i in [1, 3, 5] loop
+        |  let count = $count + 1;
+        |  continue;
+        |  let res = $res || $i;
+        |end loop
+                """.stripMargin
+    val context = runMainVisitor(code)
+    val count = context.getVar("count")
+    assert(count.isInstanceOf[gInt])
+    assert(count.asInstanceOf[gInt].getValue == 3)
+    val res = context.getVar("res")
+    assert(res.isInstanceOf[string])
+    assert(res.asInstanceOf[string].getValue == "")
+  }
+
+  test("Test for in cursor break: array") {
+    val code =
+      """
+        |let res = "";
+        |let count = 0;
+        |for i in [1, 3, 5] loop
+        |  let count = $count + 1;
+        |  break;
+        |  let res = $res || $i;
+        |end loop
+                """.stripMargin
+    val context = runMainVisitor(code)
+    val count = context.getVar("count")
+    assert(count.isInstanceOf[gInt])
+    assert(count.asInstanceOf[gInt].getValue == 1)
+    val res = context.getVar("res")
+    assert(res.isInstanceOf[string])
+    assert(res.asInstanceOf[string].getValue == "")
   }
 
   test("Test change engine") {
@@ -277,6 +394,125 @@ class ControlStmtsTest extends MainVisitorBaseTest {
     val res = context.getVar("res")
     assert(res.isInstanceOf[gInt])
     assert(res.asInstanceOf[gInt].getValue == 1)
+  }
+
+  test("Test return from lambda with while cycle") {
+    val code =
+      """
+        |let test_ret = (x) -> begin 
+        |   let x = 1;
+        |   while $x < 5 do
+        |     return $x;
+        |     let x = $x + 1;
+        |   end while
+        |   return 2;
+        |end;
+        |let res = test_ret(1);
+        |let end_var = 12;
+                """.stripMargin
+    val context = runMainVisitor(code)
+    val res = context.getVar("res")
+    assert(res.isInstanceOf[gInt])
+    assert(res.asInstanceOf[gInt].getValue == 1)
+    val end = context.getVar("end_var")
+    assert(end.isInstanceOf[gInt])
+    assert(end.asInstanceOf[gInt].getValue == 12)
+  }
+
+  test("Test return from lambda with for range") {
+    val code =
+      """
+        |let test_ret = (x) -> begin 
+        |   let x = 0;
+        |   for i in 1..20 step 2 loop
+        |     return $i;
+        |   end loop
+        |   return 2;
+        |end;
+        |let res = test_ret(1);
+        |let end_var = 12;
+                """.stripMargin
+    val context = runMainVisitor(code)
+    val res = context.getVar("res")
+    assert(res.isInstanceOf[gInt])
+    assert(res.asInstanceOf[gInt].getValue == 1)
+    val end = context.getVar("end_var")
+    assert(end.isInstanceOf[gInt])
+    assert(end.asInstanceOf[gInt].getValue == 12)
+  }
+
+  test("Test return from lambda with for in cursor") {
+    val code =
+      """
+        |let test_ret = (x) -> begin 
+        |   let x = 0;
+        |   for i in [1, 3, 5] loop
+        |     return $i;
+        |   end loop
+        |   return 2;
+        |end;
+        |let res = test_ret(1);
+        |let end_var = 12;
+                """.stripMargin
+    val context = runMainVisitor(code)
+    val res = context.getVar("res")
+    assert(res.isInstanceOf[gInt])
+    assert(res.asInstanceOf[gInt].getValue == 1)
+    val end = context.getVar("end_var")
+    assert(end.isInstanceOf[gInt])
+    assert(end.asInstanceOf[gInt].getValue == 12)
+  }
+
+  test("Test return from lambda with try/catch: try") {
+    val code =
+      """
+        |let test_ret = (x) -> begin 
+        |   TRY
+        |     return 0;
+        |   CATCH ex THEN
+        |     return 1;
+        |   END
+        |   return 2;
+        |end;
+        |let res = test_ret(1);
+        |let end_var = 12;
+                """.stripMargin
+    val context = runMainVisitor(code)
+    val res = context.getVar("res")
+    assert(res.isInstanceOf[gInt])
+    assert(res.asInstanceOf[gInt].getValue == 0)
+    val end = context.getVar("end_var")
+    assert(end.isInstanceOf[gInt])
+    assert(end.asInstanceOf[gInt].getValue == 12)
+  }
+
+  test("Test return from lambda with try/catch: catch") {
+    val code =
+      """
+        |let test_ret = (x) -> begin 
+        |   TRY
+        |     select gg from wp;
+        |   CATCH ex THEN
+        |     return 1;
+        |   END
+        |   return 2;
+        |end;
+        |let res = test_ret(1);
+        |let end_var = 12;
+                """.stripMargin
+    class Other extends StubEngine {
+      override def execute(stmt: String): Type = {
+        throw new NullPointerException("hello")
+      }
+    }
+    val context =
+      runMainVisitor(code, new Context(MutMap("stub" -> new Other), "stub"))
+    val res = context.getVar("res")
+    assert(res.isInstanceOf[gInt])
+    assert(res.asInstanceOf[gInt].getValue == 1)
+    val end = context.getVar("end_var")
+    assert(end.isInstanceOf[gInt])
+    assert(end.asInstanceOf[gInt].getValue == 12)
   }
 
   test("Test multiple assigment") {

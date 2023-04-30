@@ -173,10 +173,9 @@ trait ExpressionVisitor extends BaseVisitor {
         else Nil
       })
       .toMap
-    pack(
-      FunctionInvoker
-        .invoke(context.functions.toMap, funcName, context, args.toList, kwargs)
-    )
+    val res = FunctionInvoker
+      .invoke(context.functions.toMap, funcName, context, args.toList, kwargs)
+    pack(res)
   }
 
   override def visitExprSpecFuncCast(ctx: sql.ExprSpecFuncCastContext): Type = {

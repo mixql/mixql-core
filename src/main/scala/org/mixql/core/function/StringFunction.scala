@@ -92,7 +92,7 @@ object StringFunction {
   val findFirstIn = new ((String, String) => Any) {
     def apply(str: String, findPattern: String): Any = {
       findPattern.r.findFirstIn(str) match {
-        case None => null
+        case None    => null
         case Some(v) => v
       }
     }
@@ -106,7 +106,7 @@ object StringFunction {
 
   val replaceAllIn = new ((String, String, String) => String) {
     def apply(str: String, pattern: String, replacement: String): String = {
-      pattern.r.replaceAllIn(str,replacement)
+      pattern.r.replaceAllIn(str, replacement)
     }
   }
 

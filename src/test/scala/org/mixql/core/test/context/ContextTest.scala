@@ -12,7 +12,7 @@ class ContextTest extends AnyFunSuite {
   def isNull(v: Type): Boolean = {
     v match {
       case _: Null => true
-      case _    => false
+      case _       => false
     }
   }
 
@@ -37,7 +37,9 @@ class ContextTest extends AnyFunSuite {
     assert(context.getVar("intVariable").isInstanceOf[gInt])
     assert(context.getVar("intVariable").asInstanceOf[gInt].getValue == 42)
     assert(context.getVar("doubleVariable").isInstanceOf[gDouble])
-    assert(context.getVar("doubleVariable").asInstanceOf[gDouble].getValue == 42.42)
+    assert(
+      context.getVar("doubleVariable").asInstanceOf[gDouble].getValue == 42.42
+    )
     assert(context.getVar("strVariable").isInstanceOf[string])
     assert(context.getVar("strVariable").asInstanceOf[string].getValue == "str")
     assert(context.getVar("variable.with.points").isInstanceOf[string])
@@ -49,7 +51,10 @@ class ContextTest extends AnyFunSuite {
     )
     assert(context.getVar("variable.with.points2").isInstanceOf[gInt])
     assert(
-      context.getVar("variable.with.points2").asInstanceOf[gInt].getValue == 1725
+      context
+        .getVar("variable.with.points2")
+        .asInstanceOf[gInt]
+        .getValue == 1725
     )
     assert(context.getVar("listVariable").isInstanceOf[array])
     val arr = context.getVar("listVariable").asInstanceOf[array]

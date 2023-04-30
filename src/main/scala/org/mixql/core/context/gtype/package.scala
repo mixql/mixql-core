@@ -41,9 +41,9 @@ package object gtype {
 
     def to_bool(a: Type): bool = {
       a match {
-        case value: bool   => value
-        case t: gDouble => t.getValue != 0
-        case t: gInt    => t.getValue != 0
+        case value: bool => value
+        case t: gDouble  => t.getValue != 0
+        case t: gInt     => t.getValue != 0
         case t: string =>
           if (t.getValue.toLowerCase == "true")
             true
@@ -66,10 +66,10 @@ package object gtype {
 
     def to_int(a: Type): gInt = {
       a match {
-        case t: bool      => if (t.getValue) 1 else 0
-        case t: gDouble    => new gInt(t.getValue.toInt)
-        case value: gInt       => value
-        case t: string => new gInt(t.getValue.toInt)
+        case t: bool     => if (t.getValue) 1 else 0
+        case t: gDouble  => new gInt(t.getValue.toInt)
+        case value: gInt => value
+        case t: string   => new gInt(t.getValue.toInt)
         case _: Null =>
           throw new NullPointerException("cannot convert null to int")
         case value =>
@@ -81,10 +81,10 @@ package object gtype {
 
     def to_double(a: Type): gDouble = {
       a match {
-        case t: bool      => if (t.getValue) 1 else 0
-        case value: gDouble    => value
-        case t: gInt       => t.getValue.toDouble
-        case t: string => t.getValue.toDouble
+        case t: bool        => if (t.getValue) 1 else 0
+        case value: gDouble => value
+        case t: gInt        => t.getValue.toDouble
+        case t: string      => t.getValue.toDouble
         case _: Null =>
           throw new NullPointerException("cannot convert null to double")
         case value =>
@@ -98,7 +98,7 @@ package object gtype {
   def isNull(a: Type): Boolean =
     a match {
       case _: Null => true
-      case _    => false
+      case _       => false
     }
 
   def pack(a: Any): Type = {
@@ -113,7 +113,8 @@ package object gtype {
         import scala.collection.JavaConverters._
         new map(
           scala.collection.mutable
-            .Map(p.map(kv => pack(kv._1) -> pack(kv._2)).toSeq: _*).asJava
+            .Map(p.map(kv => pack(kv._1) -> pack(kv._2)).toSeq: _*)
+            .asJava
         )
       case p: SqlLambda => p
       case other        => new string(other.toString)
@@ -123,13 +124,14 @@ package object gtype {
   def unpack(a: Type): Any = {
     import scala.collection.JavaConverters._
     a match {
-      case _: Null         => null
-      case t: string => t.getValue
-      case t: gInt       => t.getValue
-      case t: gDouble    => t.getValue
-      case t: bool      => t.getValue
-      case t: array     => t.getArr.map(unpack)
-      case t: map       => t.getMap.asScala.map(kv => unpack(kv._1) -> unpack(kv._2)).toMap
+      case _: Null    => null
+      case t: string  => t.getValue
+      case t: gInt    => t.getValue
+      case t: gDouble => t.getValue
+      case t: bool    => t.getValue
+      case t: array   => t.getArr.map(unpack)
+      case t: map =>
+        t.getMap.asScala.map(kv => unpack(kv._1) -> unpack(kv._2)).toMap
       case v: SqlLambda => v
     }
   }

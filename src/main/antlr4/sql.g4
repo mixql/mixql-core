@@ -15,6 +15,8 @@ statment:
     | print_stmt
     | expr_stmt
     | return_stmt
+    | break_stmt
+    | continue_stmt
     | if_stmt
     | while_stmt
     | for_cursor_stmt

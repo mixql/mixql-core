@@ -13,7 +13,7 @@ import java.{util => ju}
 import scala.reflect.ClassTag
 import scala.collection.JavaConverters._
 
-object Context{
+object Context {
   val defaultFunctions: MutMap[String, Any] = MutMap[String, Any](
     "ascii" -> StringFunction.ascii,
     "base64" -> StringFunction.base64,
@@ -35,10 +35,8 @@ object Context{
     "split" -> StringFunction.split,
     "toLowerCase" -> StringFunction.toLowerCase,
     "toUpperCase" -> StringFunction.toUpperCase,
-    "trim" -> StringFunction.trim,
-  ).map(
-    t => t._1.toLowerCase -> t._2
-  )
+    "trim" -> StringFunction.trim
+  ).map(t => t._1.toLowerCase -> t._2)
 }
 
 /** the entry point to gsql api. Context stores registered engines, variables
@@ -299,8 +297,8 @@ class Context(
     scope.foreach(vars => {
       val res = vars.getOrElse(key, new Null())
       res match {
-        case _:  Null  =>
-        case other => return other
+        case _: Null =>
+        case other   => return other
       }
     })
     new Null()
@@ -332,10 +330,16 @@ class Context(
     if (functions.contains(name.toLowerCase()))
       throw new InstantiationException(s"function $name is already defined")
     else {
-      logDebug("Functions map after adding function: " + functions.keySet.toList.sorted.toString())
+      logDebug(
+        "Functions map after adding function: " + functions.keySet.toList.sorted
+          .toString()
+      )
       val map = Map(name.toLowerCase() -> function)
       functions = functions ++ map;
-      logDebug("Functions map after adding function: " + functions.keySet.toList.sorted.toString())
+      logDebug(
+        "Functions map after adding function: " + functions.keySet.toList.sorted
+          .toString()
+      )
     }
   }
 
@@ -354,10 +358,8 @@ class Context(
     })
   }
 
-
   def getScope(): List[Map[String, Type]] = {
-    for {w <- scope}
-      yield Map(w.toSeq: _*)
+    for { w <- scope } yield Map(w.toSeq: _*)
   }
 
   private var scope: List[MutMap[String, Type]] = null
