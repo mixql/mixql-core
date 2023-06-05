@@ -20,4 +20,28 @@ public class Null extends Type {
         } else
             return super.Add(other);
     }
+
+    @Override
+    public Type Equal(Type other) {
+        if (other instanceof Null) {
+            return new bool(true);
+        }
+        return new bool(false);
+    }
+
+    @Override
+    public Type NotEqual(Type other) {
+        if (other instanceof Null) {
+            return new bool(false);
+        }
+        return new bool(true);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Null)
+            return true;
+        else
+            return false;
+    }
 }
