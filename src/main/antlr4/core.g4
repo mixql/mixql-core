@@ -100,8 +100,9 @@ compare_operator:
 
 /** functions with special syntax */
 spec_func :
-       T_CAST T_OPEN_P expr T_AS  dtype dtype_len? T_CLOSE_P  #exprSpecFuncCast
-     | T_COUNT T_OPEN_P (expr | T_MUL) T_CLOSE_P              #exprSpecFuncCount
+//       T_CAST T_OPEN_P expr T_AS  dtype dtype_len? T_CLOSE_P  #exprSpecFuncCast
+       T_CAST T_OPEN_P expr T_AS  dtype T_CLOSE_P  #exprSpecFuncCast
+//     | T_COUNT T_OPEN_P (expr | T_MUL) T_CLOSE_P              #exprSpecFuncCount
      ;
 
 case_r : T_CASE ex_switch=expr? (case_when_then)+ (T_ELSE ex_else=expr)? T_END;

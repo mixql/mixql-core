@@ -181,16 +181,16 @@ trait ExpressionVisitor extends BaseVisitor {
   override def visitExprSpecFuncCast(ctx: sql.ExprSpecFuncCastContext): Type = {
     if (ctx.dtype.primitive_type)
       castPrimitive(visit(ctx.expr), ctx.dtype.primitive_type)
-    else if (ctx.dtype.array_type)
-      throw new UnsupportedOperationException("array types not supported now")
-    else if (ctx.dtype.map_type)
-      throw new UnsupportedOperationException("map types not supported now")
-    else if (ctx.dtype.struct_type)
-      throw new UnsupportedOperationException("struct types not supported now")
-    else if (ctx.dtype.user_defined_type)
-      throw new UnsupportedOperationException(
-        "user defined types not supported now"
-      )
+//    else if (ctx.dtype.array_type)
+//      throw new UnsupportedOperationException("array types not supported now")
+//    else if (ctx.dtype.map_type)
+//      throw new UnsupportedOperationException("map types not supported now")
+//    else if (ctx.dtype.struct_type)
+//      throw new UnsupportedOperationException("struct types not supported now")
+//    else if (ctx.dtype.user_defined_type)
+//      throw new UnsupportedOperationException(
+//        "user defined types not supported now"
+//      )
     else
       throw new UnsupportedOperationException("unknown type")
   }
