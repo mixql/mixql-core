@@ -31,10 +31,19 @@ engine_params:
 print_stmt: T_PRINT T_OPEN_P expr T_CLOSE_P T_SEMICOLON;
 
 assigment_stmt:
-       T_LET ident T_COLON? T_EQUAL expr T_SEMICOLON                                       #assigment_default
+       T_LET ident T_COLON? T_EQUAL (T_CURSOR T_IS)? expr T_SEMICOLON                                       #assigment_default
      | T_LET ident T_OPEN_SB index=expr T_CLOSE_SB T_COLON? T_EQUAL value=expr T_SEMICOLON #assigment_by_index
      | T_LET ident (T_COMMA ident)* T_COLON? T_EQUAL expr (T_COMMA expr)* T_SEMICOLON      #assigment_multiple
      ;
+
+open_cursor_stmt:
+    T_OPEN ident T_SEMICOLON;
+
+close_cursor_stmt:
+    T_CLOSE ident T_SEMICOLON;
+
+fetch_cursor_stmt:
+    T_FETCH ident;
 
 if_stmt: T_IF expr T_THEN block elseif_block* else_block? T_END T_IF;
 
@@ -47,7 +56,7 @@ while_stmt :            // WHILE loop statement
      ;
 
 for_cursor_stmt :       // FOR (cursor) statement
-       T_FOR ident (T_COMMA ident)* T_IN expr T_LOOP block T_END T_LOOP
+       T_FOR ident (T_COMMA ident)* T_IN T_CURSOR? T_IS? expr T_LOOP block T_END T_LOOP
      ;
 
 for_range_stmt :        // FOR (Integer range) statement
@@ -63,10 +72,12 @@ expr_stmt:
      ;
      
 expr: // TODO other expressions if needed
-       lambda                                                    #expr_lambda 
+       lambda                                                    #expr_lambda
+     | fetch_cursor_stmt                                         #expr_fetch_cursor
      | T_OPEN_P (expr | other (T_ON choose_engine)?) T_CLOSE_P   #expr_recurse
      | collection=expr T_OPEN_SB index=expr T_CLOSE_SB           #expr_index
      | expr (T_MUL | T_DIV) expr                                 #expr_arithmetic_p1 // first priority
+//     | expr T_DIV expr                                 #expr_arithmetic_p1 // first priority
      | expr (T_SUB | T_ADD) expr                                 #expr_arithmetic_p2 // second pririty
      | expr compare_operator expr                                #expr_compare
      | expr logical_operator expr                                #expr_logical
@@ -77,9 +88,14 @@ expr: // TODO other expressions if needed
      | ident T_PERCENT (T_ISOPEN | T_FOUND | T_NOTFOUND)         #expr_found // TODO do we need it?
      | spec_func                                                 #expr_spec_func // TODO what functions to add?
      | func                                                      #expr_func
-     | var                                                       #expr_var
+     | var                                                    #expr_var
      | literal                                                   #expr_literal
+//     | (var | interpolation_expr | string | T_OPEN_P other T_CLOSE_P | ~(T_DOLLAR))*?   #other_expr_stmt
      ;
+
+//     other: (var | interpolation_expr | string | T_OPEN_P other T_CLOSE_P | ~(T_DOLLAR))*?;
+
+//     interpolation_expr: T_INTERP_EXPR expr T_CLOSE_B;
 
 logical_operator:
        T_AND
@@ -267,7 +283,7 @@ non_reserved_words :                      // Tokens that are not reserved words 
      | T_CURRENT_SCHEMA
 //     | T_CURRENT_TIMESTAMP
      | T_CURRENT_USER
-     | T_CURSOR
+//     | T_CURSOR
      | T_DATA
      | T_DATABASE
      | T_DATE
@@ -314,7 +330,7 @@ non_reserved_words :                      // Tokens that are not reserved words 
      | T_EXIT
      | T_FALLBACK
 //     | T_FALSE
-     | T_FETCH
+//     | T_FETCH
      | T_FIELDS
      | T_FILE
      | T_FILES
@@ -360,7 +376,7 @@ non_reserved_words :                      // Tokens that are not reserved words 
      | T_INTO
      | T_INVOKER
      | T_ITEMS
-     | T_IS
+//     | T_IS
      | T_ISOPEN
      | T_JOIN
      | T_KEEP
@@ -413,7 +429,7 @@ non_reserved_words :                      // Tokens that are not reserved words 
      | T_OFF
      | T_ON
      | T_ONLY
-     | T_OPEN
+//     | T_OPEN
      | T_OR
      | T_ORDER
      | T_OUT
