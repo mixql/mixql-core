@@ -5,8 +5,6 @@ import org.mixql.core.context.Context;
 import org.mixql.core.generated.sql;
 import org.mixql.core.visitor.CursorExprVisitor;
 
-import java.util.Set;
-
 public class gcursor extends cursor {
 //    Context gCtx = null;
 //    TokenStream tokens = null;
@@ -66,7 +64,6 @@ public class gcursor extends cursor {
 
             if (arr_index < arr_size.value) {
                 var elem = arr.apply(new gInt(arr_index++));
-                System.out.println("Returning cursor element: " + elem);
                 return elem;
             }
 
