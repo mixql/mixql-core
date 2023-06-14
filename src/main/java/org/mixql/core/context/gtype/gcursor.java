@@ -64,8 +64,11 @@ public class gcursor extends cursor {
                 arr_index = 0;
             }
 
-            if (arr_index < arr_size.value)
-                return arr.apply(new gInt(arr_index++));
+            if (arr_index < arr_size.value) {
+                var elem = arr.apply(new gInt(arr_index++));
+                System.out.println("Returning cursor element: " + elem);
+                return elem;
+            }
 
             return new nothing();
         }

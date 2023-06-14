@@ -79,13 +79,14 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
       context.setVar(visit(ctx.ident).toString, cursor)
     }else{
       val value = visit(ctx.expr)
+      logDebug("visitAssigment_default: value: " + value)
       value match {
         case v: SqlLambda =>
           val lambdaFuncName = visit(ctx.ident).toString;
           logDebug("Adding lambda function " + lambdaFuncName + " to context")
           context.addFunction(lambdaFuncName, v)
 
-        case _ => context.setVar(visit(ctx.ident).toString, visit(ctx.expr))
+        case _ => context.setVar(visit(ctx.ident).toString, value)
       }
     }
     new Null()
@@ -122,7 +123,9 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
     val cursor = context.getVar(cursor_name)
     cursor match {
       case cursor1: cursor =>
-        cursor1.fetch()
+        val res = cursor1.fetch()
+        logDebug("visitExpr_fetch_cursor: returning from fetch " + res )
+        res
       case _ =>
         throw new Exception("You can only fetch from cursor, not other type: " +
           cursor.getClass.getName
