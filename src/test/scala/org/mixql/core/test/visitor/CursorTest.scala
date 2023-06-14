@@ -196,7 +196,7 @@ class CursorTest extends MainVisitorBaseTest {
     val arr1Size = arr1.size().getValue
     assert(arr1Size == 20)
 
-    for (i <- 0 to arr1Size - 1) {
+    for (i <- 0 until arr1Size) {
       if (i < 10)
         assert(arr1.apply(new gInt(i)).isInstanceOf[gInt])
       else
