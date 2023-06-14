@@ -105,4 +105,19 @@ class CursorTest extends MainVisitorBaseTest {
     val res5 = context.getVar("res5")
     assert(res5.isInstanceOf[nothing])
   }
+
+  test("Test cursor will not fetch without open") {
+    val code =
+      """
+        |let d_cursor = cursor is {"fb": TRUE,
+        |   "sarr": [TRUE, "gg", 12], "sgint": 12
+        |}; --does not execute when defined, only when open is triggered
+        |
+        |
+        |let res1 = fetch d_cursor;
+              """.stripMargin
+    assertThrows[Exception] {
+      val context = runMainVisitor(code)
+    }
+  }
 }
