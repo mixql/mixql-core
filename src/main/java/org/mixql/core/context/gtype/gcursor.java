@@ -87,7 +87,9 @@ public class gcursor extends cursor {
             }
 
             if (keySetIndex < mSize){
-                return m.apply(keySet[keySetIndex++]);
+                return new array(
+                        new Type[]{keySet[keySetIndex], m.apply(keySet[keySetIndex++])}
+                );
             }
             return new nothing();
         }
