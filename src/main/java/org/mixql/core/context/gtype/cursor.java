@@ -6,5 +6,4 @@ public abstract class cursor extends Type {
     public abstract bool close();
 
     public abstract Type fetch();
-
 }

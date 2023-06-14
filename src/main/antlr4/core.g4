@@ -42,9 +42,6 @@ open_cursor_stmt:
 close_cursor_stmt:
     T_CLOSE ident T_SEMICOLON;
 
-fetch_cursor_stmt:
-    T_FETCH ident;
-
 if_stmt: T_IF expr T_THEN block elseif_block* else_block? T_END T_IF;
 
 elseif_block: T_ELIF expr T_THEN block;
@@ -73,11 +70,10 @@ expr_stmt:
      
 expr: // TODO other expressions if needed
        lambda                                                    #expr_lambda
-     | fetch_cursor_stmt                                         #expr_fetch_cursor
+     | T_FETCH ident                                             #expr_fetch_cursor
      | T_OPEN_P (expr | other (T_ON choose_engine)?) T_CLOSE_P   #expr_recurse
      | collection=expr T_OPEN_SB index=expr T_CLOSE_SB           #expr_index
      | expr (T_MUL | T_DIV) expr                                 #expr_arithmetic_p1 // first priority
-//     | expr T_DIV expr                                 #expr_arithmetic_p1 // first priority
      | expr (T_SUB | T_ADD) expr                                 #expr_arithmetic_p2 // second pririty
      | expr compare_operator expr                                #expr_compare
      | expr logical_operator expr                                #expr_logical
@@ -88,14 +84,9 @@ expr: // TODO other expressions if needed
      | ident T_PERCENT (T_ISOPEN | T_FOUND | T_NOTFOUND)         #expr_found // TODO do we need it?
      | spec_func                                                 #expr_spec_func // TODO what functions to add?
      | func                                                      #expr_func
-     | var                                                    #expr_var
+     | var                                                       #expr_var
      | literal                                                   #expr_literal
-//     | (var | interpolation_expr | string | T_OPEN_P other T_CLOSE_P | ~(T_DOLLAR))*?   #other_expr_stmt
      ;
-
-//     other: (var | interpolation_expr | string | T_OPEN_P other T_CLOSE_P | ~(T_DOLLAR))*?;
-
-//     interpolation_expr: T_INTERP_EXPR expr T_CLOSE_B;
 
 logical_operator:
        T_AND
@@ -163,6 +154,7 @@ literal:
      | array_literal            #literal_array
      | map_literal              #literal_map
      | T_NULL                   #literal_null
+     | T_NOTHING                #literal_nothing
      | T_CURRENT_DATE           #literal_current_date
      | T_CURRENT_TIMESTAMP      #literal_current_timestamp
      ;

@@ -6,6 +6,7 @@ import org.mixql.core.context.Context
 import org.mixql.core.context.gtype._
 import org.mixql.core.function.SqlLambda
 import org.mixql.core.generated.sql
+import org.mixql.core.generated.sql.{Close_cursor_stmtContext, Open_cursor_stmtContext}
 import org.mixql.core.logger.{logDebug, logInfo}
 
 import scala.util.{Failure, Success}
@@ -73,16 +74,60 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
   override def visitAssigment_default(
     ctx: sql.Assigment_defaultContext
   ): Type = {
-    val value = visit(ctx.expr)
-    value match {
-      case v: SqlLambda =>
-        val lambdaFuncName = visit(ctx.ident).toString;
-        logDebug("Adding lambda function " + lambdaFuncName + " to context")
-        context.addFunction(lambdaFuncName, v)
+    if (ctx.T_CURSOR() != null && ctx.T_IS() != null){
+      val cursor = new gcursor(context, tokenStream, ctx.expr())
+      context.setVar(visit(ctx.ident).toString, cursor)
+    }else{
+      val value = visit(ctx.expr)
+      value match {
+        case v: SqlLambda =>
+          val lambdaFuncName = visit(ctx.ident).toString;
+          logDebug("Adding lambda function " + lambdaFuncName + " to context")
+          context.addFunction(lambdaFuncName, v)
 
-      case _ => context.setVar(visit(ctx.ident).toString, visit(ctx.expr))
+        case _ => context.setVar(visit(ctx.ident).toString, visit(ctx.expr))
+      }
     }
     new Null()
+  }
+
+  override def visitOpen_cursor_stmt(ctx: Open_cursor_stmtContext): bool = {
+    val cursor_name = visit(ctx.ident).toString
+    val cursor = context.getVar(cursor_name)
+    cursor match {
+      case cursor1: cursor =>
+        cursor1.open()
+      case _ =>
+        throw new Exception("You can only open cursor, not other type: " +
+          cursor.getClass.getName
+        )
+    }
+  }
+
+  override def visitClose_cursor_stmt(ctx: Close_cursor_stmtContext): bool = {
+    val cursor_name = visit(ctx.ident).toString
+    val cursor = context.getVar(cursor_name)
+    cursor match {
+      case cursor1: cursor =>
+        cursor1.close()
+      case _ =>
+        throw new Exception("You can only close cursor, not other type: " +
+          cursor.getClass.getName
+        )
+    }
+  }
+
+  override def visitExpr_fetch_cursor(ctx: sql.Expr_fetch_cursorContext): Type = {
+    val cursor_name = visit(ctx.ident).toString
+    val cursor = context.getVar(cursor_name)
+    cursor match {
+      case cursor1: cursor =>
+        cursor1.fetch()
+      case _ =>
+        throw new Exception("You can only fetch from cursor, not other type: " +
+          cursor.getClass.getName
+        )
+    }
   }
 
   override def visitAssigment_by_index(

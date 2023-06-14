@@ -26,14 +26,14 @@ trait ExpressionVisitor extends BaseVisitor {
             .map(visit(_).toString)
             .zip(engine.engine_params.expr.asScala.map(visit))
             .toMap
-          context.execute(stmt, engineName, params)
+          context.execute(stmt, engineName, params, false)
         } else {
           // execute with current params
-          context.execute(stmt, engineName)
+          context.execute(stmt, engineName, false)
         }
       } else {
         // execute on current engine
-        context.execute(stmt)
+        context.execute(stmt, false)
       }
     }
 
