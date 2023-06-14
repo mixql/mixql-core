@@ -5,6 +5,8 @@ import org.mixql.core.context.Context;
 import org.mixql.core.generated.sql;
 import org.mixql.core.visitor.CursorExprVisitor;
 
+import java.util.Set;
+
 public class gcursor extends cursor {
 //    Context gCtx = null;
 //    TokenStream tokens = null;
@@ -15,24 +17,84 @@ public class gcursor extends cursor {
 
     Type source = null;
 
+    Boolean openWasTriggered = false;
+
     @Override
     public bool open() {
-        if (source != null)
+        openWasTriggered = true;
+        if (source != null) {
             return new bool(true);
-        else {
+        } else {
             source = exprVisitor.visit(ctx);
+            if (source instanceof cursor) {
+                return ((cursor) source).open();
+            }
             return new bool(true);
         }
     }
 
     @Override
     public bool close() {
+        if (source instanceof cursor) {
+            return ((cursor) source).close();
+        }
         return new bool(true);
     }
 
+    Integer arr_index = -1;
+
+    Type[] keySet = null;
+    Integer keySetIndex = -1;
+
     @Override
-    public Type fetch() {
-        return new Null();
+    public Type fetch() throws Exception {
+        if (!openWasTriggered)
+            throw new Exception("Can not fetch from cursor, when open was not called");
+        if (source instanceof cursor) {
+            return ((cursor) source).fetch();
+        }
+
+        if (source instanceof array) {
+            array arr = (array) source;
+            gInt arr_size = arr.size();
+            if (arr_size.value == 0)
+                return new nothing();
+
+            if (arr_index == -1) {
+                arr_index = 0;
+            }
+
+            if (arr_index < arr_size.value)
+                return arr.apply(new gInt(arr_index++));
+
+            return new nothing();
+        }
+
+        if (source instanceof map) {
+            map m = (map) source;
+            int mSize = m.size().value;
+            if (keySet == null) {
+
+                keySet = new Type[mSize];
+                keySet = m.getMap().keySet().toArray(keySet);
+            }
+
+            if (mSize == 0)
+                return new nothing();
+
+            if (keySetIndex == -1) {
+                keySetIndex = 0;
+            }
+
+            if (keySetIndex < mSize){
+                return m.apply(keySet[keySetIndex++]);
+            }
+            return new nothing();
+        }
+
+        throw new Exception("Expexted source of type array or map for cursor, not type: " +
+                source.getClass().getName()
+        );
     }
 
     public gcursor(Type source) {
