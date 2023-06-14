@@ -14,7 +14,7 @@
         <!-- Root logger referring to console appender -->
 <!-- Change logLevel to debug here!!! -->
 <!--        <Root level="debug" additivity="false">-->
-        <Root level="debug" additivity="false">
+        <Root level="info" additivity="false">
             <AppenderRef ref="console" />
         </Root>
     </Loggers>

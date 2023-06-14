@@ -4,7 +4,7 @@ import org.antlr.v4.runtime.{CharStreams, CommonTokenStream}
 import org.mixql.core.context.Context
 import org.mixql.core.engine.Engine
 import org.mixql.core.generated.{sql, token}
-import org.mixql.core.test.stub.StubEngine
+import org.mixql.core.test.engines.StubEngine
 import org.mixql.core.visitor.MainVisitor
 import org.scalatest.funsuite.AnyFunSuite
 

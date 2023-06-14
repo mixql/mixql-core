@@ -1,7 +1,10 @@
 package org.mixql.core.test.visitor
 
-import org.mixql.core.context.gtype.{array, bool, gInt, nothing, string}
+import org.mixql.core.context.Context
+import org.mixql.core.context.gtype.{array, bool, gInt, nothing}
+import org.mixql.core.engine.Engine
 import org.mixql.core.test.MainVisitorBaseTest
+import org.mixql.core.test.engines.{CursorTestEngine1, CursorTestEngine2}
 
 class CursorTest extends MainVisitorBaseTest {
   test("Test cursor is array, fetch, open, close") {
@@ -118,6 +121,86 @@ class CursorTest extends MainVisitorBaseTest {
               """.stripMargin
     assertThrows[Exception] {
       val context = runMainVisitor(code)
+    }
+  }
+
+  test("Test cursor with engine that does not return cursor") {
+    import scala.collection.mutable.{Map => MutMap}
+
+    val code =
+      """
+        |let d_cursor = cursor is (select * from table_a);--does not execute
+        |-- when defined, only when open is triggered
+        |
+        |open d_cursor; --executes expression here
+        |
+        |let arr = [];
+        |
+        |for i in 1..20 loop
+        |     let arr = $arr + fetch d_cursor;
+        |end loop
+        |
+        |print("arr is $arr");
+        |
+        |close d_cursor;
+              """.stripMargin
+    val context = runMainVisitor(code,
+      new Context(
+        MutMap[String, Engine]("CursorTestEngine1" -> new CursorTestEngine1),
+        "CursorTestEngine1")
+    )
+
+    val res1 = context.getVar("arr")
+    assert(res1.isInstanceOf[array])
+    val arr1 = res1.asInstanceOf[array]
+    val arr1Size = arr1.size().getValue
+    assert(arr1Size == 20)
+
+    for (i <- 0 to arr1Size - 1) {
+      if (i < 7)
+        assert(arr1.apply(new gInt(i)).isInstanceOf[gInt])
+      else
+        assert(arr1.apply(new gInt(i)).isInstanceOf[nothing])
+    }
+  }
+
+  test("Test cursor with engine that return cursor") {
+    import scala.collection.mutable.{Map => MutMap}
+
+    val code =
+      """
+        |let d_cursor = cursor is (select * from table_a);--does not execute
+        |-- when defined, only when open is triggered
+        |
+        |open d_cursor; --executes expression here
+        |
+        |let arr = [];
+        |
+        |for i in 1..20 loop
+        |     let arr = $arr + fetch d_cursor;
+        |end loop
+        |
+        |--print("arr is $arr");
+        |
+        |close d_cursor;
+              """.stripMargin
+    val context = runMainVisitor(code,
+      new Context(
+        MutMap[String, Engine]("CursorTestEngine2" -> new CursorTestEngine2),
+        "CursorTestEngine2")
+    )
+
+    val res1 = context.getVar("arr")
+    assert(res1.isInstanceOf[array])
+    val arr1 = res1.asInstanceOf[array]
+    val arr1Size = arr1.size().getValue
+    assert(arr1Size == 20)
+
+    for (i <- 0 to arr1Size - 1) {
+      if (i < 10)
+        assert(arr1.apply(new gInt(i)).isInstanceOf[gInt])
+      else
+        assert(arr1.apply(new gInt(i)).isInstanceOf[nothing])
     }
   }
 }

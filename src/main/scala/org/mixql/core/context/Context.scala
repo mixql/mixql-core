@@ -210,7 +210,7 @@ class Context(
     if (!expect_cursor)
       currentEngine.execute(stmt)
     else
-      currentEngine.executeCursor(stmt)
+      currentEngine.getCursor(stmt)
   }
 
   /** execute statement on engine
@@ -225,7 +225,7 @@ class Context(
   def execute(stmt: String, engine: String,  expect_cursor: Boolean): Type =
     getEngine(engine) match {
       case Some(value) => if (!expect_cursor) value.execute(stmt) else
-        value.executeCursor(stmt)
+        value.getCursor(stmt)
       case None => throw new NoSuchElementException(s"unknown engine $engine")
     }
 
@@ -249,7 +249,7 @@ class Context(
         val res = if (!expect_cursor)
           eng.execute(stmt)
         else
-          eng.executeCursor(stmt)
+          eng.getCursor(stmt)
         old.foreach(p => eng.setParam(p._1, p._2))
         res
       case None => throw new NoSuchElementException(s"unknown engine $engine")

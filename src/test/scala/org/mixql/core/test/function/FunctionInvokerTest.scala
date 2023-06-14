@@ -4,7 +4,7 @@ import org.mixql.core.context.Context
 import org.mixql.core.context.gtype.gInt
 import org.mixql.core.engine.Engine
 import org.mixql.core.function.FunctionInvoker
-import org.mixql.core.test.stub.StubEngine
+import org.mixql.core.test.engines.StubEngine
 import org.scalatest.Ignore
 import org.scalatest.funsuite.AnyFunSuite
 
