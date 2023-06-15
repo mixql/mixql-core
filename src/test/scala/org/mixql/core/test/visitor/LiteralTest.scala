@@ -23,6 +23,42 @@ class LiteralTest extends MainVisitorBaseTest {
     assert(res1.asInstanceOf[bool].getValue)
   }
 
+  test("Test if int not null") {
+    import scala.collection.mutable.{Map => MutMap}
+
+    val code =
+      """
+        |let res = 5;
+        |let flag = false;
+        |if $res != null then
+        |let flag = true;
+        |end if
+              """.stripMargin
+    val context = runMainVisitor(code)
+
+    val res1 = context.getVar("flag")
+    assert(res1.isInstanceOf[bool])
+    assert(res1.asInstanceOf[bool].getValue)
+  }
+
+  test("Test if int not nothing") {
+    import scala.collection.mutable.{Map => MutMap}
+
+    val code =
+      """
+        |let res = 5;
+        |let flag = false;
+        |if $res != nothing then
+        |let flag = true;
+        |end if
+              """.stripMargin
+    val context = runMainVisitor(code)
+
+    val res1 = context.getVar("flag")
+    assert(res1.isInstanceOf[bool])
+    assert(res1.asInstanceOf[bool].getValue)
+  }
+
   test("Test if nothing is nothing") {
     import scala.collection.mutable.{Map => MutMap}
 
@@ -95,6 +131,24 @@ class LiteralTest extends MainVisitorBaseTest {
     assert(res1.asInstanceOf[bool].getValue)
   }
 
+  test("Test if null not array") {
+    import scala.collection.mutable.{Map => MutMap}
+
+    val code =
+      """
+        |let res = [5.3];
+        |let flag = false;
+        |if null != $res then
+        |let flag = true;
+        |end if
+              """.stripMargin
+    val context = runMainVisitor(code)
+
+    val res1 = context.getVar("flag")
+    assert(res1.isInstanceOf[bool])
+    assert(res1.asInstanceOf[bool].getValue)
+  }
+
   test("Test if array not nothing") {
     import scala.collection.mutable.{Map => MutMap}
 
@@ -149,4 +203,75 @@ class LiteralTest extends MainVisitorBaseTest {
     assert(res1.asInstanceOf[bool].getValue)
   }
 
+  test("Test if bool not null") {
+    import scala.collection.mutable.{Map => MutMap}
+
+    val code =
+      """
+        |let res = true;
+        |let flag = false;
+        |if $res != null then
+        |let flag = true;
+        |end if
+              """.stripMargin
+    val context = runMainVisitor(code)
+
+    val res1 = context.getVar("flag")
+    assert(res1.isInstanceOf[bool])
+    assert(res1.asInstanceOf[bool].getValue)
+  }
+
+  test("Test if bool not nothing") {
+    import scala.collection.mutable.{Map => MutMap}
+
+    val code =
+      """
+        |let res =  true;
+        |let flag = false;
+        |if $res != nothing then
+        |let flag = true;
+        |end if
+              """.stripMargin
+    val context = runMainVisitor(code)
+
+    val res1 = context.getVar("flag")
+    assert(res1.isInstanceOf[bool])
+    assert(res1.asInstanceOf[bool].getValue)
+  }
+
+  test("Test if string not null") {
+    import scala.collection.mutable.{Map => MutMap}
+
+    val code =
+      """
+        |let res = "true";
+        |let flag = false;
+        |if $res != null then
+        |let flag = true;
+        |end if
+              """.stripMargin
+    val context = runMainVisitor(code)
+
+    val res1 = context.getVar("flag")
+    assert(res1.isInstanceOf[bool])
+    assert(res1.asInstanceOf[bool].getValue)
+  }
+
+  test("Test if string not nothing") {
+    import scala.collection.mutable.{Map => MutMap}
+
+    val code =
+      """
+        |let res =  "true";
+        |let flag = false;
+        |if $res != nothing then
+        |let flag = true;
+        |end if
+              """.stripMargin
+    val context = runMainVisitor(code)
+
+    val res1 = context.getVar("flag")
+    assert(res1.isInstanceOf[bool])
+    assert(res1.asInstanceOf[bool].getValue)
+  }
 }

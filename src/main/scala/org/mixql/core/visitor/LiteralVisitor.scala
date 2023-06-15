@@ -86,6 +86,9 @@ trait LiteralVisitor extends BaseVisitor {
   override def visitLiteral_null(ctx: sql.Literal_nullContext): Type =
     new Null()
 
+  override def visitLiteral_nothing(ctx: sql.Literal_nothingContext): Type =
+    new nothing()
+
   override def visitLiteral_current_date(
     ctx: sql.Literal_current_dateContext
   ): Type = {
