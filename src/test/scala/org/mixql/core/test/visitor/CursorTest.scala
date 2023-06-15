@@ -164,7 +164,7 @@ class CursorTest extends MainVisitorBaseTest {
     }
   }
 
-  test("Test cursor with engine that return cursor") {
+  test("Test cursor with engine that return cursor in while") {
     import scala.collection.mutable.{Map => MutMap}
 
     val code =
@@ -176,11 +176,14 @@ class CursorTest extends MainVisitorBaseTest {
         |
         |let arr = [];
         |
-        |for i in 1..20 loop
-        |     let arr = $arr + fetch d_cursor;
-        |end loop
-        |
-        |--print("arr is $arr");
+        |let res = null;
+        |while $res != nothing do
+        |   if $res != null then
+        |       let arr = $arr + $res;
+        |   end if
+        |   let res = fetch d_cursor;
+        |   -- print($res);
+        |end while
         |
         |close d_cursor;
               """.stripMargin
@@ -194,13 +197,10 @@ class CursorTest extends MainVisitorBaseTest {
     assert(res1.isInstanceOf[array])
     val arr1 = res1.asInstanceOf[array]
     val arr1Size = arr1.size().getValue
-    assert(arr1Size == 20)
+    assert(arr1Size == 10)
 
     for (i <- 0 until arr1Size) {
-      if (i < 10)
         assert(arr1.apply(new gInt(i)).isInstanceOf[gInt])
-      else
-        assert(arr1.apply(new gInt(i)).isInstanceOf[nothing])
     }
   }
 }
