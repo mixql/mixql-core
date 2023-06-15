@@ -13,7 +13,7 @@ import scala.util.{Failure, Success}
 import scala.collection.JavaConverters._
 
 class MainVisitor(ctx: Context, tokens: TokenStream)
-    extends ExpressionVisitor
+  extends ExpressionVisitor
     with LiteralVisitor
     with ControlStmtsVisitor {
   val context = ctx
@@ -57,8 +57,8 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
   }
 
   override def visitChange_engine_stmt(
-    ctx: sql.Change_engine_stmtContext
-  ): Type = {
+                                        ctx: sql.Change_engine_stmtContext
+                                      ): Type = {
     if (ctx.choose_engine.expr)
       context.setCurrentEngine(visit(ctx.choose_engine.expr).toString)
     else
@@ -72,12 +72,12 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
   }
 
   override def visitAssigment_default(
-    ctx: sql.Assigment_defaultContext
-  ): Type = {
-    if (ctx.T_CURSOR() != null && ctx.T_IS() != null){
+                                       ctx: sql.Assigment_defaultContext
+                                     ): Type = {
+    if (ctx.T_CURSOR() != null && ctx.T_IS() != null) {
       val cursor = new gcursor(context, tokenStream, ctx.expr())
       context.setVar(visit(ctx.ident).toString, cursor)
-    }else{
+    } else {
       val value = visit(ctx.expr)
       logDebug("visitAssigment_default: value: " + value)
       value match {
@@ -110,7 +110,11 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
     val cursor = context.getVar(cursor_name)
     cursor match {
       case cursor1: cursor =>
-        cursor1.close()
+        val res = cursor1.close()
+        if (res.getValue) {
+          context.setVar(cursor_name, new Null())
+        }
+        res
       case _ =>
         throw new Exception("You can only close cursor, not other type: " +
           cursor.getClass.getName
@@ -124,7 +128,7 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
     cursor match {
       case cursor1: cursor =>
         val res = cursor1.fetch()
-        logDebug("visitExpr_fetch_cursor: returning from fetch " + res )
+        logDebug("visitExpr_fetch_cursor: returning from fetch " + res)
         res
       case _ =>
         throw new Exception("You can only fetch from cursor, not other type: " +
@@ -134,8 +138,8 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
   }
 
   override def visitAssigment_by_index(
-    ctx: sql.Assigment_by_indexContext
-  ): Type = {
+                                        ctx: sql.Assigment_by_indexContext
+                                      ): Type = {
     context.getVar(visit(ctx.ident).toString) match {
       case x: collection => x.update(visit(ctx.index), visit(ctx.value))
       case _ =>
@@ -147,8 +151,8 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
   }
 
   override def visitAssigment_multiple(
-    ctx: sql.Assigment_multipleContext
-  ): Type = {
+                                        ctx: sql.Assigment_multipleContext
+                                      ): Type = {
     if (ctx.expr.size > 1) {
       if (ctx.ident.size > ctx.expr.size)
         throw new IndexOutOfBoundsException(
@@ -202,7 +206,7 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
         to = child.getSourceInterval.a - 1
         val ch = visit(child) match {
           case s: string => s.quoted
-          case other     => other.toString
+          case other => other.toString
         }
         res += tokenStream.getText(new Interval(from, to)) + ch
         from = child.getSourceInterval.b + 1
@@ -212,8 +216,8 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
   }
 
   override def visitInterpolation_expr(
-    ctx: sql.Interpolation_exprContext
-  ): Type = {
+                                        ctx: sql.Interpolation_exprContext
+                                      ): Type = {
     new string(visit(ctx.expr).toString)
   }
 }
