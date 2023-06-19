@@ -1,12 +1,14 @@
 package org.mixql.core.visitor
 
+import org.antlr.v4.runtime.TokenStream
+import org.mixql.core.context.Context
 import org.mixql.core.context.gtype._
 import org.mixql.core.generated.sql
 
 import scala.language.implicitConversions
 import scala.collection.JavaConverters._
 import scala.collection.convert.ImplicitConversions.`map AsScala`
-import scala.util.control.Breaks._
+import scala.util.control.Breaks.{break, _}
 
 trait ControlStmtsVisitor extends BaseVisitor {
   override def visitTry_catch_stmt(ctx: sql.Try_catch_stmtContext): Type = {
@@ -86,7 +88,7 @@ trait ControlStmtsVisitor extends BaseVisitor {
     breakable {
       while (
         (!ctx.T_REVERSE && i.LessThen(to)) ||
-        (ctx.T_REVERSE && i.MoreThen(to))
+          (ctx.T_REVERSE && i.MoreThen(to))
       ) {
         val block = visit(ctx.block)
         if (block.control == Type.Control.RETURN) {
@@ -100,7 +102,7 @@ trait ControlStmtsVisitor extends BaseVisitor {
     }
     if (
       (!ctx.T_REVERSE && i.MoreEqualThen(to)) ||
-      (ctx.T_REVERSE && i.LessEqualThen(to))
+        (ctx.T_REVERSE && i.LessEqualThen(to))
     ) {
       context.setVar(i_name, to)
       val block = visit(ctx.block)
@@ -110,10 +112,49 @@ trait ControlStmtsVisitor extends BaseVisitor {
     result
   }
 
-  override def visitFor_cursor_stmt(ctx: sql.For_cursor_stmtContext): Type = {
+  def execForInGcursor(cursor: gcursor, ctx: sql.For_cursor_stmtContext): Type = {
+    cursor.open()
+
+    var fetchRes = cursor.fetch()
+    while (!fetchRes.isInstanceOf[nothing]) {
+//      fetchRes match {
+//        case collection1: collection => execBlockInFor(collection1, ctx)
+//        case _ => execFetchBlockInFor(fetchRes, ctx)
+//      }
+      execFetchBlockInFor(fetchRes, ctx)
+      fetchRes = cursor.fetch()
+    }
+    new Null
+  }
+
+  def execFetchBlockInFor(inRes: Type, ctx: sql.For_cursor_stmtContext): Type = {
     var result: Type = new Null
-    val cursor = visit(ctx.expr)
-    cursor match {
+    ctx.ident.size match {
+      case 1 =>
+        val cursorName = visit(ctx.ident(0)).toString
+        val old = context.getVar(cursorName)
+        breakable {
+          context.setVar(cursorName, inRes)
+          val block = visit(ctx.block)
+          if (block.control == Type.Control.RETURN) {
+            result = block
+            break
+          }
+          if (block.control == Type.Control.BREAK) break
+        }
+        context.setVar(cursorName, old)
+      case other =>
+        throw new IllegalStateException(
+          "too many arguments to unpack result from cursor, which did not return collection"
+        )
+    }
+    result
+  }
+
+
+  def execBlockInFor(inRes: collection, ctx: sql.For_cursor_stmtContext): Type = {
+    var result: Type = new Null
+    inRes match {
       case c: array =>
         ctx.ident.size match {
           case 1 =>

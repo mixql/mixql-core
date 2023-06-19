@@ -1,7 +1,7 @@
 package org.mixql.core.test.visitor
 
 import org.mixql.core.context.Context
-import org.mixql.core.context.gtype.{array, bool, gInt, nothing}
+import org.mixql.core.context.gtype.{array, bool, gInt, nothing, string}
 import org.mixql.core.engine.Engine
 import org.mixql.core.test.MainVisitorBaseTest
 import org.mixql.core.test.engines.{CursorTestEngine1, CursorTestEngine2}
@@ -203,4 +203,120 @@ class CursorTest extends MainVisitorBaseTest {
         assert(arr1.apply(new gInt(i)).isInstanceOf[gInt])
     }
   }
+
+  test("Test cursor with for in cursor var") {
+    import scala.collection.mutable.{Map => MutMap}
+
+    val code =
+      """
+        |let d_cursor = cursor is (select * from table_a);--does not execute
+        |-- when defined, only when open is triggered
+        |
+        |open d_cursor; --executes expression here
+        |
+        |let arr = [];
+        |
+        |let res = null;
+        |-- iterates while nothing is not got
+        |for res in $d_cursor loop
+        |   if $res != null then
+        |       let arr = $arr + $res;
+        |   end if
+        |   print($res);
+        |end loop
+        |
+        |close d_cursor;
+              """.stripMargin
+    val context = runMainVisitor(code,
+      new Context(
+        MutMap[String, Engine]("CursorTestEngine2" -> new CursorTestEngine2),
+        "CursorTestEngine2")
+    )
+
+    val res1 = context.getVar("arr")
+    assert(res1.isInstanceOf[array])
+    val arr1 = res1.asInstanceOf[array]
+    val arr1Size = arr1.size().getValue
+    assert(arr1Size == 10)
+
+    for (i <- 0 until arr1Size) {
+      assert(arr1.apply(new gInt(i)).isInstanceOf[gInt])
+    }
+  }
+
+  test("Test cursor with for in cursor is array") {
+    import scala.collection.mutable.{Map => MutMap}
+
+    val code =
+      """
+        |let arr = [];
+        |
+        |let res = null;
+        |
+        |for res in cursor is ['a', 'b', 'c'] loop --anonymous cursor, will be opened and closed after
+        |   -- leaving for scope
+        |
+        |   if $res != null then
+        |       let arr = $arr + $res;
+        |   end if
+        |   print($res);
+        |end loop
+        |
+              """.stripMargin
+    val context = runMainVisitor(code,
+      new Context(
+        MutMap[String, Engine]("CursorTestEngine2" -> new CursorTestEngine2),
+        "CursorTestEngine2")
+    )
+
+    val res1 = context.getVar("arr")
+    assert(res1.isInstanceOf[array])
+    val arr1 = res1.asInstanceOf[array]
+    val arr1Size = arr1.size().getValue
+    assert(arr1Size == 3)
+
+    assert(arr1.apply(new gInt(0)).isInstanceOf[string])
+    assert(arr1.apply(new gInt(0)).asInstanceOf[string].toString == "a")
+    assert(arr1.apply(new gInt(1)).isInstanceOf[string])
+    assert(arr1.apply(new gInt(1)).asInstanceOf[string].toString == "b")
+    assert(arr1.apply(new gInt(2)).isInstanceOf[string])
+    assert(arr1.apply(new gInt(2)).asInstanceOf[string].toString == "c")
+  }
+
+  test("Test cursor with for in cursor select from *") {
+    import scala.collection.mutable.{Map => MutMap}
+
+    val code =
+      """
+        |let arr = [];
+        |
+        |let res = null;
+        |
+        |for res in cursor is (select * from table_a) loop --anonymous cursor, will be opened and closed after
+        |   -- leaving for scope
+        |
+        |   if $res != null then
+        |       let arr = $arr + $res;
+        |   end if
+        |   print($res);
+        |end loop
+              """.stripMargin
+    val context = runMainVisitor(code,
+      new Context(
+        MutMap[String, Engine]("CursorTestEngine2" -> new CursorTestEngine2),
+        "CursorTestEngine2")
+    )
+
+    val res1 = context.getVar("arr")
+    assert(res1.isInstanceOf[array])
+    val arr1 = res1.asInstanceOf[array]
+    val arr1Size = arr1.size().getValue
+    assert(arr1Size == 10)
+
+    for (i <- 0 until arr1Size) {
+      assert(arr1.apply(new gInt(i)).isInstanceOf[gInt])
+    }
+  }
 }
+
+

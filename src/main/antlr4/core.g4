@@ -53,7 +53,7 @@ while_stmt :            // WHILE loop statement
      ;
 
 for_cursor_stmt :       // FOR (cursor) statement
-       T_FOR ident (T_COMMA ident)* T_IN T_CURSOR? T_IS? expr T_LOOP block T_END T_LOOP
+       T_FOR ident (T_COMMA ident)* T_IN (T_CURSOR T_IS)? expr T_LOOP block T_END T_LOOP
      ;
 
 for_range_stmt :        // FOR (Integer range) statement

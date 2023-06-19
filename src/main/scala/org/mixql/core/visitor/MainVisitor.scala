@@ -7,7 +7,7 @@ import org.mixql.core.context.gtype._
 import org.mixql.core.function.SqlLambda
 import org.mixql.core.generated.sql
 import org.mixql.core.generated.sql.{Close_cursor_stmtContext, Open_cursor_stmtContext}
-import org.mixql.core.logger.{logDebug, logInfo}
+import org.mixql.core.logger.{logDebug, logInfo, logWarn}
 
 import scala.util.{Failure, Success}
 import scala.collection.JavaConverters._
@@ -30,6 +30,29 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
         return res
     })
     res
+  }
+
+  override def visitFor_cursor_stmt(ctx: sql.For_cursor_stmtContext): Type = {
+
+    if (ctx.T_CURSOR != null) {
+      val anonymousCursor = new gcursor(this.ctx, tokens, ctx.expr)
+      execForInGcursor(anonymousCursor, ctx)
+      anonymousCursor.close()
+    } else {
+      val exprRes = visit(ctx.expr)
+      if (exprRes.isInstanceOf[gcursor]) {
+        val cursor = exprRes.asInstanceOf[gcursor]
+        execForInGcursor(cursor, ctx)
+      } else {
+        exprRes match {
+          case collection1: collection => execBlockInFor(collection1, ctx)
+          case _ =>
+            logWarn("\"visitFor_cursor_stmt\": cursor must be collection. Ignore executing of for block")
+            new Null()
+//            throw new IllegalArgumentException("cursor must be collection")
+        }
+      }
+    }
   }
 
   override def visitEmpty_stmt(x: sql.Empty_stmtContext): Type = new Null()
