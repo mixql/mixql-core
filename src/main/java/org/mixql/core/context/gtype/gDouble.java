@@ -134,6 +134,12 @@ public class gDouble extends Type {
         if (other instanceof gDouble) {
             return new bool(value == ((gDouble) other).value);
         }
+        if (other instanceof Null) {
+            return new bool(false);
+        }
+        if (other instanceof nothing) {
+            return new bool(false);
+        }
         return super.Equal(other);
     }
 
@@ -144,6 +150,12 @@ public class gDouble extends Type {
         }
         if (other instanceof gDouble) {
             return new bool(value != ((gDouble) other).value);
+        }
+        if (other instanceof Null) {
+            return new bool(true);
+        }
+        if (other instanceof nothing) {
+            return new bool(true);
         }
         return super.NotEqual(other);
     }

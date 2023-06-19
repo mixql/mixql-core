@@ -211,6 +211,7 @@ T_NONE            : N O N E ;
 T_NOSCAN          : N O S C A N;
 T_NOT             : N O T ;
 T_NOTFOUND        : N O T F O U N D ;
+T_NOTHING         : N O T H I N G ;
 T_NULL            : N U L L ;
 T_NULLS           : N U L L S ;
 T_NUMERIC         : N U M E R I C ;

@@ -2,7 +2,7 @@ package org.mixql.core.test.visitor
 
 import org.mixql.core.context.gtype._
 import org.mixql.core.test.MainVisitorBaseTest
-import org.mixql.core.test.stub.StubEngine
+import org.mixql.core.test.engines.StubEngine
 import org.mixql.core.context.Context
 import org.mixql.core.engine.Engine
 

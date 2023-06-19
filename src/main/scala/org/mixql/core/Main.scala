@@ -14,7 +14,7 @@ object Main {
     override def name: String = "demo"
 
     override def execute(stmt: String): Type = {
-      println("[DemoEngine] execute: " + stmt)
+      logDebug("[DemoEngine] execute: " + stmt)
       new Null()
     }
 

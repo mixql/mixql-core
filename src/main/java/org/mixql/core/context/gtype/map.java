@@ -23,6 +23,14 @@ public class map extends collection {
     }
 
     @Override
+    public Type NotEqual(Type other) {
+        if (other instanceof map) {
+            return new bool(!m.equals(((map) other).m));
+        }
+        return new bool(true);
+    }
+
+    @Override
     public Type apply(Type index) {
         for (Map.Entry<Type, Type> entry : m.entrySet()) {
             try {

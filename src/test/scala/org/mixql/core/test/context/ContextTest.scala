@@ -3,7 +3,7 @@ package org.mixql.core.test.context
 import org.mixql.core.context.gtype._
 import org.mixql.core.context.Context
 import org.mixql.core.engine.Engine
-import org.mixql.core.test.stub.StubEngine
+import org.mixql.core.test.engines.StubEngine
 import org.scalatest.funsuite.AnyFunSuite
 
 import scala.collection.mutable.{Map => MutMap}
@@ -144,7 +144,7 @@ class ContextTest extends AnyFunSuite {
     val e = new MyEngine()
     context.addEngine(e)
     context.setCurrentEngine("MyEngine")
-    context.execute("select a from b")
+    context.execute("select a from b",false)
     assert(context.currentEngine == e)
     assert(e.query == "select a from b")
     val engine_name = context.getVar("mixql.execution.engine")
@@ -346,7 +346,7 @@ class ContextTest extends AnyFunSuite {
     context.addEngine(e2)
     context.push_scope()
     context.setCurrentEngine("MyEngine")
-    context.execute("select a from b")
+    context.execute("select a from b", false)
     assert(context.currentEngine == e2)
     assert(e2.query == "select a from b")
     val engine_name = context.getVar("mixql.execution.engine")

@@ -62,6 +62,15 @@ public class array extends collection {
     }
 
     @Override
+    public Type NotEqual(Type other) {
+        if (other instanceof array) {
+            Type[] otherArr = ((array) other).getArr();
+            return new bool(!Arrays.equals(getArr(), otherArr));
+        }
+        return new bool(true);
+    }
+
+    @Override
     public gInt size() {
         return new gInt(arr.size());
     }

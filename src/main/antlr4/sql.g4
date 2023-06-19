@@ -13,6 +13,8 @@ statment:
     | change_engine_stmt
     | assigment_stmt
     | print_stmt
+    | open_cursor_stmt
+    | close_cursor_stmt
     | expr_stmt
     | return_stmt
     | break_stmt

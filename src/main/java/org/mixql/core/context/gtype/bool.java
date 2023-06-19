@@ -50,6 +50,12 @@ public class bool extends Type {
         if (other instanceof Boolean) {
             return value == (Boolean) other;
         }
+        if (other instanceof Null) {
+            return false;
+        }
+        if (other instanceof nothing) {
+            return false;
+        }
         return super.equals(other);
     }
 
@@ -58,6 +64,12 @@ public class bool extends Type {
         if (other instanceof bool) {
             return new bool(this.equals(other));
         }
+        if (other instanceof Null) {
+            return new bool(false);
+        }
+        if (other instanceof nothing) {
+            return new bool(false);
+        }
         return super.Equal(other);
     }
 
@@ -65,6 +77,12 @@ public class bool extends Type {
     public Type NotEqual(Type other) {
         if (other instanceof bool) {
             return new bool(value != ((bool) other).value);
+        }
+        if (other instanceof Null) {
+            return new bool(true);
+        }
+        if (other instanceof nothing) {
+            return new bool(true);
         }
         return super.NotEqual(other);
     }
