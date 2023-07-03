@@ -12,7 +12,7 @@ lazy val mixQLCore = (project in file("."))
     credentials += Credentials(Path.userHome / ".sbt" / "sonatype_credentials"),
     organization := "org.mixql",
     name := "mixql-core",
-    version := "0.5.0-SNAPSHOT",
+    version := "0.5.1",
     crossScalaVersions := ScalaVersions,
     organizationName := "MixQL",
     organizationHomepage := Some(url("https://mixql.org/")),
@@ -59,7 +59,7 @@ lazy val mixQLCore = (project in file("."))
       if (isSnapshot.value)
         Some("snapshots" at nexus + "content/repositories/snapshots")
       else
-        Some("releases" at nexus + "service/local/staging/deploy/maven2")
+        Some("releases" at nexus + "content/repositories/releases/")
     },
     libraryDependencies ++= Seq(
       "org.antlr"      % "antlr4-runtime" % "4.8-1",
