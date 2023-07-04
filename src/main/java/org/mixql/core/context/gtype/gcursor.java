@@ -63,7 +63,7 @@ public class gcursor extends cursor {
             }
 
             if (arr_index < arr_size.value) {
-                var elem = arr.apply(new gInt(arr_index++));
+                Type elem = arr.apply(new gInt(arr_index++));
                 return elem;
             }
 
