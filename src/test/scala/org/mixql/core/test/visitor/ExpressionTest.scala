@@ -5,6 +5,7 @@ import org.mixql.core.test.MainVisitorBaseTest
 import org.mixql.core.test.engines.StubEngine
 import org.mixql.core.context.Context
 import org.mixql.core.engine.Engine
+import org.mixql.core.logger.logDebug
 
 import scala.collection.mutable.{Map => MutMap}
 
@@ -315,7 +316,7 @@ class ExpressionTest extends MainVisitorBaseTest {
     val res = context.getVar("res")
     assert(res.isInstanceOf[array])
     val arr = res.asInstanceOf[array]
-    println("arr size: " + arr.size)
+    logDebug("arr size: " + arr.size)
     assert(arr.size.Equal(new gInt(5)).asInstanceOf[bool].getValue)
     assert(arr(new gInt(0)).Equal(new gInt(1)).asInstanceOf[bool].getValue)
     assert(
