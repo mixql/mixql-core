@@ -1,7 +1,7 @@
 package org.mixql.core.test.context
 
 import org.mixql.core.context.gtype._
-import org.mixql.core.context.Context
+import org.mixql.core.context.{Context, ContextVars}
 import org.mixql.core.engine.Engine
 import org.mixql.core.test.engines.StubEngine
 import org.scalatest.funsuite.AnyFunSuite
@@ -19,13 +19,12 @@ class ContextTest extends AnyFunSuite {
   class MyEngine extends Engine {
     var query: String = ""
     override def name: String = "MyEngine"
-    override def execute(stmt: String): Type = {
+    override def execute(stmt: String, ctx: ContextVars): Type = {
       query = stmt
       new Null()
     }
-    override def executeFunc(name: String, params: Type*): Type = ???
-    override def getParam(name: String): Type = new Null()
-    override def setParam(name: String, value: Type): Unit = {}
+    override def executeFunc(name: String, ctx: ContextVars, params: Type*): Type = ???
+    override def paramChanged(name: String, ctx: ContextVars): Unit = {}
   }
 
   test("Test get vars from config") {
@@ -178,7 +177,7 @@ class ContextTest extends AnyFunSuite {
         .getEngine("stub1")
         .get
         .asInstanceOf[StubEngine]
-        .param("a")
+        .changedParams("a")
         .isInstanceOf[gInt]
     )
     assert(
@@ -186,7 +185,7 @@ class ContextTest extends AnyFunSuite {
         .getEngine("stub1")
         .get
         .asInstanceOf[StubEngine]
-        .param("a")
+        .changedParams("a")
         .asInstanceOf[gInt]
         .getValue == 12
     )
@@ -195,7 +194,7 @@ class ContextTest extends AnyFunSuite {
         .getEngine("stub2")
         .get
         .asInstanceOf[StubEngine]
-        .param("a")
+        .changedParams("a")
         .isInstanceOf[gInt]
     )
     assert(
@@ -203,7 +202,7 @@ class ContextTest extends AnyFunSuite {
         .getEngine("stub2")
         .get
         .asInstanceOf[StubEngine]
-        .param("a")
+        .changedParams("a")
         .asInstanceOf[gInt]
         .getValue == 12
     )
@@ -227,7 +226,7 @@ class ContextTest extends AnyFunSuite {
         .getEngine("stub1")
         .get
         .asInstanceOf[StubEngine]
-        .param("a")
+        .changedParams("a")
         .isInstanceOf[gInt]
     )
     assert(
@@ -235,7 +234,7 @@ class ContextTest extends AnyFunSuite {
         .getEngine("stub1")
         .get
         .asInstanceOf[StubEngine]
-        .param("a")
+        .changedParams("a")
         .asInstanceOf[gInt]
         .getValue == 12
     )
@@ -245,7 +244,7 @@ class ContextTest extends AnyFunSuite {
           .getEngine("stub2")
           .get
           .asInstanceOf[StubEngine]
-          .param
+          .changedParams
           .getOrElse("a", new Null)
       )
     )
@@ -270,7 +269,7 @@ class ContextTest extends AnyFunSuite {
           .getEngine("stub1")
           .get
           .asInstanceOf[StubEngine]
-          .param
+          .changedParams
           .getOrElse("a", new Null)
       )
     )
@@ -280,7 +279,7 @@ class ContextTest extends AnyFunSuite {
           .getEngine("stub2")
           .get
           .asInstanceOf[StubEngine]
-          .param
+          .changedParams
           .getOrElse("a", new Null)
       )
     )
@@ -307,7 +306,7 @@ class ContextTest extends AnyFunSuite {
         .getEngine("stub1")
         .get
         .asInstanceOf[StubEngine]
-        .param("a")
+        .changedParams("a")
         .isInstanceOf[gInt]
     )
     assert(
@@ -315,7 +314,7 @@ class ContextTest extends AnyFunSuite {
         .getEngine("stub1")
         .get
         .asInstanceOf[StubEngine]
-        .param("a")
+        .changedParams("a")
         .asInstanceOf[gInt]
         .getValue == 12
     )
@@ -324,7 +323,7 @@ class ContextTest extends AnyFunSuite {
         .getEngine("stub2")
         .get
         .asInstanceOf[StubEngine]
-        .param("a")
+        .changedParams("a")
         .isInstanceOf[gInt]
     )
     assert(
@@ -332,7 +331,7 @@ class ContextTest extends AnyFunSuite {
         .getEngine("stub2")
         .get
         .asInstanceOf[StubEngine]
-        .param("a")
+        .changedParams("a")
         .asInstanceOf[gInt]
         .getValue == 12
     )

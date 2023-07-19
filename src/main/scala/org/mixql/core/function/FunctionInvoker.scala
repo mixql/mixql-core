@@ -1,6 +1,6 @@
 package org.mixql.core.function
 
-import org.mixql.core.context.Context
+import org.mixql.core.context.{Context, ContextVars}
 import org.mixql.core.context.gtype._
 
 import java.lang.reflect.Method
@@ -63,16 +63,16 @@ object FunctionInvoker {
               "named args for engine function not supported"
             )
           if (
-            ctx.currentEngine.getDefinedFunctions.contains(funcName.toLowerCase)
+            ctx.currentEngine.getDefinedFunctions(new ContextVars(ctx)).contains(funcName.toLowerCase)
           )
-            unpack(ctx.currentEngine.executeFunc(funcName, args.map(pack): _*))
+            unpack(ctx.currentEngine.executeFunc(funcName,new ContextVars(ctx), args.map(pack): _*))
           else {
             val engine = ctx.engines.find(eng =>
-              eng._2.getDefinedFunctions.contains(funcName)
+              eng._2.getDefinedFunctions(new ContextVars(ctx)).contains(funcName)
             )
             engine match {
               case Some(value) =>
-                unpack(value._2.executeFunc(funcName, args.map(pack): _*))
+                unpack(value._2.executeFunc(funcName, new ContextVars(ctx), args.map(pack): _*))
               case None =>
                 throw new NoSuchMethodException(
                   s"no function $funcName found for any engine"

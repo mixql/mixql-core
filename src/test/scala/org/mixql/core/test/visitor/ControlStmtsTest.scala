@@ -3,7 +3,7 @@ package org.mixql.core.test.visitor
 import org.mixql.core.test.MainVisitorBaseTest
 import org.mixql.core.context.gtype._
 import org.mixql.core.engine.Engine
-import org.mixql.core.context.Context
+import org.mixql.core.context.{Context, ContextVars}
 import org.mixql.core
 import org.mixql.core.test.engines.StubEngine
 
@@ -250,13 +250,11 @@ class ControlStmtsTest extends MainVisitorBaseTest {
     class Other extends Engine {
       override def name: String = "other"
 
-      override def execute(stmt: String): Type = ???
+      override def execute(stmt: String, ctx: ContextVars): Type = ???
 
-      override def executeFunc(name: String, params: Type*): Type = ???
+      override def executeFunc(name: String, ctx: ContextVars, params: Type*): Type = ???
 
-      override def setParam(name: String, value: Type): Unit = {}
-
-      override def getParam(name: String): Type = ???
+      override def paramChanged(name: String, ctx: ContextVars): Unit = {}
 
     }
     val context = runMainVisitor(
@@ -292,8 +290,34 @@ class ControlStmtsTest extends MainVisitorBaseTest {
     assert(context.currentEngine.name == "stub")
     assert(context.currentEngineAllias == "stub")
     assert(
-      context.currentEngine
-        .getParam("spark.execution.memory")
+      context.currentEngine.asInstanceOf[StubEngine]
+        .getChangedParam("spark.execution.memory")
+        .toString() == "16G"
+    )
+  }
+
+  test("Test engine context vars") {
+    val code =
+      """
+        |let engine stub;
+        |
+        |let spark.execution.memory="16G";
+        |
+                """.stripMargin
+    val context = runMainVisitor(
+      code,
+      new Context(
+        MutMap("stub" -> new StubEngine),
+        "stub"
+      )
+    )
+
+    assert(context.currentEngine.isInstanceOf[StubEngine])
+    assert(context.currentEngine.name == "stub")
+    assert(context.currentEngineAllias == "stub")
+    assert(
+      context.currentEngine.asInstanceOf[StubEngine]
+        .getChangedParam("spark.execution.memory")
         .toString() == "16G"
     )
   }
@@ -305,11 +329,11 @@ class ControlStmtsTest extends MainVisitorBaseTest {
                 """.stripMargin
     class Other extends StubEngine {
       var old: Map[String, Type] = Map()
-      param.put("spark.execution.memory", new string("8G"))
+      changedParams.put("spark.execution.memory", new string("8G"))
       override def name: String = "other"
-      override def execute(stmt: String): Type = {
+      override def execute(stmt: String, ctx: ContextVars): Type = {
         queue += stmt
-        old = param.toMap
+        old = changedParams.toMap
         new Null()
       }
     }
@@ -323,9 +347,14 @@ class ControlStmtsTest extends MainVisitorBaseTest {
     assert(context.currentEngine.name == "stub")
     assert(context.currentEngineAllias == "stub")
     assert(
+      context.getEngine("stub").get.asInstanceOf[StubEngine]
+        .getChangedParam("spark.execution.memory")
+        .toString() == "16G"
+    )
+    assert(
       stub1
-        .getParam("spark.execution.memory")
-        .toString() == "8G"
+        .getChangedParam("spark.execution.memory")
+        .toString() == "16G"
     )
     assert(
       stub1
@@ -346,7 +375,7 @@ class ControlStmtsTest extends MainVisitorBaseTest {
                 """.stripMargin
 
     class Other extends StubEngine {
-      override def execute(stmt: String): Type = {
+      override def execute(stmt: String, ctx: ContextVars): Type = {
         throw new NullPointerException("hello")
       }
     }
@@ -501,7 +530,7 @@ class ControlStmtsTest extends MainVisitorBaseTest {
         |let end_var = 12;
                 """.stripMargin
     class Other extends StubEngine {
-      override def execute(stmt: String): Type = {
+      override def execute(stmt: String, ctx: ContextVars): Type = {
         throw new NullPointerException("hello")
       }
     }

@@ -105,10 +105,10 @@ class Context(
     engineVariablesUpdate match {
       case "all" =>
         head.foreach(v =>
-          engines.foreach(e => e._2.setParam(v._1, getVar(v._1)))
+          engines.foreach(e => e._2.paramChanged(v._1, new ContextVars(this)))
         )
       case "current" =>
-        head.foreach(v => currentEngine.setParam(v._1, getVar(v._1)))
+        head.foreach(v => currentEngine.paramChanged(v._1, new ContextVars(this)))
       case _ =>
     }
     setVar("mixql.execution.engine", getVar("mixql.execution.engine"))
@@ -135,10 +135,10 @@ class Context(
     engineVariablesUpdate match {
       case "all" =>
         engines.foreach(e =>
-          e._2.setParam("mixql.execution.engine", new string(name))
+          e._2.paramChanged("mixql.execution.engine", new ContextVars(this))
         )
       case "current" =>
-        currentEngine.setParam("mixql.execution.engine", new string(name))
+        currentEngine.paramChanged("mixql.execution.engine", new ContextVars(this))
       case _ =>
     }
   }
@@ -206,11 +206,11 @@ class Context(
    * @return
    * the result of execution
    */
-  def execute(stmt: String, expect_cursor: Boolean ): Type = {
+  def execute(stmt: String, expect_cursor: Boolean): Type = {
     if (!expect_cursor)
-      currentEngine.execute(stmt)
+      currentEngine.execute(stmt, new ContextVars(this))
     else
-      currentEngine.getCursor(stmt)
+      currentEngine.getCursor(stmt, new ContextVars(this))
   }
 
   /** execute statement on engine
@@ -222,10 +222,10 @@ class Context(
    * @return
    * the result of execution
    */
-  def execute(stmt: String, engine: String,  expect_cursor: Boolean): Type =
+  def execute(stmt: String, engine: String, expect_cursor: Boolean): Type =
     getEngine(engine) match {
-      case Some(value) => if (!expect_cursor) value.execute(stmt) else
-        value.getCursor(stmt)
+      case Some(value) => if (!expect_cursor) value.execute(stmt, new ContextVars(this)) else
+        value.getCursor(stmt, new ContextVars(this))
       case None => throw new NoSuchElementException(s"unknown engine $engine")
     }
 
@@ -241,19 +241,20 @@ class Context(
    * the result of execution
    */
   def execute(stmt: String, engine: String, params: Map[String, Type],
-              expect_cursor: Boolean): Type =
+              expect_cursor: Boolean): Type = {
+    params.foreach(p => setVar(p._1, p._2))
+
     getEngine(engine) match {
       case Some(eng) =>
-        val old = params.keys.map(name => name -> eng.getParam(name)).toMap
-        params.foreach(p => eng.setParam(p._1, p._2))
         val res = if (!expect_cursor)
-          eng.execute(stmt)
+          eng.execute(stmt, new ContextVars(this))
         else
-          eng.getCursor(stmt)
-        old.foreach(p => eng.setParam(p._1, p._2))
+          eng.getCursor(stmt, new ContextVars(this))
+        params.foreach(p => eng.paramChanged(p._1, new ContextVars(this)))
         res
       case None => throw new NoSuchElementException(s"unknown engine $engine")
     }
+  }
 
   /** set variable value. if key starts with some engines name then this engines
    * param updates by value
@@ -290,8 +291,8 @@ class Context(
         scope.head.put(key, value)
     }
     engineVariablesUpdate match {
-      case "all" => engines.foreach(e => e._2.setParam(key, value))
-      case "current" => currentEngine.setParam(key, value)
+      case "all" => engines.foreach(e => e._2.paramChanged(key, new ContextVars(this)))
+      case "current" => currentEngine.paramChanged(key, new ContextVars(this))
       case _ =>
     }
   }
@@ -396,9 +397,9 @@ class Context(
     currentEngine = engines(defaultEngine)
     engineVariablesUpdate match {
       case "all" =>
-        scope.head.foreach(v => engines.foreach(e => e._2.setParam(v._1, v._2)))
+        scope.head.foreach(v => engines.foreach(e => e._2.paramChanged(v._1, new ContextVars(this))))
       case "current" =>
-        scope.head.foreach(v => currentEngine.setParam(v._1, v._2))
+        scope.head.foreach(v => currentEngine.paramChanged(v._1, new ContextVars(this)))
       case _ =>
     }
   }
@@ -476,20 +477,17 @@ class Context(
 
     var currentEngine: Engine = null
 
-    override def execute(stmt: String): Type = {
+    override def execute(stmt: String, ctx: ContextVars): Type = {
       interpolated = stmt
       new Null()
     }
 
-    override def executeFunc(name: String, params: Type*) =
+    override def executeFunc(name: String, ctx: ContextVars, params: Type*) =
       throw new UnsupportedOperationException(
         "interpolator dont have specific funcs"
       )
 
-    override def setParam(name: String, value: Type): Unit = {}
+    override def paramChanged(name: String, ctx: ContextVars): Unit = {}
 
-    override def getParam(name: String): Type = currentEngine.getParam(name)
-
-    override def isParam(name: String): Boolean = true
   }
 }
