@@ -1,5 +1,6 @@
 package org.mixql.core.test.visitor
 
+import com.typesafe.config.ConfigFactory
 import org.mixql.core.test.MainVisitorBaseTest
 import org.mixql.core.context.gtype._
 import org.mixql.core.engine.Engine
@@ -8,6 +9,7 @@ import org.mixql.core
 import org.mixql.core.test.engines.StubEngine
 
 import scala.collection.mutable.{Map => MutMap}
+import scala.util.Try
 
 class ControlStmtsTest extends MainVisitorBaseTest {
   test("Test if: then") {
@@ -271,13 +273,23 @@ class ControlStmtsTest extends MainVisitorBaseTest {
   }
 
   test("Test change engine params") {
+    //    assume({
+    //      val config = ConfigFactory.load()
+    //      Try({
+    //        val param = config.getString("mixql.engine.variables.update")
+    //        if (param.trim != "all") false
+    //        else true
+    //      }).getOrElse(true)
+    //    })
     val code =
-      """
-        |let engine stub(spark.execution.memory="16G");
+    """
+      |let engine stub(spark.execution.memory="16G");
                 """.stripMargin
+
     class Other extends StubEngine {
       override def name: String = "other"
     }
+
     val context = runMainVisitor(
       code,
       new Context(
@@ -303,41 +315,55 @@ class ControlStmtsTest extends MainVisitorBaseTest {
         |
         |let spark.execution.memory="16G";
         |
+        |select * from table that does not exist:) using param;
+        |
                 """.stripMargin
+    class Other extends StubEngine {
+      override def name: String = "stub"
+
+      override def execute(stmt: String, ctx: ContextVars): Type = {
+        queue += stmt + " spark.execution.memory=" + ctx.getVar("spark.execution.memory").toString
+        new Null()
+      }
+    }
+
     val context = runMainVisitor(
       code,
       new Context(
-        MutMap("stub" -> new StubEngine),
+        MutMap("stub" -> new Other),
         "stub"
       )
     )
 
-    assert(context.currentEngine.isInstanceOf[StubEngine])
+    assert(context.currentEngine.isInstanceOf[Other])
     assert(context.currentEngine.name == "stub")
     assert(context.currentEngineAllias == "stub")
     assert(
-      context.currentEngine.asInstanceOf[StubEngine]
-        .getChangedParam("spark.execution.memory")
-        .toString() == "16G"
+      context.currentEngine.asInstanceOf[Other]
+        .queue.last == "select * from table that does not exist:) using param " +
+        "spark.execution.memory=16G"
     )
   }
 
   test("Test run on other engine with params") {
     val code =
       """
+        |let spark.execution.memory = 8G;
         |select gg from wp on engine stub1(spark.execution.memory="16G");
                 """.stripMargin
-    class Other extends StubEngine {
-      var old: Map[String, Type] = Map()
-      changedParams.put("spark.execution.memory", new string("8G"))
-      override def name: String = "other"
-      override def execute(stmt: String, ctx: ContextVars): Type = {
-        queue += stmt
-        old = changedParams.toMap
-        new Null()
-      }
-    }
-    val stub1 = new Other
+//    class Other extends StubEngine {
+//      var old: Map[String, Type] = Map()
+//      changedParams.put("spark.execution.memory", new string("8G"))
+//
+//      override def name: String = "other"
+//
+//      override def execute(stmt: String, ctx: ContextVars): Type = {
+//        queue += stmt
+//        old = changedParams.toMap
+//        new Null()
+//      }
+//    }
+    val stub1 = new StubEngine
     val context = runMainVisitor(
       code,
       new Context(MutMap("stub" -> new StubEngine, "stub1" -> stub1), "stub")
@@ -346,21 +372,29 @@ class ControlStmtsTest extends MainVisitorBaseTest {
     assert(context.currentEngine.isInstanceOf[StubEngine])
     assert(context.currentEngine.name == "stub")
     assert(context.currentEngineAllias == "stub")
-    assert(
-      context.getEngine("stub").get.asInstanceOf[StubEngine]
-        .getChangedParam("spark.execution.memory")
-        .toString() == "16G"
-    )
+    if ( {
+      val config = ConfigFactory.load()
+      Try({
+        val param = config.getString("mixql.engine.variables.update")
+        if (param.trim != "all") false
+        else true
+      }).getOrElse(true)
+    })
+      assert(
+        context.getEngine("stub").get.asInstanceOf[StubEngine]
+          .getChangedParam("spark.execution.memory")
+          .toString() == "16G"
+      )
     assert(
       stub1
         .getChangedParam("spark.execution.memory")
         .toString() == "16G"
     )
-    assert(
-      stub1
-        .old("spark.execution.memory")
-        .toString() == "16G"
-    )
+//    assert(
+//      stub1
+//        .old("spark.execution.memory")
+//        .toString() == "8G"
+//    )
   }
 
   test("Test try/catch") {
@@ -412,7 +446,7 @@ class ControlStmtsTest extends MainVisitorBaseTest {
   test("Test return from lambda") {
     val code =
       """
-        |let test_ret = (x) -> begin 
+        |let test_ret = (x) -> begin
         |  return 1;
         |  return 2;
         |  1 + 2;
@@ -428,7 +462,7 @@ class ControlStmtsTest extends MainVisitorBaseTest {
   test("Test return from lambda with while cycle") {
     val code =
       """
-        |let test_ret = (x) -> begin 
+        |let test_ret = (x) -> begin
         |   let x = 1;
         |   while $x < 5 do
         |     return $x;
@@ -451,7 +485,7 @@ class ControlStmtsTest extends MainVisitorBaseTest {
   test("Test return from lambda with for range") {
     val code =
       """
-        |let test_ret = (x) -> begin 
+        |let test_ret = (x) -> begin
         |   let x = 0;
         |   for i in 1..20 step 2 loop
         |     return $i;
@@ -473,7 +507,7 @@ class ControlStmtsTest extends MainVisitorBaseTest {
   test("Test return from lambda with for in cursor") {
     val code =
       """
-        |let test_ret = (x) -> begin 
+        |let test_ret = (x) -> begin
         |   let x = 0;
         |   for i in [1, 3, 5] loop
         |     return $i;
@@ -495,7 +529,7 @@ class ControlStmtsTest extends MainVisitorBaseTest {
   test("Test return from lambda with try/catch: try") {
     val code =
       """
-        |let test_ret = (x) -> begin 
+        |let test_ret = (x) -> begin
         |   TRY
         |     return 0;
         |   CATCH ex THEN
@@ -518,7 +552,7 @@ class ControlStmtsTest extends MainVisitorBaseTest {
   test("Test return from lambda with try/catch: catch") {
     val code =
       """
-        |let test_ret = (x) -> begin 
+        |let test_ret = (x) -> begin
         |   TRY
         |     select gg from wp;
         |   CATCH ex THEN

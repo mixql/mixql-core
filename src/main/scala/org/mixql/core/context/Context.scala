@@ -242,8 +242,7 @@ class Context(
    */
   def execute(stmt: String, engine: String, params: Map[String, Type],
               expect_cursor: Boolean): Type = {
-    params.foreach(p => setVar(p._1, p._2))
-
+    params.keys.foreach(k => setVar(k, params(k)))
     getEngine(engine) match {
       case Some(eng) =>
         val res = if (!expect_cursor)
