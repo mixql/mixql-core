@@ -144,7 +144,7 @@ class ContextTest extends AnyFunSuite {
     val e = new MyEngine()
     context.addEngine(e)
     context.setCurrentEngine("MyEngine")
-    context.execute("select a from b",false)
+    context.execute("select a from b", false)
     assert(context.currentEngine == e)
     assert(e.query == "select a from b")
     val engine_name = context.getVar("mixql.execution.engine")

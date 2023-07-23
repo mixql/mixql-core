@@ -4,7 +4,6 @@ import org.mixql.core.context.gtype
 import org.mixql.core.context.gtype.{Type, array, gInt}
 import org.mixql.core.engine.Engine
 
-
 class CursorTestEngine1 extends Engine {
   var query: String = ""
 
@@ -14,15 +13,17 @@ class CursorTestEngine1 extends Engine {
 
   override def execute(stmt: String): Type = {
     query = stmt
-    new array(Array[Type](
-      new gInt(rand.nextInt()),
-      new gInt(rand.nextInt()),
-      new gInt(rand.nextInt()),
-      new gInt(rand.nextInt()),
-      new gInt(rand.nextInt()),
-      new gInt(rand.nextInt()),
-      new gInt(rand.nextInt())
-    ))
+    new array(
+      Array[Type](
+        new gInt(rand.nextInt()),
+        new gInt(rand.nextInt()),
+        new gInt(rand.nextInt()),
+        new gInt(rand.nextInt()),
+        new gInt(rand.nextInt()),
+        new gInt(rand.nextInt()),
+        new gInt(rand.nextInt())
+      )
+    )
   }
 
   override def executeFunc(name: String, params: Type*): Type = ???

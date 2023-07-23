@@ -84,23 +84,26 @@ class CursorTest extends MainVisitorBaseTest {
 
     val res1 = context.getVar("res1")
     assert(res1.isInstanceOf[array])
-    assert(res1.asInstanceOf[array].toString == "[\"fb\", true]"
-      || res1.asInstanceOf[array].toString == "[\"sarr\", [true, \"gg\", 12]]"
-      || res1.asInstanceOf[array].toString == "[\"sgint\", 12]"
+    assert(
+      res1.asInstanceOf[array].toString == "[\"fb\", true]"
+        || res1.asInstanceOf[array].toString == "[\"sarr\", [true, \"gg\", 12]]"
+        || res1.asInstanceOf[array].toString == "[\"sgint\", 12]"
     )
 
     val res2 = context.getVar("res2")
     assert(res2.isInstanceOf[array])
-    assert(res2.asInstanceOf[array].toString == "[\"fb\", true]"
-      || res2.asInstanceOf[array].toString == "[\"sarr\", [true, \"gg\", 12]]"
-      || res2.asInstanceOf[array].toString == "[\"sgint\", 12]"
+    assert(
+      res2.asInstanceOf[array].toString == "[\"fb\", true]"
+        || res2.asInstanceOf[array].toString == "[\"sarr\", [true, \"gg\", 12]]"
+        || res2.asInstanceOf[array].toString == "[\"sgint\", 12]"
     )
 
     val res3 = context.getVar("res3")
     assert(res3.isInstanceOf[array])
-    assert(res3.asInstanceOf[array].toString == "[\"fb\", true]"
-      || res3.asInstanceOf[array].toString == "[\"sarr\", [true, \"gg\", 12]]"
-      || res3.asInstanceOf[array].toString == "[\"sgint\", 12]"
+    assert(
+      res3.asInstanceOf[array].toString == "[\"fb\", true]"
+        || res3.asInstanceOf[array].toString == "[\"sarr\", [true, \"gg\", 12]]"
+        || res3.asInstanceOf[array].toString == "[\"sgint\", 12]"
     )
 
     val res4 = context.getVar("res4")
@@ -144,10 +147,12 @@ class CursorTest extends MainVisitorBaseTest {
         |
         |close d_cursor;
               """.stripMargin
-    val context = runMainVisitor(code,
+    val context = runMainVisitor(
+      code,
       new Context(
         MutMap[String, Engine]("CursorTestEngine1" -> new CursorTestEngine1),
-        "CursorTestEngine1")
+        "CursorTestEngine1"
+      )
     )
 
     val res1 = context.getVar("arr")
@@ -187,10 +192,12 @@ class CursorTest extends MainVisitorBaseTest {
         |
         |close d_cursor;
               """.stripMargin
-    val context = runMainVisitor(code,
+    val context = runMainVisitor(
+      code,
       new Context(
         MutMap[String, Engine]("CursorTestEngine2" -> new CursorTestEngine2),
-        "CursorTestEngine2")
+        "CursorTestEngine2"
+      )
     )
 
     val res1 = context.getVar("arr")
@@ -200,7 +207,7 @@ class CursorTest extends MainVisitorBaseTest {
     assert(arr1Size == 10)
 
     for (i <- 0 until arr1Size) {
-        assert(arr1.apply(new gInt(i)).isInstanceOf[gInt])
+      assert(arr1.apply(new gInt(i)).isInstanceOf[gInt])
     }
   }
 
@@ -227,10 +234,12 @@ class CursorTest extends MainVisitorBaseTest {
         |
         |close d_cursor;
               """.stripMargin
-    val context = runMainVisitor(code,
+    val context = runMainVisitor(
+      code,
       new Context(
         MutMap[String, Engine]("CursorTestEngine2" -> new CursorTestEngine2),
-        "CursorTestEngine2")
+        "CursorTestEngine2"
+      )
     )
 
     val res1 = context.getVar("arr")
@@ -263,10 +272,12 @@ class CursorTest extends MainVisitorBaseTest {
         |end loop
         |
               """.stripMargin
-    val context = runMainVisitor(code,
+    val context = runMainVisitor(
+      code,
       new Context(
         MutMap[String, Engine]("CursorTestEngine2" -> new CursorTestEngine2),
-        "CursorTestEngine2")
+        "CursorTestEngine2"
+      )
     )
 
     val res1 = context.getVar("arr")
@@ -301,10 +312,12 @@ class CursorTest extends MainVisitorBaseTest {
         |   print($res);
         |end loop
               """.stripMargin
-    val context = runMainVisitor(code,
+    val context = runMainVisitor(
+      code,
       new Context(
         MutMap[String, Engine]("CursorTestEngine2" -> new CursorTestEngine2),
-        "CursorTestEngine2")
+        "CursorTestEngine2"
+      )
     )
 
     val res1 = context.getVar("arr")
