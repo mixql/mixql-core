@@ -95,9 +95,10 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
   override def visitRaise_stmt(ctx: sql.Raise_stmtContext): Type = {
     if (ctx.exc_type) {
       val exc_type = visit(ctx.exc_type).toString
-      val exc_message = if (ctx.exc_message)
-        visit(ctx.exc_message).toString
-      else ""
+      val exc_message =
+        if (ctx.exc_message)
+          visit(ctx.exc_message).toString
+        else ""
       throw new UserSqlException(exc_type, exc_message)
     }
     throw new UserSqlException("UserError", "")
