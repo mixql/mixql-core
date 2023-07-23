@@ -1,7 +1,7 @@
 package org.mixql.core.visitor
 
 import org.antlr.v4.runtime.TokenStream
-import org.mixql.core.context.Context
+import org.mixql.core.context.{Context, ControlContext}
 import org.mixql.core.context.gtype._
 import org.mixql.core.generated.sql
 
@@ -14,7 +14,6 @@ trait ControlStmtsVisitor extends BaseVisitor {
   override def visitTry_catch_stmt(ctx: sql.Try_catch_stmtContext): Type = {
     try {
       val block = visit(ctx.try_bock)
-      if (block.control != Type.Control.NONE) return block
     } catch {
       case e: Throwable =>
         val old_exc =
@@ -46,7 +45,6 @@ trait ControlStmtsVisitor extends BaseVisitor {
         if (old_message.nonEmpty) {
           context.setVar(visit(ctx.exc).toString + ".message", old_message.get)
         }
-        if (block.control != Type.Control.NONE) return block
     }
     new Null()
   }
@@ -88,31 +86,36 @@ trait ControlStmtsVisitor extends BaseVisitor {
     breakable {
       while (
         (!ctx.T_REVERSE && i.LessThen(to)) ||
-          (ctx.T_REVERSE && i.MoreThen(to))
+        (ctx.T_REVERSE && i.MoreThen(to))
       ) {
         val block = visit(ctx.block)
-        if (block.control == Type.Control.RETURN) {
+        if (controlState == ControlContext.RETURN) {
           context.setVar(i_name, old)
           return block
         }
-        if (block.control == Type.Control.BREAK) break
+        if (controlState == ControlContext.BREAK) {
+          controlState = ControlContext.NONE
+          break
+        }
         i = i.Add(step)
         context.setVar(i_name, i)
       }
     }
     if (
       (!ctx.T_REVERSE && i.MoreEqualThen(to)) ||
-        (ctx.T_REVERSE && i.LessEqualThen(to))
+      (ctx.T_REVERSE && i.LessEqualThen(to))
     ) {
       context.setVar(i_name, to)
-      val block = visit(ctx.block)
-      if (block.control == Type.Control.RETURN) result = block
+      visit(ctx.block)
     }
     context.setVar(i_name, old)
     result
   }
 
-  def execForInGcursor(cursor: gcursor, ctx: sql.For_cursor_stmtContext): Type = {
+  def execForInGcursor(
+    cursor: gcursor,
+    ctx: sql.For_cursor_stmtContext
+  ): Type = {
     cursor.open()
 
     var fetchRes = cursor.fetch()
@@ -127,7 +130,10 @@ trait ControlStmtsVisitor extends BaseVisitor {
     new Null
   }
 
-  def execFetchBlockInFor(inRes: Type, ctx: sql.For_cursor_stmtContext): Type = {
+  def execFetchBlockInFor(
+    inRes: Type,
+    ctx: sql.For_cursor_stmtContext
+  ): Type = {
     var result: Type = new Null
     ctx.ident.size match {
       case 1 =>
@@ -136,11 +142,14 @@ trait ControlStmtsVisitor extends BaseVisitor {
         breakable {
           context.setVar(cursorName, inRes)
           val block = visit(ctx.block)
-          if (block.control == Type.Control.RETURN) {
+          if (controlState == ControlContext.RETURN) {
             result = block
             break
           }
-          if (block.control == Type.Control.BREAK) break
+          if (controlState == ControlContext.BREAK) {
+            controlState = ControlContext.NONE
+            break
+          }
         }
         context.setVar(cursorName, old)
       case other =>
@@ -151,8 +160,10 @@ trait ControlStmtsVisitor extends BaseVisitor {
     result
   }
 
-
-  def execBlockInFor(inRes: collection, ctx: sql.For_cursor_stmtContext): Type = {
+  def execBlockInFor(
+    inRes: collection,
+    ctx: sql.For_cursor_stmtContext
+  ): Type = {
     var result: Type = new Null
     inRes match {
       case c: array =>
@@ -164,11 +175,14 @@ trait ControlStmtsVisitor extends BaseVisitor {
               c.getArr.foreach(el => {
                 context.setVar(cursorName, el)
                 val block = visit(ctx.block)
-                if (block.control == Type.Control.RETURN) {
+                if (controlState == ControlContext.RETURN) {
                   result = block
                   break
                 }
-                if (block.control == Type.Control.BREAK) break
+                if (controlState == ControlContext.BREAK) {
+                  controlState = ControlContext.NONE
+                  break
+                }
               })
             }
             context.setVar(cursorName, old)
@@ -189,11 +203,14 @@ trait ControlStmtsVisitor extends BaseVisitor {
                       context.setVar(kv._1, kv._2)
                     })
                   val block = visit(ctx.block)
-                  if (block.control == Type.Control.RETURN) {
+                  if (controlState == ControlContext.RETURN) {
                     result = block
                     break
                   }
-                  if (block.control == Type.Control.BREAK) break
+                  if (controlState == ControlContext.BREAK) {
+                    controlState = ControlContext.NONE
+                    break
+                  }
                 } else {
                   throw new IllegalStateException(
                     "not enough arguments to unpack"
@@ -215,11 +232,14 @@ trait ControlStmtsVisitor extends BaseVisitor {
                 context.setVar(cursorKeyName, el._1)
                 context.setVar(cursorValueName, el._2)
                 val block = visit(ctx.block)
-                if (block.control == Type.Control.RETURN) {
+                if (controlState == ControlContext.RETURN) {
                   result = block
                   break
                 }
-                if (block.control == Type.Control.BREAK) break
+                if (controlState == ControlContext.BREAK) {
+                  controlState = ControlContext.NONE
+                  break
+                }
               })
             }
             context.setVar(cursorKeyName, oldKey)
@@ -231,11 +251,14 @@ trait ControlStmtsVisitor extends BaseVisitor {
               c.getMap.foreach(el => {
                 context.setVar(cursorName, el._2)
                 val block = visit(ctx.block)
-                if (block.control == Type.Control.RETURN) {
+                if (controlState == ControlContext.RETURN) {
                   result = block
                   break
                 }
-                if (block.control == Type.Control.BREAK) break
+                if (controlState == ControlContext.BREAK) {
+                  controlState = ControlContext.NONE
+                  break
+                }
               })
             }
             context.setVar(cursorName, oldCursor)
@@ -253,8 +276,11 @@ trait ControlStmtsVisitor extends BaseVisitor {
     breakable {
       while (condition) {
         val block = visit(ctx.block)
-        if (block.control == Type.Control.RETURN) return block
-        if (block.control == Type.Control.BREAK) break
+        if (controlState == ControlContext.RETURN) return block
+        if (controlState == ControlContext.BREAK) {
+          controlState = ControlContext.NONE
+          break
+        }
         condition = visit(ctx.expr)
       }
     }

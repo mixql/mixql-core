@@ -2,7 +2,7 @@ package org.mixql.core.visitor
 
 import org.antlr.v4.runtime.TokenStream
 import org.antlr.v4.runtime.tree.{ParseTree, TerminalNode}
-import org.mixql.core.context.Context
+import org.mixql.core.context.{Context, ControlContext}
 import org.mixql.core.context.gtype._
 import org.mixql.core.generated.{sqlBaseVisitor, token}
 
@@ -11,6 +11,7 @@ import scala.language.implicitConversions
 trait BaseVisitor extends sqlBaseVisitor[Type] {
   val context: Context
   val tokenStream: TokenStream
+  var controlState: ControlContext.ControlContext
 
   protected implicit def is_ctx_defined(rule: ParseTree): Boolean =
     rule != null

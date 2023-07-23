@@ -8,12 +8,12 @@ import org.mixql.core.visitor.MainVisitor
 
 package object core {
 
-  /** run script on context
+  /** run script with context
     *
     * @param script
     *   to run
     * @param context
-    *   run on this context
+    *   run with this context
     */
   def run(script: String, context: Context): Type = {
     val lexer = new token(CharStreams.fromString(script))

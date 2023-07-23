@@ -318,5 +318,3 @@ class CursorTest extends MainVisitorBaseTest {
     }
   }
 }
-
-

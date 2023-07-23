@@ -8,6 +8,7 @@ import org.mixql.core.generated.sql
 
 import scala.util.{Failure, Success, Try}
 import scala.collection.JavaConverters._
+import org.mixql.core.context.ControlContext
 
 trait ExpressionVisitor extends BaseVisitor {
   def executeOther(stmt: String, engine: sql.Choose_engineContext): Try[Type] =
@@ -175,6 +176,7 @@ trait ExpressionVisitor extends BaseVisitor {
       .toMap
     val res = FunctionInvoker
       .invoke(context.functions.toMap, funcName, context, args.toList, kwargs)
+    controlState = ControlContext.NONE
     pack(res)
   }
 
