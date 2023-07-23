@@ -15,6 +15,10 @@ try_catch_stmt:
      T_TRY try_bock=block T_CATCH (exc=ident T_THEN)? catch_block=block T_END
      ;
 
+raise_stmt:
+     T_RAISE (exc_type=expr (T_COMMA exc_message=expr)?)? T_SEMICOLON
+     ;
+
 change_engine_stmt:
      T_LET choose_engine T_SEMICOLON
      ;

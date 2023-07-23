@@ -14,6 +14,7 @@ import org.mixql.core.logger.{logDebug, logInfo, logWarn}
 
 import scala.util.{Failure, Success}
 import scala.collection.JavaConverters._
+import org.mixql.core.exception.UserSqlException
 
 /** it is not thread safe. if you need new multithread run new visitor for each
   *
@@ -89,6 +90,17 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
     val res = new Null
     controlState = ControlContext.CONTINUE
     res
+  }
+
+  override def visitRaise_stmt(ctx: sql.Raise_stmtContext): Type = {
+    if (ctx.exc_type) {
+      val exc_type = visit(ctx.exc_type).toString
+      val exc_message = if (ctx.exc_message)
+        visit(ctx.exc_message).toString
+      else ""
+      throw new UserSqlException(exc_type, exc_message)
+    }
+    throw new UserSqlException("UserError", "")
   }
 
   override def visitExpr_stmt(ctx: sql.Expr_stmtContext): Type = {

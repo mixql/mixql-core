@@ -363,6 +363,28 @@ class ControlStmtsTest extends MainVisitorBaseTest {
     assert(isNull(context.getVar("ex.message")))
   }
 
+  test("Test try/catch: user exception") {
+    val code =
+      """
+        |TRY
+        |  raise "gg", "wp";
+        |CATCH ex THEN
+        |  let res = $ex;
+        |  let res_msg = $ex.message;
+        |END
+                """.stripMargin
+    val context = runMainVisitor(code)
+    val res = context.getVar("res")
+    assert(res.isInstanceOf[string])
+    assert(res.asInstanceOf[string].getValue == "gg")
+    val res_msg = context.getVar("res_msg")
+    assert(res_msg.isInstanceOf[string])
+    assert(res_msg.asInstanceOf[string].getValue == "wp")
+
+    assert(isNull(context.getVar("ex")))
+    assert(isNull(context.getVar("ex.message")))
+  }
+
   test("Test return") {
     val code =
       """

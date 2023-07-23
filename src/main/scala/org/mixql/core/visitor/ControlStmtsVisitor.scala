@@ -9,42 +9,43 @@ import scala.language.implicitConversions
 import scala.collection.JavaConverters._
 import scala.collection.convert.ImplicitConversions.`map AsScala`
 import scala.util.control.Breaks.{break, _}
+import org.mixql.core.exception.UserSqlException
 
 trait ControlStmtsVisitor extends BaseVisitor {
+  def toUserSqlException(e: Throwable): UserSqlException = {
+    if (e.isInstanceOf[UserSqlException])
+      return e.asInstanceOf[UserSqlException]
+    return new UserSqlException(e.getClass.getSimpleName, e.getMessage)
+  }
+
   override def visitTry_catch_stmt(ctx: sql.Try_catch_stmtContext): Type = {
     try {
       val block = visit(ctx.try_bock)
+      if (controlState == ControlContext.RETURN) return block
     } catch {
       case e: Throwable =>
-        val old_exc =
-          if (ctx.exc)
-            Some(context.getVar(visit(ctx.exc).toString))
-          else
-            None
-        val old_message =
-          if (ctx.exc)
-            Some(context.getVar(visit(ctx.exc).toString + ".message"))
-          else
-            None
-        if (old_exc.nonEmpty) {
-          context.setVar(
-            visit(ctx.exc).toString,
-            new string(e.getClass.getSimpleName)
-          )
-        }
-        if (old_message.nonEmpty) {
-          context.setVar(
-            visit(ctx.exc).toString + ".message",
-            new string(e.getMessage)
-          )
-        }
-        val block = visit(ctx.catch_block)
-        if (old_exc.nonEmpty) {
-          context.setVar(visit(ctx.exc).toString, old_exc.get)
-        }
-        if (old_message.nonEmpty) {
-          context.setVar(visit(ctx.exc).toString + ".message", old_message.get)
-        }
+        val exception = toUserSqlException(e)
+        val block =
+          if (ctx.exc) {
+            val old_exc = context.getVar(visit(ctx.exc).toString)
+            val old_message =
+              context.getVar(visit(ctx.exc).toString + ".message")
+            context.setVar(
+              visit(ctx.exc).toString,
+              new string(exception.exc_type)
+            )
+            context.setVar(
+              visit(ctx.exc).toString + ".message",
+              new string(exception.detailMessage)
+            )
+            val block = visit(ctx.catch_block)
+            context.setVar(visit(ctx.exc).toString, old_exc)
+            context.setVar(visit(ctx.exc).toString + ".message", old_message)
+            block
+          } else {
+            visit(ctx.catch_block)
+          }
+        if (controlState == ControlContext.RETURN) return block
     }
     new Null()
   }
