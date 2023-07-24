@@ -110,8 +110,7 @@ trait ExpressionVisitor extends BaseVisitor {
       visit(ctx.expr)
     else if (ctx.other)
       executeOther(visit(ctx.other).toString, ctx.choose_engine) match {
-        case Success(value) =>
-          value
+        case Success(value) => value
         case Failure(exception) =>
           if (context.errorSkip)
             new Null()
@@ -144,8 +143,7 @@ trait ExpressionVisitor extends BaseVisitor {
   override def visitExpr_index(ctx: sql.Expr_indexContext): Type = {
     val col = visit(ctx.collection)
     col match {
-      case x: collection =>
-        x(visit(ctx.index))
+      case x: collection => x(visit(ctx.index))
       case _ =>
         throw new NoSuchMethodException(
           "only collections supports access by index")
@@ -171,8 +169,8 @@ trait ExpressionVisitor extends BaseVisitor {
       ctx.func.arg.asScala.flatMap(arg => {
         if (arg.ident != null)
           Seq(
-            visit(arg.ident).toString ->
-              unpack(visit(arg.expr)).asInstanceOf[Object])
+            visit(arg.ident).toString -> unpack(visit(arg.expr))
+              .asInstanceOf[Object])
         else
           Nil
       }).toMap

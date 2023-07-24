@@ -59,12 +59,9 @@ lazy val mixQLCore = (project in file(".")).enablePlugins(Antlr4Plugin)
           "com.typesafe"   % "config"         % "1.4.2",
           "org.scala-lang" % "scala-reflect" % {
             CrossVersion.partialVersion(scalaVersion.value) match {
-              case Some((2, 13)) =>
-                scalaVersion.value
-              case Some((2, 12)) =>
-                scalaVersion.value
-              case Some((3, _)) =>
-                "2.13.8"
+              case Some((2, 13)) => scalaVersion.value
+              case Some((2, 12)) => scalaVersion.value
+              case Some((3, _))  => "2.13.8"
             }
           },
           "org.apache.logging.log4j" % "log4j-api"  % "2.19.0",
@@ -73,21 +70,16 @@ lazy val mixQLCore = (project in file(".")).enablePlugins(Antlr4Plugin)
           // "org.ow2.asm"              % "asm-tree"   % "9.3",
           "org.scalatest" %% "scalatest" % {
             CrossVersion.partialVersion(scalaVersion.value) match {
-              case Some((2, 13)) =>
-                "3.1.1"
-              case Some((2, 12)) =>
-                "3.1.1"
-              case Some((3, _)) =>
-                "3.2.14"
+              case Some((2, 13)) => "3.1.1"
+              case Some((2, 12)) => "3.1.1"
+              case Some((3, _))  => "3.2.14"
             }
           } % Test),
     scalacOptions := {
       val stdOptions = Seq("-feature", "-deprecation")
       CrossVersion.partialVersion(scalaVersion.value) match {
-        case Some((2, 13)) =>
-          stdOptions
-        case Some((2, 12)) =>
-          stdOptions
+        case Some((2, 13)) => stdOptions
+        case Some((2, 12)) => stdOptions
         case Some((3, _)) =>
           stdOptions ++
             Seq(

@@ -76,8 +76,7 @@ class Context(val engines: MutMap[String, Engine],
     */
   def errorSkip: Boolean =
     getVar("mixql.error.skip") match {
-      case t: bool =>
-        t.getValue
+      case t: bool => t.getValue
       case _: Type =>
         throw new Exception("something wrong mixql.error.skip must be bool")
     }
@@ -92,9 +91,7 @@ class Context(val engines: MutMap[String, Engine],
 
   /** add variable scope
     */
-  def push_scope(): Unit = {
-    scope = MutMap[String, Type]() :: scope
-  }
+  def push_scope(): Unit = { scope = MutMap[String, Type]() :: scope }
 
   /** remove top variable scope
     */
@@ -184,10 +181,8 @@ class Context(val engines: MutMap[String, Engine],
     */
   def getEngine[T <: Engine: ClassTag]: Option[T] = {
     val res = engines.values.flatMap {
-      case e: T =>
-        Some(e)
-      case _ =>
-        None
+      case e: T => Some(e)
+      case _    => None
     }
     if (res.isEmpty)
       None
@@ -225,8 +220,7 @@ class Context(val engines: MutMap[String, Engine],
           value.execute(stmt)
         else
           value.getCursor(stmt)
-      case None =>
-        throw new NoSuchElementException(s"unknown engine $engine")
+      case None => throw new NoSuchElementException(s"unknown engine $engine")
     }
 
   /** execute statement on engine with specific params
@@ -255,8 +249,7 @@ class Context(val engines: MutMap[String, Engine],
             eng.getCursor(stmt)
         old.foreach(p => eng.setParam(p._1, p._2))
         res
-      case None =>
-        throw new NoSuchElementException(s"unknown engine $engine")
+      case None => throw new NoSuchElementException(s"unknown engine $engine")
     }
 
   /** set variable value. if key starts with some engines name then this engines
@@ -287,17 +280,13 @@ class Context(val engines: MutMap[String, Engine],
     }
     // set variable value
     value match {
-      case _: Null =>
-        scope.head.remove(key)
-      case _ =>
-        scope.head.put(key, value)
+      case _: Null => scope.head.remove(key)
+      case _       => scope.head.put(key, value)
     }
     engineVariablesUpdate match {
-      case "all" =>
-        engines.foreach(e => e._2.setParam(key, value))
-      case "current" =>
-        currentEngine.setParam(key, value)
-      case _ =>
+      case "all"     => engines.foreach(e => e._2.setParam(key, value))
+      case "current" => currentEngine.setParam(key, value)
+      case _         =>
     }
   }
 
@@ -313,8 +302,7 @@ class Context(val engines: MutMap[String, Engine],
       val res = vars.getOrElse(key, new Null())
       res match {
         case _: Null =>
-        case other =>
-          return other
+        case other   => return other
       }
     })
     new Null()
@@ -372,9 +360,7 @@ class Context(val engines: MutMap[String, Engine],
   }
 
   def getScope(): List[Map[String, Type]] = {
-    for {
-      w <- scope
-    } yield Map(w.toSeq: _*)
+    for { w <- scope } yield Map(w.toSeq: _*)
   }
 
   private var scope: List[MutMap[String, Type]] = null
@@ -434,9 +420,8 @@ class Context(val engines: MutMap[String, Engine],
     val res = MutMap[String, Type]()
     params.asScala.foreach(kv => {
       if (kv._2.valueType() == OBJECT)
-        res ++=
-          recurseParseParams(kv._2.asInstanceOf[ConfigObject],
-                             scope + kv._1 + ".")
+        res ++= recurseParseParams(kv._2.asInstanceOf[ConfigObject],
+                                   scope + kv._1 + ".")
       else
         res += scope + kv._1 -> convertConfigValue(kv._2.unwrapped)
     })

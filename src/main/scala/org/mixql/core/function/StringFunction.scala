@@ -95,33 +95,25 @@ object StringFunction {
 
   val endsWith =
     new ((String, String) => Boolean) {
-      def apply(str: String, suffix: String): Boolean = {
-        str.endsWith(suffix)
-      }
+      def apply(str: String, suffix: String): Boolean = { str.endsWith(suffix) }
     }
 
   val isEmpty =
     new ((String) => Boolean) {
-      def apply(str: String): Boolean = {
-        str.isEmpty
-      }
+      def apply(str: String): Boolean = { str.isEmpty }
     }
 
   val nonEmpty =
     new ((String) => Boolean) {
-      def apply(str: String): Boolean = {
-        str.nonEmpty
-      }
+      def apply(str: String): Boolean = { str.nonEmpty }
     }
 
   val findFirstIn =
     new ((String, String) => Any) {
       def apply(str: String, findPattern: String): Any = {
         findPattern.r.findFirstIn(str) match {
-          case None =>
-            null
-          case Some(v) =>
-            v
+          case None    => null
+          case Some(v) => v
         }
       }
     }
@@ -156,22 +148,16 @@ object StringFunction {
 
   val toLowerCase =
     new ((String) => String) {
-      def apply(str: String): String = {
-        str.toLowerCase
-      }
+      def apply(str: String): String = { str.toLowerCase }
     }
 
   val toUpperCase =
     new ((String) => String) {
-      def apply(str: String): String = {
-        str.toUpperCase
-      }
+      def apply(str: String): String = { str.toUpperCase }
     }
 
   val trim =
     new ((String) => String) {
-      def apply(str: String): String = {
-        str.trim
-      }
+      def apply(str: String): String = { str.trim }
     }
 }

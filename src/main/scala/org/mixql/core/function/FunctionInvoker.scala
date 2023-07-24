@@ -99,10 +99,8 @@ object FunctionInvoker {
   private def isTypeEquals(left: Class[_], right: Class[_]): Boolean = {
     if (left.isPrimitive) {
       left.getName match {
-        case "int" =>
-          return right.getName == "java.lang.Integer"
-        case "double" =>
-          return right.getName == "java.lang.Double"
+        case "int"    => return right.getName == "java.lang.Integer"
+        case "double" => return right.getName == "java.lang.Double"
       }
     }
     right.isAssignableFrom(left)
@@ -118,8 +116,8 @@ object FunctionInvoker {
       return obj.asInstanceOf[SqlLambda].apply(args: _*)
     val a = obj.getClass.getMethods.find(p =>
       p.getName == "apply" &&
-        (p.getParameters.length == 0 ||
-          p.getParameters()(0).getName.toLowerCase != "v1"))
+        (p.getParameters.length == 0 || p.getParameters()(0)
+          .getName.toLowerCase != "v1"))
     a match {
       case Some(apply) =>
         val applyParams = apply.getParameters
@@ -134,12 +132,10 @@ object FunctionInvoker {
           val seqc = "scala.collection.immutable.Seq"
           val seqcOld = "scala.collection.Seq" // In case of scala 2.12
           // argument is variable number of args like gg: String*
-          if (i == size &&
-              (ptype.getName == seqc) ||
-              (ptype.getName == seqcOld)) {
-            lb += args1
-          } else if (context != null &&
-                     (ptype.getName == cc || ptype == context.getClass)) {
+          if (i == size && (ptype.getName == seqc) ||
+              (ptype.getName == seqcOld)) { lb += args1 }
+          else if (context != null &&
+                   (ptype.getName == cc || ptype == context.getClass)) {
             lb += context
           } else if (kwargs1.contains(pname)) {
             lb += kwargs1(pname)
@@ -147,9 +143,7 @@ object FunctionInvoker {
           } else if (args1.nonEmpty) {
             lb += args1.head
             args1 = args1.tail
-          } else {
-            lb += getDefParamsFor(obj, i)
-          }
+          } else { lb += getDefParamsFor(obj, i) }
           i += 1
         })
         apply.invoke(obj, lb.toArray: _*)

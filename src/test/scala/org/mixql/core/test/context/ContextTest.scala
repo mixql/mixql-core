@@ -11,10 +11,8 @@ import scala.collection.mutable.{Map => MutMap}
 class ContextTest extends AnyFunSuite {
   def isNull(v: Type): Boolean = {
     v match {
-      case _: Null =>
-        true
-      case _ =>
-        false
+      case _: Null => true
+      case _       => false
     }
   }
 

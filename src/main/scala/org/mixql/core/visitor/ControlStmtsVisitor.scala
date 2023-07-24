@@ -39,9 +39,7 @@ trait ControlStmtsVisitor extends BaseVisitor {
             context.setVar(visit(ctx.exc).toString, old_exc)
             context.setVar(visit(ctx.exc).toString + ".message", old_message)
             block
-          } else {
-            visit(ctx.catch_block)
-          }
+          } else { visit(ctx.catch_block) }
         if (controlState == ControlContext.RETURN)
           return block
     }
@@ -50,14 +48,11 @@ trait ControlStmtsVisitor extends BaseVisitor {
 
   override def visitIf_stmt(ctx: sql.If_stmtContext): Type = {
     val condition: Boolean = visit(ctx.expr)
-    if (condition) {
-      visit(ctx.block)
-    } else {
+    if (condition) { visit(ctx.block) }
+    else {
       ctx.elseif_block().forEach(elif => {
         val elsecondition: Boolean = visit(elif.expr)
-        if (elsecondition) {
-          return visit(elif.block)
-        }
+        if (elsecondition) { return visit(elif.block) }
       })
       if (ctx.else_block)
         visit(ctx.else_block.block)
@@ -83,12 +78,10 @@ trait ControlStmtsVisitor extends BaseVisitor {
       else
         visit(ctx.from)
     val step =
-      (
-        if (ctx.T_REVERSE)
-          new gInt(-1)
-        else
-          new gInt(1)
-      ).Multiply(
+      (if (ctx.T_REVERSE)
+         new gInt(-1)
+       else
+         new gInt(1)).Multiply(
         if (ctx.step)
           visit(ctx.step)
         else
@@ -258,8 +251,7 @@ trait ControlStmtsVisitor extends BaseVisitor {
               })
             }
             context.setVar(cursorName, oldCursor)
-          case _ =>
-            throw new IllegalStateException("too many cursors for map")
+          case _ => throw new IllegalStateException("too many cursors for map")
         }
       case other =>
         throw new IllegalArgumentException("cursor must be collection")

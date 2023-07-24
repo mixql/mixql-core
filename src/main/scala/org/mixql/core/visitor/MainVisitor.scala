@@ -22,9 +22,7 @@ import org.mixql.core.exception.UserSqlException
   * @param tokens
   */
 class MainVisitor(ctx: Context, tokens: TokenStream)
-    extends ExpressionVisitor
-    with LiteralVisitor
-    with ControlStmtsVisitor {
+    extends ExpressionVisitor with LiteralVisitor with ControlStmtsVisitor {
 
   val context = ctx
   val tokenStream = tokens
@@ -60,8 +58,7 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
         execForInGcursor(cursor, ctx)
       } else {
         exprRes match {
-          case collection1: collection =>
-            execBlockInFor(collection1, ctx)
+          case collection1: collection => execBlockInFor(collection1, ctx)
           case _ =>
             logWarn(
               "\"visitFor_cursor_stmt\": cursor must be collection. Ignore executing of for block")
@@ -136,8 +133,7 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
           logDebug("Adding lambda function " + lambdaFuncName + " to context")
           context.addFunction(lambdaFuncName, v)
 
-        case _ =>
-          context.setVar(visit(ctx.ident).toString, value)
+        case _ => context.setVar(visit(ctx.ident).toString, value)
       }
     }
     new Null()
@@ -147,8 +143,7 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
     val cursor_name = visit(ctx.ident).toString
     val cursor = context.getVar(cursor_name)
     cursor match {
-      case cursor1: cursor =>
-        cursor1.open()
+      case cursor1: cursor => cursor1.open()
       case _ =>
         throw new Exception(
           "You can only open cursor, not other type: " +
@@ -162,9 +157,7 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
     cursor match {
       case cursor1: cursor =>
         val res = cursor1.close()
-        if (res.getValue) {
-          context.setVar(cursor_name, new Null())
-        }
+        if (res.getValue) { context.setVar(cursor_name, new Null()) }
         res
       case _ =>
         throw new Exception(
@@ -192,8 +185,7 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
   override def visitAssigment_by_index(
     ctx: sql.Assigment_by_indexContext): Type = {
     context.getVar(visit(ctx.ident).toString) match {
-      case x: collection =>
-        x.update(visit(ctx.index), visit(ctx.value))
+      case x: collection => x.update(visit(ctx.index), visit(ctx.value))
       case _ =>
         throw new NoSuchMethodException(
           "only collections supports access by index")
@@ -233,8 +225,7 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
 
   override def visitOther_stmt(ctx: sql.Other_stmtContext): Type = {
     executeOther(visit(ctx.other).toString, ctx.choose_engine) match {
-      case Success(value) =>
-        value
+      case Success(value) => value
       case Failure(exception) =>
         if (context.errorSkip)
           new Null()
@@ -252,10 +243,8 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
         to = child.getSourceInterval.a - 1
         val ch =
           visit(child) match {
-            case s: string =>
-              s.quoted
-            case other =>
-              other.toString
+            case s: string => s.quoted
+            case other     => other.toString
           }
         res += tokenStream.getText(new Interval(from, to)) + ch
         from = child.getSourceInterval.b + 1

@@ -11,9 +11,7 @@ object ArrayFunction {
   val sort =
     new ((Array[Any], SqlLambda) => Array[Any]) {
       override def apply(arr: Array[Any], less: SqlLambda): Array[Any] = {
-        arr.sortWith((x, y) => {
-          less(x, y).asInstanceOf[Boolean]
-        })
+        arr.sortWith((x, y) => { less(x, y).asInstanceOf[Boolean] })
       }
     }
 }
