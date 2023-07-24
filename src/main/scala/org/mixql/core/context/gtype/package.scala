@@ -134,12 +134,8 @@ package object gtype {
         new array(p.map(pack))
       case p: Map[Any, Any] =>
         import scala.collection.JavaConverters._
-        new map(
-          scala
-            .collection
-            .mutable
-            .Map(p.map(kv => pack(kv._1) -> pack(kv._2)).toSeq: _*)
-            .asJava)
+        new map(scala.collection.mutable.Map(p.map(kv =>
+          pack(kv._1) -> pack(kv._2)).toSeq: _*).asJava)
       case p: SqlLambda =>
         p
       case other =>

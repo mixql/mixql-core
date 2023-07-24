@@ -35,18 +35,15 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
 
   override def visitBlock(ctx: sql.BlockContext): Type = {
     var res: Type = new Null()
-    ctx
-      .statment
-      .asScala
-      .foreach(stmt => {
-        res = visit(stmt)
-        if (controlState == ControlContext.CONTINUE) {
-          controlState = ControlContext.NONE
-          return res
-        }
-        if (controlState != ControlContext.NONE)
-          return res
-      })
+    ctx.statment.asScala.foreach(stmt => {
+      res = visit(stmt)
+      if (controlState == ControlContext.CONTINUE) {
+        controlState = ControlContext.NONE
+        return res
+      }
+      if (controlState != ControlContext.NONE)
+        return res
+    })
     res
   }
 
@@ -119,12 +116,7 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
     else
       context.setCurrentEngine(visit(ctx.choose_engine.ident).toString)
     if (ctx.choose_engine.engine_params)
-      ctx
-        .choose_engine
-        .engine_params
-        .ident
-        .asScala
-        .map(visit)
+      ctx.choose_engine.engine_params.ident.asScala.map(visit)
         .zip(ctx.choose_engine.engine_params.expr.asScala.map(visit))
         .foreach(p => context.currentEngine.setParam(p._1.toString, p._2))
     new Null()
@@ -215,12 +207,8 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
       if (ctx.ident.size > ctx.expr.size)
         throw new IndexOutOfBoundsException(
           "not enought argument for multiple assigment")
-      ctx
-        .ident
-        .asScala
-        .zip(ctx.expr.asScala)
-        .foreach(variable =>
-          context.setVar(visit(variable._1).toString, visit(variable._2)))
+      ctx.ident.asScala.zip(ctx.expr.asScala).foreach(variable =>
+        context.setVar(visit(variable._1).toString, visit(variable._2)))
     } else {
       val res =
         visit(ctx.expr(0)) match {
@@ -228,12 +216,8 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
             if (ctx.ident.size > arr.size.getValue)
               throw new IndexOutOfBoundsException(
                 "not enought argument for multiple assigment")
-            ctx
-              .ident
-              .asScala
-              .zip(arr.getArr)
-              .foreach(variable =>
-                context.setVar(visit(variable._1).toString, variable._2))
+            ctx.ident.asScala.zip(arr.getArr).foreach(variable =>
+              context.setVar(visit(variable._1).toString, variable._2))
           case _ =>
             throw new IllegalArgumentException(
               "cannot unpack non array expression")
@@ -264,20 +248,18 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
     var from = ctx.start.getTokenIndex
     var to = from
     if (ctx.children != null) {
-      ctx
-        .children
-        .forEach(child => {
-          to = child.getSourceInterval.a - 1
-          val ch =
-            visit(child) match {
-              case s: string =>
-                s.quoted
-              case other =>
-                other.toString
-            }
-          res += tokenStream.getText(new Interval(from, to)) + ch
-          from = child.getSourceInterval.b + 1
-        })
+      ctx.children.forEach(child => {
+        to = child.getSourceInterval.a - 1
+        val ch =
+          visit(child) match {
+            case s: string =>
+              s.quoted
+            case other =>
+              other.toString
+          }
+        res += tokenStream.getText(new Interval(from, to)) + ch
+        from = child.getSourceInterval.b + 1
+      })
     }
     new string(res)
   }

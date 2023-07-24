@@ -38,9 +38,8 @@ class OtherInterpolationTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
     val query = context.currentEngine.asInstanceOf[StubEngine].queue
     assert(
-      query
-        .dequeue() == "select '$10 df;df some str\\' from table where column > 10"
-    )
+      query.dequeue() ==
+        "select '$10 df;df some str\\' from table where column > 10")
   }
 
   test("Test any statement with curly brackets") {

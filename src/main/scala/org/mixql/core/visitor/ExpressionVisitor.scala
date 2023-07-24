@@ -24,13 +24,8 @@ trait ExpressionVisitor extends BaseVisitor {
         if (engine.engine_params) {
           // execute with additional params
           val params =
-            engine
-              .engine_params
-              .ident
-              .asScala
-              .map(visit(_).toString)
-              .zip(engine.engine_params.expr.asScala.map(visit))
-              .toMap
+            engine.engine_params.ident.asScala.map(visit(_).toString)
+              .zip(engine.engine_params.expr.asScala.map(visit)).toMap
           context.execute(stmt, engineName, params, false)
         } else {
           // execute with current params
@@ -132,18 +127,15 @@ trait ExpressionVisitor extends BaseVisitor {
         Some(visit(ctx.case_r.ex_switch))
       else
         None
-    ctx
-      .case_r
-      .case_when_then
-      .forEach(case_r => {
-        val condition: Boolean =
-          if (switch.nonEmpty)
-            switch.get == visit(case_r.condition)
-          else
-            visit(case_r.condition)
-        if (condition)
-          return visit(case_r.ex_do)
-      })
+    ctx.case_r.case_when_then.forEach(case_r => {
+      val condition: Boolean =
+        if (switch.nonEmpty)
+          switch.get == visit(case_r.condition)
+        else
+          visit(case_r.condition)
+      if (condition)
+        return visit(case_r.ex_do)
+    })
     if (ctx.case_r.ex_else)
       return visit(ctx.case_r.ex_else)
     new Null() // TODO default result if no condition matched (mb exception?)
@@ -169,31 +161,21 @@ trait ExpressionVisitor extends BaseVisitor {
     val funcName = visit(ctx.func.ident).toString
     // TODO: add the implicit cast
     val args: Seq[Object] =
-      ctx
-        .func
-        .arg
-        .asScala
-        .flatMap(arg => {
-          if (arg.ident == null)
-            Seq(unpack(visit(arg.expr)).asInstanceOf[Object])
-          else
-            Nil
-        })
-        .toSeq
+      ctx.func.arg.asScala.flatMap(arg => {
+        if (arg.ident == null)
+          Seq(unpack(visit(arg.expr)).asInstanceOf[Object])
+        else
+          Nil
+      }).toSeq
     val kwargs: Map[String, Object] =
-      ctx
-        .func
-        .arg
-        .asScala
-        .flatMap(arg => {
-          if (arg.ident != null)
-            Seq(
-              visit(arg.ident).toString ->
-                unpack(visit(arg.expr)).asInstanceOf[Object])
-          else
-            Nil
-        })
-        .toMap
+      ctx.func.arg.asScala.flatMap(arg => {
+        if (arg.ident != null)
+          Seq(
+            visit(arg.ident).toString ->
+              unpack(visit(arg.expr)).asInstanceOf[Object])
+        else
+          Nil
+      }).toMap
     val res = FunctionInvoker
       .invoke(context.functions.toMap, funcName, context, args.toList, kwargs)
     controlState = ControlContext.NONE

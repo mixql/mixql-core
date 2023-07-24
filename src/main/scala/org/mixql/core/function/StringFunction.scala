@@ -17,10 +17,7 @@ object StringFunction {
   val base64 =
     new (String => String) {
       def apply(str: String): String =
-        java
-          .util
-          .Base64
-          .getEncoder
+        java.util.Base64.getEncoder
           .encodeToString(str.getBytes(StandardCharsets.UTF_8))
     }
 

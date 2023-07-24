@@ -16,9 +16,12 @@ class StubEngine extends Engine {
 
   override def executeFunc(name: String, params: Type*): Type = {
     name match {
-      case "getnum" => 42
-      case "getstr" => "42"
-      case _        => throw new NoSuchMethodException(s"unknown func $name")
+      case "getnum" =>
+        42
+      case "getstr" =>
+        "42"
+      case _ =>
+        throw new NoSuchMethodException(s"unknown func $name")
     }
   }
   override def setParam(name: String, value: Type): Unit = {

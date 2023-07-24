@@ -93,17 +93,12 @@ trait LiteralVisitor extends BaseVisitor {
 
   override def visitLiteral_map(ctx: sql.Literal_mapContext): Type = {
     val res =
-      ctx
-        .map_literal
-        .map_item
-        .asScala
-        .map(item => {
-          val k = visit(item.key)
-          if (k.isInstanceOf[collection])
-            throw new IllegalArgumentException("collection can't be key")
-          k -> visit(item.value)
-        })
-        .toMap
+      ctx.map_literal.map_item.asScala.map(item => {
+        val k = visit(item.key)
+        if (k.isInstanceOf[collection])
+          throw new IllegalArgumentException("collection can't be key")
+        k -> visit(item.value)
+      }).toMap
     import scala.collection.JavaConverters._
     new map(scala.collection.mutable.Map(res.toSeq: _*).asJava)
   }

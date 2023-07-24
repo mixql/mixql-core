@@ -261,11 +261,8 @@ class ControlStmtsTest extends MainVisitorBaseTest {
     }
     val context = runMainVisitor(
       code,
-      new Context(
-        MutMap("stub" -> new StubEngine, "stub1" -> new Other),
-        "stub"
-      )
-    )
+      new Context(MutMap("stub" -> new StubEngine, "stub1" -> new Other),
+                  "stub"))
 
     assert(context.currentEngine.isInstanceOf[Other])
     assert(context.currentEngine.name == "other")
@@ -282,20 +279,15 @@ class ControlStmtsTest extends MainVisitorBaseTest {
     }
     val context = runMainVisitor(
       code,
-      new Context(
-        MutMap("stub" -> new StubEngine, "stub1" -> new Other),
-        "stub"
-      )
-    )
+      new Context(MutMap("stub" -> new StubEngine, "stub1" -> new Other),
+                  "stub"))
 
     assert(context.currentEngine.isInstanceOf[StubEngine])
     assert(context.currentEngine.name == "stub")
     assert(context.currentEngineAllias == "stub")
     assert(
-      context.currentEngine
-        .getParam("spark.execution.memory")
-        .toString() == "16G"
-    )
+      context.currentEngine.getParam("spark.execution.memory").toString() ==
+        "16G")
   }
 
   test("Test run on other engine with params") {
@@ -316,22 +308,13 @@ class ControlStmtsTest extends MainVisitorBaseTest {
     val stub1 = new Other
     val context = runMainVisitor(
       code,
-      new Context(MutMap("stub" -> new StubEngine, "stub1" -> stub1), "stub")
-    )
+      new Context(MutMap("stub" -> new StubEngine, "stub1" -> stub1), "stub"))
 
     assert(context.currentEngine.isInstanceOf[StubEngine])
     assert(context.currentEngine.name == "stub")
     assert(context.currentEngineAllias == "stub")
-    assert(
-      stub1
-        .getParam("spark.execution.memory")
-        .toString() == "8G"
-    )
-    assert(
-      stub1
-        .old("spark.execution.memory")
-        .toString() == "16G"
-    )
+    assert(stub1.getParam("spark.execution.memory").toString() == "8G")
+    assert(stub1.old("spark.execution.memory").toString() == "16G")
   }
 
   test("Test try/catch") {
@@ -350,8 +333,9 @@ class ControlStmtsTest extends MainVisitorBaseTest {
         throw new NullPointerException("hello")
       }
     }
-    val context =
-      runMainVisitor(code, new Context(MutMap("stub" -> new Other), "stub"))
+    val context = runMainVisitor(
+      code,
+      new Context(MutMap("stub" -> new Other), "stub"))
     val res = context.getVar("res")
     assert(res.isInstanceOf[string])
     assert(res.asInstanceOf[string].getValue == "NullPointerException")
@@ -396,8 +380,7 @@ class ControlStmtsTest extends MainVisitorBaseTest {
                 """.stripMargin
     val res = core.run(
       code,
-      new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
-    )
+      new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub"))
     assert(res.isInstanceOf[gInt])
     assert(res.asInstanceOf[gInt].getValue == 1)
   }
@@ -527,8 +510,9 @@ class ControlStmtsTest extends MainVisitorBaseTest {
         throw new NullPointerException("hello")
       }
     }
-    val context =
-      runMainVisitor(code, new Context(MutMap("stub" -> new Other), "stub"))
+    val context = runMainVisitor(
+      code,
+      new Context(MutMap("stub" -> new Other), "stub"))
     val res = context.getVar("res")
     assert(res.isInstanceOf[gInt])
     assert(res.asInstanceOf[gInt].getValue == 1)

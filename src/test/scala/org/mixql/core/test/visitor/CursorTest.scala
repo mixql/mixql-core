@@ -85,26 +85,23 @@ class CursorTest extends MainVisitorBaseTest {
     val res1 = context.getVar("res1")
     assert(res1.isInstanceOf[array])
     assert(
-      res1.asInstanceOf[array].toString == "[\"fb\", true]"
-        || res1.asInstanceOf[array].toString == "[\"sarr\", [true, \"gg\", 12]]"
-        || res1.asInstanceOf[array].toString == "[\"sgint\", 12]"
-    )
+      res1.asInstanceOf[array].toString == "[\"fb\", true]" ||
+        res1.asInstanceOf[array].toString == "[\"sarr\", [true, \"gg\", 12]]" ||
+        res1.asInstanceOf[array].toString == "[\"sgint\", 12]")
 
     val res2 = context.getVar("res2")
     assert(res2.isInstanceOf[array])
     assert(
-      res2.asInstanceOf[array].toString == "[\"fb\", true]"
-        || res2.asInstanceOf[array].toString == "[\"sarr\", [true, \"gg\", 12]]"
-        || res2.asInstanceOf[array].toString == "[\"sgint\", 12]"
-    )
+      res2.asInstanceOf[array].toString == "[\"fb\", true]" ||
+        res2.asInstanceOf[array].toString == "[\"sarr\", [true, \"gg\", 12]]" ||
+        res2.asInstanceOf[array].toString == "[\"sgint\", 12]")
 
     val res3 = context.getVar("res3")
     assert(res3.isInstanceOf[array])
     assert(
-      res3.asInstanceOf[array].toString == "[\"fb\", true]"
-        || res3.asInstanceOf[array].toString == "[\"sarr\", [true, \"gg\", 12]]"
-        || res3.asInstanceOf[array].toString == "[\"sgint\", 12]"
-    )
+      res3.asInstanceOf[array].toString == "[\"fb\", true]" ||
+        res3.asInstanceOf[array].toString == "[\"sarr\", [true, \"gg\", 12]]" ||
+        res3.asInstanceOf[array].toString == "[\"sgint\", 12]")
 
     val res4 = context.getVar("res4")
     assert(res4.isInstanceOf[nothing])
@@ -151,9 +148,7 @@ class CursorTest extends MainVisitorBaseTest {
       code,
       new Context(
         MutMap[String, Engine]("CursorTestEngine1" -> new CursorTestEngine1),
-        "CursorTestEngine1"
-      )
-    )
+        "CursorTestEngine1"))
 
     val res1 = context.getVar("arr")
     assert(res1.isInstanceOf[array])
@@ -196,9 +191,7 @@ class CursorTest extends MainVisitorBaseTest {
       code,
       new Context(
         MutMap[String, Engine]("CursorTestEngine2" -> new CursorTestEngine2),
-        "CursorTestEngine2"
-      )
-    )
+        "CursorTestEngine2"))
 
     val res1 = context.getVar("arr")
     assert(res1.isInstanceOf[array])
@@ -238,9 +231,7 @@ class CursorTest extends MainVisitorBaseTest {
       code,
       new Context(
         MutMap[String, Engine]("CursorTestEngine2" -> new CursorTestEngine2),
-        "CursorTestEngine2"
-      )
-    )
+        "CursorTestEngine2"))
 
     val res1 = context.getVar("arr")
     assert(res1.isInstanceOf[array])
@@ -276,9 +267,7 @@ class CursorTest extends MainVisitorBaseTest {
       code,
       new Context(
         MutMap[String, Engine]("CursorTestEngine2" -> new CursorTestEngine2),
-        "CursorTestEngine2"
-      )
-    )
+        "CursorTestEngine2"))
 
     val res1 = context.getVar("arr")
     assert(res1.isInstanceOf[array])
@@ -316,9 +305,7 @@ class CursorTest extends MainVisitorBaseTest {
       code,
       new Context(
         MutMap[String, Engine]("CursorTestEngine2" -> new CursorTestEngine2),
-        "CursorTestEngine2"
-      )
-    )
+        "CursorTestEngine2"))
 
     val res1 = context.getVar("arr")
     assert(res1.isInstanceOf[array])

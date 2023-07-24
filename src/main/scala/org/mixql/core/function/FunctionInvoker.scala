@@ -23,14 +23,11 @@ object FunctionInvoker {
         func match {
           case l: List[_] =>
             for (f <- l) {
-              val applyMethods = f
-                .getClass
-                .getMethods
-                .filter(x =>
-                  // x.getParameters.length != 0 &&
-                  x.getParameters
-                    .exists(y => y.getType.getName != "java.lang.Object") &&
-                    x.getName == "apply")
+              val applyMethods = f.getClass.getMethods.filter(x =>
+                // x.getParameters.length != 0 &&
+                x.getParameters
+                  .exists(y => y.getType.getName != "java.lang.Object") &&
+                  x.getName == "apply")
 
               if (compareFunctionTypes(applyMethods(0), args)) {
                 return invokeFunc(f.asInstanceOf[Object],
@@ -57,14 +54,11 @@ object FunctionInvoker {
           if (kwargs.nonEmpty)
             throw new UnsupportedOperationException(
               "named args for engine function not supported")
-          if (ctx
-                .currentEngine
-                .getDefinedFunctions
+          if (ctx.currentEngine.getDefinedFunctions
                 .contains(funcName.toLowerCase))
             unpack(ctx.currentEngine.executeFunc(funcName, args.map(pack): _*))
           else {
-            val engine = ctx
-              .engines
+            val engine = ctx.engines
               .find(eng => eng._2.getDefinedFunctions.contains(funcName))
             engine match {
               case Some(value) =>
@@ -84,12 +78,9 @@ object FunctionInvoker {
   private def compareFunctionTypes(a: Method, paramsSeq: Seq[_]): Boolean = {
     val params = paramsSeq.toArray
     if (a.getParameters.length != params.length) {
-      if (a.getParameters
-            .last
-            .getType
-            .isAssignableFrom(
-              Try(Class.forName("scala.collection.immutable.Seq"))
-                .getOrElse(Class.forName("scala.collection.Seq"))))
+      if (a.getParameters.last.getType.isAssignableFrom(
+            Try(Class.forName("scala.collection.immutable.Seq"))
+              .getOrElse(Class.forName("scala.collection.Seq"))))
         return true
       else
         return false
@@ -125,13 +116,10 @@ object FunctionInvoker {
                          cc: String): Any = {
     if (obj.isInstanceOf[SqlLambda])
       return obj.asInstanceOf[SqlLambda].apply(args: _*)
-    val a = obj
-      .getClass
-      .getMethods
-      .find(p =>
-        p.getName == "apply" &&
-          (p.getParameters.length == 0 ||
-            p.getParameters()(0).getName.toLowerCase != "v1"))
+    val a = obj.getClass.getMethods.find(p =>
+      p.getName == "apply" &&
+        (p.getParameters.length == 0 ||
+          p.getParameters()(0).getName.toLowerCase != "v1"))
     a match {
       case Some(apply) =>
         val applyParams = apply.getParameters

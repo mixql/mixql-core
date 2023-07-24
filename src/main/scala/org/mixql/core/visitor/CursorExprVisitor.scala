@@ -25,13 +25,8 @@ class CursorExprVisitor(ctx: Context, tokens: TokenStream)
         if (engine.engine_params) {
           // execute with additional params
           val params =
-            engine
-              .engine_params
-              .ident
-              .asScala
-              .map(visit(_).toString)
-              .zip(engine.engine_params.expr.asScala.map(visit))
-              .toMap
+            engine.engine_params.ident.asScala.map(visit(_).toString)
+              .zip(engine.engine_params.expr.asScala.map(visit)).toMap
           context.execute(stmt, engineName, params, true)
         } else {
           // execute with current params

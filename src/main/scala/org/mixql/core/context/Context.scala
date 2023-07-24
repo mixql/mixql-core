@@ -183,14 +183,12 @@ class Context(val engines: MutMap[String, Engine],
     *   the first engine isInstanceOf[T]
     */
   def getEngine[T <: Engine: ClassTag]: Option[T] = {
-    val res = engines
-      .values
-      .flatMap {
-        case e: T =>
-          Some(e)
-        case _ =>
-          None
-      }
+    val res = engines.values.flatMap {
+      case e: T =>
+        Some(e)
+      case _ =>
+        None
+    }
     if (res.isEmpty)
       None
     else
@@ -363,17 +361,14 @@ class Context(val engines: MutMap[String, Engine],
     logDebug("mixql core context: starting close")
     logDebug(
       "mixql core context: stop engines, if they were not closed before by shutdown command")
-    engines
-      .values
-      .foreach(engine => {
-        import java.lang.AutoCloseable
-        if (engine.isInstanceOf[AutoCloseable]) {
-          val engineCloseable: AutoCloseable = engine
-            .asInstanceOf[AutoCloseable]
-          logDebug(s"mixql core context: stopping engine " + engine.name)
-          engineCloseable.close()
-        }
-      })
+    engines.values.foreach(engine => {
+      import java.lang.AutoCloseable
+      if (engine.isInstanceOf[AutoCloseable]) {
+        val engineCloseable: AutoCloseable = engine.asInstanceOf[AutoCloseable]
+        logDebug(s"mixql core context: stopping engine " + engine.name)
+        engineCloseable.close()
+      }
+    })
   }
 
   def getScope(): List[Map[String, Type]] = {
@@ -437,16 +432,14 @@ class Context(val engines: MutMap[String, Engine],
   private def recurseParseParams(params: ConfigObject,
                                  scope: String = ""): MutMap[String, Type] = {
     val res = MutMap[String, Type]()
-    params
-      .asScala
-      .foreach(kv => {
-        if (kv._2.valueType() == OBJECT)
-          res ++=
-            recurseParseParams(kv._2.asInstanceOf[ConfigObject],
-                               scope + kv._1 + ".")
-        else
-          res += scope + kv._1 -> convertConfigValue(kv._2.unwrapped)
-      })
+    params.asScala.foreach(kv => {
+      if (kv._2.valueType() == OBJECT)
+        res ++=
+          recurseParseParams(kv._2.asInstanceOf[ConfigObject],
+                             scope + kv._1 + ".")
+      else
+        res += scope + kv._1 -> convertConfigValue(kv._2.unwrapped)
+    })
     res
   }
 
@@ -463,10 +456,7 @@ class Context(val engines: MutMap[String, Engine],
       new gDouble(value.asInstanceOf[Double])
     else if (value.isInstanceOf[ju.List[Object]]) {
       new array(
-        value
-          .asInstanceOf[ju.List[Object]]
-          .asScala
-          .map(convertConfigValue)
+        value.asInstanceOf[ju.List[Object]].asScala.map(convertConfigValue)
           .toArray)
     } else
       throw new Exception("unknown param type")

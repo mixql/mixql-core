@@ -269,14 +269,12 @@ class ExpressionTest extends MainVisitorBaseTest {
     assert(res.isInstanceOf[array])
     val arr = res.asInstanceOf[array]
     assert(
-      arr.apply(new gInt(0)).Equal(new bool(true)).asInstanceOf[bool].getValue
-    )
+      arr.apply(new gInt(0)).Equal(new bool(true)).asInstanceOf[bool].getValue)
     assert(
-      arr.apply(new gInt(1)).Equal(new string("gg")).asInstanceOf[bool].getValue
-    )
+      arr.apply(new gInt(1)).Equal(new string("gg")).asInstanceOf[bool]
+        .getValue)
     assert(
-      arr.apply(new gInt(2)).Equal(new gInt(12)).asInstanceOf[bool].getValue
-    )
+      arr.apply(new gInt(2)).Equal(new gInt(12)).asInstanceOf[bool].getValue)
   }
 
   test("Test array get/set by index") {
@@ -291,17 +289,14 @@ class ExpressionTest extends MainVisitorBaseTest {
     val res1 = context.getVar("res1")
     assert(res1.isInstanceOf[bool])
     assert(
-      res1.asInstanceOf[bool].Equal(new bool(true)).asInstanceOf[bool].getValue
-    )
+      res1.asInstanceOf[bool].Equal(new bool(true)).asInstanceOf[bool].getValue)
     val res2 = context.getVar("res2")
     assert(res2.isInstanceOf[bool])
     assert(
-      (res2
-        .asInstanceOf[bool]
-        .Equal(new bool(false))
-        .asInstanceOf[bool]
-        .getValue)
-    )
+      (
+        res2.asInstanceOf[bool].Equal(new bool(false)).asInstanceOf[bool]
+          .getValue
+      ))
   }
 
   test("Test append and prepend value to array") {
@@ -320,8 +315,7 @@ class ExpressionTest extends MainVisitorBaseTest {
     assert(arr.size.Equal(new gInt(5)).asInstanceOf[bool].getValue)
     assert(arr(new gInt(0)).Equal(new gInt(1)).asInstanceOf[bool].getValue)
     assert(
-      arr(new gInt(4)).Equal(new string("last")).asInstanceOf[bool].getValue
-    )
+      arr(new gInt(4)).Equal(new string("last")).asInstanceOf[bool].getValue)
   }
 
   test("Test concat 2 arrays") {
@@ -388,8 +382,8 @@ class ExpressionTest extends MainVisitorBaseTest {
     val res2 = context.getVar("res")
     assert(res2.isInstanceOf[bool])
     assert(
-      res2.asInstanceOf[bool].Equal(new bool(false)).asInstanceOf[bool].getValue
-    )
+      res2.asInstanceOf[bool].Equal(new bool(false)).asInstanceOf[bool]
+        .getValue)
   }
 
   test("Test map literal") {
@@ -420,13 +414,12 @@ class ExpressionTest extends MainVisitorBaseTest {
     val res1 = context.getVar("res1")
     assert(res1.isInstanceOf[gInt])
     assert(
-      res1.asInstanceOf[gInt].Equal(new gInt(1)).asInstanceOf[bool].getValue
-    )
+      res1.asInstanceOf[gInt].Equal(new gInt(1)).asInstanceOf[bool].getValue)
     val res2 = context.getVar("res2")
     assert(res2.isInstanceOf[bool])
     assert(
-      res2.asInstanceOf[bool].Equal(new bool(false)).asInstanceOf[bool].getValue
-    )
+      res2.asInstanceOf[bool].Equal(new bool(false)).asInstanceOf[bool]
+        .getValue)
   }
 
   test("Test map pack/unpack in lambda") {
@@ -445,8 +438,8 @@ class ExpressionTest extends MainVisitorBaseTest {
     val res2 = context.getVar("res")
     assert(res2.isInstanceOf[bool])
     assert(
-      res2.asInstanceOf[bool].Equal(new bool(false)).asInstanceOf[bool].getValue
-    )
+      res2.asInstanceOf[bool].Equal(new bool(false)).asInstanceOf[bool]
+        .getValue)
   }
 
   test("Test call engine specific function") {
@@ -468,12 +461,13 @@ class ExpressionTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context =
       new Context(MutMap[String, Engine]("stub" -> (new StubEngine)), "stub")
-    val testContext = new ((String, Int, Context) => Int) {
-      override def apply(str: String, num: Int, context: Context): Int = {
-        val a = context.getVar("a")
-        a.asInstanceOf[gInt].getValue + num
+    val testContext =
+      new ((String, Int, Context) => Int) {
+        override def apply(str: String, num: Int, context: Context): Int = {
+          val a = context.getVar("a")
+          a.asInstanceOf[gInt].getValue + num
+        }
       }
-    }
     context.addFunction("testcontext", testContext)
     runMainVisitor(code, context)
     val res = context.getVar("res")
@@ -489,12 +483,13 @@ class ExpressionTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context =
       new Context(MutMap[String, Engine]("stub" -> (new StubEngine)), "stub")
-    val testContext = new ((String, Int, Context) => Int) {
-      override def apply(str: String, num: Int, context: Context): Int = {
-        val a = context.getVar("a")
-        a.asInstanceOf[gInt].getValue + num
+    val testContext =
+      new ((String, Int, Context) => Int) {
+        override def apply(str: String, num: Int, context: Context): Int = {
+          val a = context.getVar("a")
+          a.asInstanceOf[gInt].getValue + num
+        }
       }
-    }
     context.addFunction("testcontext", testContext)
     runMainVisitor(code, context)
     val res = context.getVar("res")
