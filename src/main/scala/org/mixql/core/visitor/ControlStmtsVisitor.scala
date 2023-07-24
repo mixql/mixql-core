@@ -21,23 +21,20 @@ trait ControlStmtsVisitor extends BaseVisitor {
   override def visitTry_catch_stmt(ctx: sql.Try_catch_stmtContext): Type = {
     try {
       val block = visit(ctx.try_bock)
-      if (controlState == ControlContext.RETURN) return block
+      if (controlState == ControlContext.RETURN)
+        return block
     } catch {
       case e: Throwable =>
         val exception = toUserSqlException(e)
         val block =
           if (ctx.exc) {
             val old_exc = context.getVar(visit(ctx.exc).toString)
-            val old_message =
-              context.getVar(visit(ctx.exc).toString + ".message")
-            context.setVar(
-              visit(ctx.exc).toString,
-              new string(exception.exc_type)
-            )
-            context.setVar(
-              visit(ctx.exc).toString + ".message",
-              new string(exception.detailMessage)
-            )
+            val old_message = context
+              .getVar(visit(ctx.exc).toString + ".message")
+            context
+              .setVar(visit(ctx.exc).toString, new string(exception.exc_type))
+            context.setVar(visit(ctx.exc).toString + ".message",
+                           new string(exception.detailMessage))
             val block = visit(ctx.catch_block)
             context.setVar(visit(ctx.exc).toString, old_exc)
             context.setVar(visit(ctx.exc).toString + ".message", old_message)
@@ -45,7 +42,8 @@ trait ControlStmtsVisitor extends BaseVisitor {
           } else {
             visit(ctx.catch_block)
           }
-        if (controlState == ControlContext.RETURN) return block
+        if (controlState == ControlContext.RETURN)
+          return block
     }
     new Null()
   }
@@ -76,19 +74,31 @@ trait ControlStmtsVisitor extends BaseVisitor {
     var result: Type = new Null
     val i_name = visit(ctx.ident).toString
     val old = context.getVar(i_name)
-    var i = if (!ctx.T_REVERSE) visit(ctx.from) else visit(ctx.to)
-    val to = if (!ctx.T_REVERSE) visit(ctx.to) else visit(ctx.from)
+    var i =
+      if (!ctx.T_REVERSE)
+        visit(ctx.from)
+      else
+        visit(ctx.to)
+    val to =
+      if (!ctx.T_REVERSE)
+        visit(ctx.to)
+      else
+        visit(ctx.from)
     val step =
-      (if (ctx.T_REVERSE) new gInt(-1) else new gInt(1)).Multiply(
-        if (ctx.step) visit(ctx.step)
-        else new gInt(1)
-      )
+      (
+        if (ctx.T_REVERSE)
+          new gInt(-1)
+        else
+          new gInt(1)
+      ).Multiply(
+        if (ctx.step)
+          visit(ctx.step)
+        else
+          new gInt(1))
     context.setVar(i_name, i)
     breakable {
-      while (
-        (!ctx.T_REVERSE && i.LessThen(to)) ||
-        (ctx.T_REVERSE && i.MoreThen(to))
-      ) {
+      while ((!ctx.T_REVERSE && i.LessThen(to)) ||
+             (ctx.T_REVERSE && i.MoreThen(to))) {
         val block = visit(ctx.block)
         if (controlState == ControlContext.RETURN) {
           context.setVar(i_name, old)
@@ -102,10 +112,8 @@ trait ControlStmtsVisitor extends BaseVisitor {
         context.setVar(i_name, i)
       }
     }
-    if (
-      (!ctx.T_REVERSE && i.MoreEqualThen(to)) ||
-      (ctx.T_REVERSE && i.LessEqualThen(to))
-    ) {
+    if ((!ctx.T_REVERSE && i.MoreEqualThen(to)) ||
+        (ctx.T_REVERSE && i.LessEqualThen(to))) {
       context.setVar(i_name, to)
       visit(ctx.block)
     }
@@ -113,10 +121,8 @@ trait ControlStmtsVisitor extends BaseVisitor {
     result
   }
 
-  def execForInGcursor(
-    cursor: gcursor,
-    ctx: sql.For_cursor_stmtContext
-  ): Type = {
+  def execForInGcursor(cursor: gcursor,
+                       ctx: sql.For_cursor_stmtContext): Type = {
     cursor.open()
 
     var fetchRes = cursor.fetch()
@@ -131,10 +137,8 @@ trait ControlStmtsVisitor extends BaseVisitor {
     new Null
   }
 
-  def execFetchBlockInFor(
-    inRes: Type,
-    ctx: sql.For_cursor_stmtContext
-  ): Type = {
+  def execFetchBlockInFor(inRes: Type,
+                          ctx: sql.For_cursor_stmtContext): Type = {
     var result: Type = new Null
     ctx.ident.size match {
       case 1 =>
@@ -155,16 +159,13 @@ trait ControlStmtsVisitor extends BaseVisitor {
         context.setVar(cursorName, old)
       case other =>
         throw new IllegalStateException(
-          "too many arguments to unpack result from cursor, which did not return collection"
-        )
+          "too many arguments to unpack result from cursor, which did not return collection")
     }
     result
   }
 
-  def execBlockInFor(
-    inRes: collection,
-    ctx: sql.For_cursor_stmtContext
-  ): Type = {
+  def execBlockInFor(inRes: collection,
+                     ctx: sql.For_cursor_stmtContext): Type = {
     var result: Type = new Null
     inRes match {
       case c: array =>
@@ -173,36 +174,9 @@ trait ControlStmtsVisitor extends BaseVisitor {
             val cursorName = visit(ctx.ident(0)).toString
             val old = context.getVar(cursorName)
             breakable {
-              c.getArr.foreach(el => {
-                context.setVar(cursorName, el)
-                val block = visit(ctx.block)
-                if (controlState == ControlContext.RETURN) {
-                  result = block
-                  break
-                }
-                if (controlState == ControlContext.BREAK) {
-                  controlState = ControlContext.NONE
-                  break
-                }
-              })
-            }
-            context.setVar(cursorName, old)
-          case other =>
-            val cursors = ctx.ident.asScala.map(visit(_).toString).toList
-            val old = cursors.map(context.getVar(_))
-            breakable {
-              c.getArr.foreach(el => {
-                if (el.isInstanceOf[array]) {
-                  val a = el.asInstanceOf[array]
-                  if (a.getArr.size < cursors.size)
-                    throw new IllegalStateException(
-                      "not enough arguments to unpack"
-                    )
-                  cursors
-                    .zip(a.getArr)
-                    .foreach(kv => {
-                      context.setVar(kv._1, kv._2)
-                    })
+              c.getArr
+                .foreach(el => {
+                  context.setVar(cursorName, el)
                   val block = visit(ctx.block)
                   if (controlState == ControlContext.RETURN) {
                     result = block
@@ -212,12 +186,39 @@ trait ControlStmtsVisitor extends BaseVisitor {
                     controlState = ControlContext.NONE
                     break
                   }
-                } else {
-                  throw new IllegalStateException(
-                    "not enough arguments to unpack"
-                  )
-                }
-              })
+                })
+            }
+            context.setVar(cursorName, old)
+          case other =>
+            val cursors = ctx.ident.asScala.map(visit(_).toString).toList
+            val old = cursors.map(context.getVar(_))
+            breakable {
+              c.getArr
+                .foreach(el => {
+                  if (el.isInstanceOf[array]) {
+                    val a = el.asInstanceOf[array]
+                    if (a.getArr.size < cursors.size)
+                      throw new IllegalStateException(
+                        "not enough arguments to unpack")
+                    cursors
+                      .zip(a.getArr)
+                      .foreach(kv => {
+                        context.setVar(kv._1, kv._2)
+                      })
+                    val block = visit(ctx.block)
+                    if (controlState == ControlContext.RETURN) {
+                      result = block
+                      break
+                    }
+                    if (controlState == ControlContext.BREAK) {
+                      controlState = ControlContext.NONE
+                      break
+                    }
+                  } else {
+                    throw new IllegalStateException(
+                      "not enough arguments to unpack")
+                  }
+                })
             }
             cursors.zip(old).foreach(x => context.setVar(x._1, x._2))
         }
@@ -229,19 +230,20 @@ trait ControlStmtsVisitor extends BaseVisitor {
             val oldKey = context.getVar(cursorKeyName)
             val oldValue = context.getVar(cursorValueName)
             breakable {
-              c.getMap.foreach(el => {
-                context.setVar(cursorKeyName, el._1)
-                context.setVar(cursorValueName, el._2)
-                val block = visit(ctx.block)
-                if (controlState == ControlContext.RETURN) {
-                  result = block
-                  break
-                }
-                if (controlState == ControlContext.BREAK) {
-                  controlState = ControlContext.NONE
-                  break
-                }
-              })
+              c.getMap
+                .foreach(el => {
+                  context.setVar(cursorKeyName, el._1)
+                  context.setVar(cursorValueName, el._2)
+                  val block = visit(ctx.block)
+                  if (controlState == ControlContext.RETURN) {
+                    result = block
+                    break
+                  }
+                  if (controlState == ControlContext.BREAK) {
+                    controlState = ControlContext.NONE
+                    break
+                  }
+                })
             }
             context.setVar(cursorKeyName, oldKey)
             context.setVar(cursorValueName, oldValue)
@@ -249,18 +251,19 @@ trait ControlStmtsVisitor extends BaseVisitor {
             val cursorName = visit(ctx.ident(0)).toString
             val oldCursor = context.getVar(cursorName)
             breakable {
-              c.getMap.foreach(el => {
-                context.setVar(cursorName, el._2)
-                val block = visit(ctx.block)
-                if (controlState == ControlContext.RETURN) {
-                  result = block
-                  break
-                }
-                if (controlState == ControlContext.BREAK) {
-                  controlState = ControlContext.NONE
-                  break
-                }
-              })
+              c.getMap
+                .foreach(el => {
+                  context.setVar(cursorName, el._2)
+                  val block = visit(ctx.block)
+                  if (controlState == ControlContext.RETURN) {
+                    result = block
+                    break
+                  }
+                  if (controlState == ControlContext.BREAK) {
+                    controlState = ControlContext.NONE
+                    break
+                  }
+                })
             }
             context.setVar(cursorName, oldCursor)
           case _ =>
@@ -277,7 +280,8 @@ trait ControlStmtsVisitor extends BaseVisitor {
     breakable {
       while (condition) {
         val block = visit(ctx.block)
-        if (controlState == ControlContext.RETURN) return block
+        if (controlState == ControlContext.RETURN)
+          return block
         if (controlState == ControlContext.BREAK) {
           controlState = ControlContext.NONE
           break

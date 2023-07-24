@@ -17,10 +17,10 @@ package object core {
     */
   def run(script: String, context: Context): Type = {
     val lexer = new token(CharStreams.fromString(script))
-    val tokenStream = new CommonTokenStream(
-      new token(CharStreams.fromString(script))
-    )
-    tokenStream.getNumberOfOnChannelTokens // magic. if we do not do this tokenstream is empty
+    val tokenStream =
+      new CommonTokenStream(new token(CharStreams.fromString(script)))
+    tokenStream
+      .getNumberOfOnChannelTokens // magic. if we do not do this tokenstream is empty
     val parser = new sql(new CommonTokenStream(lexer))
     new MainVisitor(context, tokenStream).visit(parser.program())
   }

@@ -23,10 +23,14 @@ trait ExpressionVisitor extends BaseVisitor {
             visit(engine.ident).toString
         if (engine.engine_params) {
           // execute with additional params
-          val params = engine.engine_params.ident.asScala
-            .map(visit(_).toString)
-            .zip(engine.engine_params.expr.asScala.map(visit))
-            .toMap
+          val params =
+            engine
+              .engine_params
+              .ident
+              .asScala
+              .map(visit(_).toString)
+              .zip(engine.engine_params.expr.asScala.map(visit))
+              .toMap
           context.execute(stmt, engineName, params, false)
         } else {
           // execute with current params
@@ -50,8 +54,7 @@ trait ExpressionVisitor extends BaseVisitor {
     new string(visit(ctx.expr(0)).toString + visit(ctx.expr(1)).toString)
 
   override def visitExpr_arithmetic_p1(
-    ctx: sql.Expr_arithmetic_p1Context
-  ): Type = {
+    ctx: sql.Expr_arithmetic_p1Context): Type = {
     val left = visit(ctx.expr(0))
     val right = visit(ctx.expr(1))
     if (ctx.T_DIV)
@@ -63,8 +66,7 @@ trait ExpressionVisitor extends BaseVisitor {
   }
 
   override def visitExpr_arithmetic_p2(
-    ctx: sql.Expr_arithmetic_p2Context
-  ): Type = {
+    ctx: sql.Expr_arithmetic_p2Context): Type = {
     val left = visit(ctx.expr(0))
     val right = visit(ctx.expr(1))
     if (ctx.T_ADD)
@@ -113,9 +115,13 @@ trait ExpressionVisitor extends BaseVisitor {
       visit(ctx.expr)
     else if (ctx.other)
       executeOther(visit(ctx.other).toString, ctx.choose_engine) match {
-        case Success(value) => value
+        case Success(value) =>
+          value
         case Failure(exception) =>
-          if (context.errorSkip) new Null() else throw exception
+          if (context.errorSkip)
+            new Null()
+          else
+            throw exception
       }
     else
       throw new UnsupportedOperationException("unknown operator")
@@ -126,27 +132,31 @@ trait ExpressionVisitor extends BaseVisitor {
         Some(visit(ctx.case_r.ex_switch))
       else
         None
-    ctx.case_r.case_when_then
+    ctx
+      .case_r
+      .case_when_then
       .forEach(case_r => {
         val condition: Boolean =
           if (switch.nonEmpty)
             switch.get == visit(case_r.condition)
           else
             visit(case_r.condition)
-        if (condition) return visit(case_r.ex_do)
+        if (condition)
+          return visit(case_r.ex_do)
       })
-    if (ctx.case_r.ex_else) return visit(ctx.case_r.ex_else)
+    if (ctx.case_r.ex_else)
+      return visit(ctx.case_r.ex_else)
     new Null() // TODO default result if no condition matched (mb exception?)
   }
 
   override def visitExpr_index(ctx: sql.Expr_indexContext): Type = {
     val col = visit(ctx.collection)
     col match {
-      case x: collection => x(visit(ctx.index))
+      case x: collection =>
+        x(visit(ctx.index))
       case _ =>
         throw new NoSuchMethodException(
-          "only collections supports access by index"
-        )
+          "only collections supports access by index")
     }
   }
 
@@ -158,22 +168,32 @@ trait ExpressionVisitor extends BaseVisitor {
   override def visitExpr_func(ctx: sql.Expr_funcContext): Type = {
     val funcName = visit(ctx.func.ident).toString
     // TODO: add the implicit cast
-    val args: Seq[Object] = ctx.func.arg.asScala
-      .flatMap(arg => {
-        if (arg.ident == null) Seq(unpack(visit(arg.expr)).asInstanceOf[Object])
-        else Nil
-      })
-      .toSeq
-    val kwargs: Map[String, Object] = ctx.func.arg.asScala
-      .flatMap(arg => {
-        if (arg.ident != null)
-          Seq(
-            visit(arg.ident).toString -> unpack(visit(arg.expr))
-              .asInstanceOf[Object]
-          )
-        else Nil
-      })
-      .toMap
+    val args: Seq[Object] =
+      ctx
+        .func
+        .arg
+        .asScala
+        .flatMap(arg => {
+          if (arg.ident == null)
+            Seq(unpack(visit(arg.expr)).asInstanceOf[Object])
+          else
+            Nil
+        })
+        .toSeq
+    val kwargs: Map[String, Object] =
+      ctx
+        .func
+        .arg
+        .asScala
+        .flatMap(arg => {
+          if (arg.ident != null)
+            Seq(
+              visit(arg.ident).toString ->
+                unpack(visit(arg.expr)).asInstanceOf[Object])
+          else
+            Nil
+        })
+        .toMap
     val res = FunctionInvoker
       .invoke(context.functions.toMap, funcName, context, args.toList, kwargs)
     controlState = ControlContext.NONE

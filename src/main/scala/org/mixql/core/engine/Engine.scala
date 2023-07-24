@@ -32,9 +32,8 @@ abstract class Engine {
   def getCursor(stmt: String): cursor = {
     import org.mixql.core.logger
     logger.logWarn(
-      "getCursor was not defined in engine " +
-        name + ". Use execute method instead"
-    )
+      "getCursor was not defined in engine " + name +
+        ". Use execute method instead")
     new gcursor(execute(stmt))
   }
 

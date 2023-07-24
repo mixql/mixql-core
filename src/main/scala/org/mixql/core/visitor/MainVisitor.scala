@@ -25,25 +25,28 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
     extends ExpressionVisitor
     with LiteralVisitor
     with ControlStmtsVisitor {
+
   val context = ctx
   val tokenStream = tokens
 
   var controlState = ControlContext.NONE
 
-  override def visitProgram(ctx: sql.ProgramContext): Type =
-    visit(ctx.block)
+  override def visitProgram(ctx: sql.ProgramContext): Type = visit(ctx.block)
 
   override def visitBlock(ctx: sql.BlockContext): Type = {
     var res: Type = new Null()
-    ctx.statment.asScala.foreach(stmt => {
-      res = visit(stmt)
-      if (controlState == ControlContext.CONTINUE) {
-        controlState = ControlContext.NONE
-        return res
-      }
-      if (controlState != ControlContext.NONE)
-        return res
-    })
+    ctx
+      .statment
+      .asScala
+      .foreach(stmt => {
+        res = visit(stmt)
+        if (controlState == ControlContext.CONTINUE) {
+          controlState = ControlContext.NONE
+          return res
+        }
+        if (controlState != ControlContext.NONE)
+          return res
+      })
     res
   }
 
@@ -60,11 +63,11 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
         execForInGcursor(cursor, ctx)
       } else {
         exprRes match {
-          case collection1: collection => execBlockInFor(collection1, ctx)
+          case collection1: collection =>
+            execBlockInFor(collection1, ctx)
           case _ =>
             logWarn(
-              "\"visitFor_cursor_stmt\": cursor must be collection. Ignore executing of for block"
-            )
+              "\"visitFor_cursor_stmt\": cursor must be collection. Ignore executing of for block")
             new Null()
 //            throw new IllegalArgumentException("cursor must be collection")
         }
@@ -98,7 +101,8 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
       val exc_message =
         if (ctx.exc_message)
           visit(ctx.exc_message).toString
-        else ""
+        else
+          ""
       throw new UserSqlException(exc_type, exc_message)
     }
     throw new UserSqlException("UserError", "")
@@ -109,14 +113,17 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
   }
 
   override def visitChange_engine_stmt(
-    ctx: sql.Change_engine_stmtContext
-  ): Type = {
+    ctx: sql.Change_engine_stmtContext): Type = {
     if (ctx.choose_engine.expr)
       context.setCurrentEngine(visit(ctx.choose_engine.expr).toString)
     else
       context.setCurrentEngine(visit(ctx.choose_engine.ident).toString)
     if (ctx.choose_engine.engine_params)
-      ctx.choose_engine.engine_params.ident.asScala
+      ctx
+        .choose_engine
+        .engine_params
+        .ident
+        .asScala
         .map(visit)
         .zip(ctx.choose_engine.engine_params.expr.asScala.map(visit))
         .foreach(p => context.currentEngine.setParam(p._1.toString, p._2))
@@ -124,8 +131,7 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
   }
 
   override def visitAssigment_default(
-    ctx: sql.Assigment_defaultContext
-  ): Type = {
+    ctx: sql.Assigment_defaultContext): Type = {
     if (ctx.T_CURSOR() != null && ctx.T_IS() != null) {
       val cursor = new gcursor(context, tokenStream, ctx.expr())
       context.setVar(visit(ctx.ident).toString, cursor)
@@ -138,7 +144,8 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
           logDebug("Adding lambda function " + lambdaFuncName + " to context")
           context.addFunction(lambdaFuncName, v)
 
-        case _ => context.setVar(visit(ctx.ident).toString, value)
+        case _ =>
+          context.setVar(visit(ctx.ident).toString, value)
       }
     }
     new Null()
@@ -153,8 +160,7 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
       case _ =>
         throw new Exception(
           "You can only open cursor, not other type: " +
-            cursor.getClass.getName
-        )
+            cursor.getClass.getName)
     }
   }
 
@@ -171,14 +177,12 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
       case _ =>
         throw new Exception(
           "You can only close cursor, not other type: " +
-            cursor.getClass.getName
-        )
+            cursor.getClass.getName)
     }
   }
 
   override def visitExpr_fetch_cursor(
-    ctx: sql.Expr_fetch_cursorContext
-  ): Type = {
+    ctx: sql.Expr_fetch_cursorContext): Type = {
     val cursor_name = visit(ctx.ident).toString
     val cursor = context.getVar(cursor_name)
     cursor match {
@@ -189,54 +193,51 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
       case _ =>
         throw new Exception(
           "You can only fetch from cursor, not other type: " +
-            cursor.getClass.getName
-        )
+            cursor.getClass.getName)
     }
   }
 
   override def visitAssigment_by_index(
-    ctx: sql.Assigment_by_indexContext
-  ): Type = {
+    ctx: sql.Assigment_by_indexContext): Type = {
     context.getVar(visit(ctx.ident).toString) match {
-      case x: collection => x.update(visit(ctx.index), visit(ctx.value))
+      case x: collection =>
+        x.update(visit(ctx.index), visit(ctx.value))
       case _ =>
         throw new NoSuchMethodException(
-          "only collections supports access by index"
-        )
+          "only collections supports access by index")
     }
     new Null()
   }
 
   override def visitAssigment_multiple(
-    ctx: sql.Assigment_multipleContext
-  ): Type = {
+    ctx: sql.Assigment_multipleContext): Type = {
     if (ctx.expr.size > 1) {
       if (ctx.ident.size > ctx.expr.size)
         throw new IndexOutOfBoundsException(
-          "not enought argument for multiple assigment"
-        )
-      ctx.ident.asScala
+          "not enought argument for multiple assigment")
+      ctx
+        .ident
+        .asScala
         .zip(ctx.expr.asScala)
         .foreach(variable =>
-          context.setVar(visit(variable._1).toString, visit(variable._2))
-        )
+          context.setVar(visit(variable._1).toString, visit(variable._2)))
     } else {
-      val res = visit(ctx.expr(0)) match {
-        case arr: array =>
-          if (ctx.ident.size > arr.size.getValue)
-            throw new IndexOutOfBoundsException(
-              "not enought argument for multiple assigment"
-            )
-          ctx.ident.asScala
-            .zip(arr.getArr)
-            .foreach(variable =>
-              context.setVar(visit(variable._1).toString, variable._2)
-            )
-        case _ =>
-          throw new IllegalArgumentException(
-            "cannot unpack non array expression"
-          )
-      }
+      val res =
+        visit(ctx.expr(0)) match {
+          case arr: array =>
+            if (ctx.ident.size > arr.size.getValue)
+              throw new IndexOutOfBoundsException(
+                "not enought argument for multiple assigment")
+            ctx
+              .ident
+              .asScala
+              .zip(arr.getArr)
+              .foreach(variable =>
+                context.setVar(visit(variable._1).toString, variable._2))
+          case _ =>
+            throw new IllegalArgumentException(
+              "cannot unpack non array expression")
+        }
     }
     new Null()
   }
@@ -248,9 +249,13 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
 
   override def visitOther_stmt(ctx: sql.Other_stmtContext): Type = {
     executeOther(visit(ctx.other).toString, ctx.choose_engine) match {
-      case Success(value) => value
+      case Success(value) =>
+        value
       case Failure(exception) =>
-        if (context.errorSkip) new Null() else throw exception
+        if (context.errorSkip)
+          new Null()
+        else
+          throw exception
     }
   }
 
@@ -259,22 +264,26 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
     var from = ctx.start.getTokenIndex
     var to = from
     if (ctx.children != null) {
-      ctx.children.forEach(child => {
-        to = child.getSourceInterval.a - 1
-        val ch = visit(child) match {
-          case s: string => s.quoted
-          case other     => other.toString
-        }
-        res += tokenStream.getText(new Interval(from, to)) + ch
-        from = child.getSourceInterval.b + 1
-      })
+      ctx
+        .children
+        .forEach(child => {
+          to = child.getSourceInterval.a - 1
+          val ch =
+            visit(child) match {
+              case s: string =>
+                s.quoted
+              case other =>
+                other.toString
+            }
+          res += tokenStream.getText(new Interval(from, to)) + ch
+          from = child.getSourceInterval.b + 1
+        })
     }
     new string(res)
   }
 
   override def visitInterpolation_expr(
-    ctx: sql.Interpolation_exprContext
-  ): Type = {
+    ctx: sql.Interpolation_exprContext): Type = {
     new string(visit(ctx.expr).toString)
   }
 }
