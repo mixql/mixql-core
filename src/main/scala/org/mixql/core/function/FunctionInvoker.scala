@@ -116,8 +116,8 @@ object FunctionInvoker {
       return obj.asInstanceOf[SqlLambda].apply(args: _*)
     val a = obj.getClass.getMethods.find(p =>
       p.getName == "apply" &&
-        (p.getParameters.length == 0 || p.getParameters()(0)
-          .getName.toLowerCase != "v1"))
+        (p.getParameters.length == 0 || p.getParameters()(0).getName
+          .toLowerCase != "v1"))
     a match {
       case Some(apply) =>
         val applyParams = apply.getParameters

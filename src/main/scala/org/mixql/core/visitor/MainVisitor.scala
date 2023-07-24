@@ -22,7 +22,9 @@ import org.mixql.core.exception.UserSqlException
   * @param tokens
   */
 class MainVisitor(ctx: Context, tokens: TokenStream)
-    extends ExpressionVisitor with LiteralVisitor with ControlStmtsVisitor {
+    extends ExpressionVisitor
+    with LiteralVisitor
+    with ControlStmtsVisitor {
 
   val context = ctx
   val tokenStream = tokens
