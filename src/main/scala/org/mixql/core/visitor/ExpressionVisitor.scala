@@ -24,8 +24,8 @@ trait ExpressionVisitor extends BaseVisitor {
         if (engine.engine_params) {
           // execute with additional params
           val params =
-            engine.engine_params.ident.asScala.map(visit(_).toString)
-              .zip(engine.engine_params.expr.asScala.map(visit)).toMap
+            engine.engine_params.ident.asScala.map(visit(_).toString).zip(engine.engine_params.expr.asScala.map(visit))
+              .toMap
           context.execute(stmt, engineName, params, false)
         } else {
           // execute with current params
@@ -48,8 +48,7 @@ trait ExpressionVisitor extends BaseVisitor {
   override def visitExpr_concat(ctx: sql.Expr_concatContext): Type =
     new string(visit(ctx.expr(0)).toString + visit(ctx.expr(1)).toString)
 
-  override def visitExpr_arithmetic_p1(
-    ctx: sql.Expr_arithmetic_p1Context): Type = {
+  override def visitExpr_arithmetic_p1(ctx: sql.Expr_arithmetic_p1Context): Type = {
     val left = visit(ctx.expr(0))
     val right = visit(ctx.expr(1))
     if (ctx.T_DIV)
@@ -60,8 +59,7 @@ trait ExpressionVisitor extends BaseVisitor {
       throw new UnsupportedOperationException("unknown operator")
   }
 
-  override def visitExpr_arithmetic_p2(
-    ctx: sql.Expr_arithmetic_p2Context): Type = {
+  override def visitExpr_arithmetic_p2(ctx: sql.Expr_arithmetic_p2Context): Type = {
     val left = visit(ctx.expr(0))
     val right = visit(ctx.expr(1))
     if (ctx.T_ADD)
@@ -102,8 +100,7 @@ trait ExpressionVisitor extends BaseVisitor {
       throw new UnsupportedOperationException("unknown operator")
   }
 
-  override def visitExpr_not(ctx: sql.Expr_notContext): Type =
-    visit(ctx.expr).Not()
+  override def visitExpr_not(ctx: sql.Expr_notContext): Type = visit(ctx.expr).Not()
 
   override def visitExpr_recurse(ctx: sql.Expr_recurseContext): Type =
     if (ctx.expr)
@@ -144,9 +141,7 @@ trait ExpressionVisitor extends BaseVisitor {
     val col = visit(ctx.collection)
     col match {
       case x: collection => x(visit(ctx.index))
-      case _ =>
-        throw new NoSuchMethodException(
-          "only collections supports access by index")
+      case _             => throw new NoSuchMethodException("only collections supports access by index")
     }
   }
 
@@ -168,14 +163,11 @@ trait ExpressionVisitor extends BaseVisitor {
     val kwargs: Map[String, Object] =
       ctx.func.arg.asScala.flatMap(arg => {
         if (arg.ident != null)
-          Seq(
-            visit(arg.ident).toString -> unpack(visit(arg.expr))
-              .asInstanceOf[Object])
+          Seq(visit(arg.ident).toString -> unpack(visit(arg.expr)).asInstanceOf[Object])
         else
           Nil
       }).toMap
-    val res = FunctionInvoker
-      .invoke(context.functions.toMap, funcName, context, args.toList, kwargs)
+    val res = FunctionInvoker.invoke(context.functions.toMap, funcName, context, args.toList, kwargs)
     controlState = ControlContext.NONE
     pack(res)
   }

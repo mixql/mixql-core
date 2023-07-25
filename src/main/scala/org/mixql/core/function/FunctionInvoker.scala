@@ -9,14 +9,12 @@ import scala.collection.mutable.ListBuffer
 import scala.util.Try
 
 object FunctionInvoker {
-  def invoke(
-    functions: Map[String, Any],
-    funcName: String,
-    context: Object, // To support not only mixql-core context
-    args: List[Any] = Nil,
-    kwargs: Map[String, Object] = Map.empty,
-    cc: String =
-      "org.mixql.core.context.Context" // To support not only mixql-core context
+  def invoke(functions: Map[String, Any],
+             funcName: String,
+             context: Object, // To support not only mixql-core context
+             args: List[Any] = Nil,
+             kwargs: Map[String, Object] = Map.empty,
+             cc: String = "org.mixql.core.context.Context" // To support not only mixql-core context
   ): Any = {
     functions.get(funcName.toLowerCase()) match {
       case Some(func) =>
@@ -25,52 +23,41 @@ object FunctionInvoker {
             for (f <- l) {
               val applyMethods = f.getClass.getMethods.filter(x =>
                 // x.getParameters.length != 0 &&
-                x.getParameters
-                  .exists(y => y.getType.getName != "java.lang.Object") &&
-                  x.getName == "apply")
+                x.getParameters.exists(y => y.getType.getName != "java.lang.Object") &&
+                  x.getName == "apply"
+              )
 
               if (compareFunctionTypes(applyMethods(0), args)) {
-                return invokeFunc(f.asInstanceOf[Object],
-                                  context,
-                                  args.map(a => a.asInstanceOf[Object]),
-                                  kwargs,
-                                  funcName,
-                                  cc)
+                return invokeFunc(
+                  f.asInstanceOf[Object],
+                  context,
+                  args.map(a => a.asInstanceOf[Object]),
+                  kwargs,
+                  funcName,
+                  cc
+                )
               }
             }
-            throw new RuntimeException(
-              s"Can't find function `$funcName` in $l [${l.length}] params=$args")
+            throw new RuntimeException(s"Can't find function `$funcName` in $l [${l.length}] params=$args")
           case _ =>
-            invokeFunc(func.asInstanceOf[Object],
-                       context,
-                       args.map(a => a.asInstanceOf[Object]),
-                       kwargs,
-                       funcName,
-                       cc)
+            invokeFunc(func.asInstanceOf[Object], context, args.map(a => a.asInstanceOf[Object]), kwargs, funcName, cc)
         }
       case None =>
         if (context.isInstanceOf[Context]) {
           val ctx = context.asInstanceOf[Context]
           if (kwargs.nonEmpty)
-            throw new UnsupportedOperationException(
-              "named args for engine function not supported")
-          if (ctx.currentEngine.getDefinedFunctions
-                .contains(funcName.toLowerCase))
+            throw new UnsupportedOperationException("named args for engine function not supported")
+          if (ctx.currentEngine.getDefinedFunctions.contains(funcName.toLowerCase))
             unpack(ctx.currentEngine.executeFunc(funcName, args.map(pack): _*))
           else {
-            val engine = ctx.engines
-              .find(eng => eng._2.getDefinedFunctions.contains(funcName))
+            val engine = ctx.engines.find(eng => eng._2.getDefinedFunctions.contains(funcName))
             engine match {
-              case Some(value) =>
-                unpack(value._2.executeFunc(funcName, args.map(pack): _*))
-              case None =>
-                throw new NoSuchMethodException(
-                  s"no function $funcName found for any engine")
+              case Some(value) => unpack(value._2.executeFunc(funcName, args.map(pack): _*))
+              case None        => throw new NoSuchMethodException(s"no function $funcName found for any engine")
             }
           }
         } else {
-          throw new NoSuchMethodException(
-            s"no function $funcName was founded to invoke")
+          throw new NoSuchMethodException(s"no function $funcName was founded to invoke")
         }
     }
   }
@@ -78,9 +65,11 @@ object FunctionInvoker {
   private def compareFunctionTypes(a: Method, paramsSeq: Seq[_]): Boolean = {
     val params = paramsSeq.toArray
     if (a.getParameters.length != params.length) {
-      if (a.getParameters.last.getType.isAssignableFrom(
-            Try(Class.forName("scala.collection.immutable.Seq"))
-              .getOrElse(Class.forName("scala.collection.Seq"))))
+      if (
+        a.getParameters.last.getType.isAssignableFrom(
+          Try(Class.forName("scala.collection.immutable.Seq")).getOrElse(Class.forName("scala.collection.Seq"))
+        )
+      )
         return true
       else
         return false
@@ -116,8 +105,8 @@ object FunctionInvoker {
       return obj.asInstanceOf[SqlLambda].apply(args: _*)
     val a = obj.getClass.getMethods.find(p =>
       p.getName == "apply" &&
-        (p.getParameters.length == 0 || p.getParameters()(0).getName
-          .toLowerCase != "v1"))
+        (p.getParameters.length == 0 || p.getParameters()(0).getName.toLowerCase != "v1")
+    )
     a match {
       case Some(apply) =>
         val applyParams = apply.getParameters
@@ -132,10 +121,14 @@ object FunctionInvoker {
           val seqc = "scala.collection.immutable.Seq"
           val seqcOld = "scala.collection.Seq" // In case of scala 2.12
           // argument is variable number of args like gg: String*
-          if (i == size && (ptype.getName == seqc) ||
-              (ptype.getName == seqcOld)) { lb += args1 }
-          else if (context != null &&
-                   (ptype.getName == cc || ptype == context.getClass)) {
+          if (
+            i == size && (ptype.getName == seqc) ||
+            (ptype.getName == seqcOld)
+          ) { lb += args1 }
+          else if (
+            context != null &&
+            (ptype.getName == cc || ptype == context.getClass)
+          ) {
             lb += context
           } else if (kwargs1.contains(pname)) {
             lb += kwargs1(pname)
@@ -147,9 +140,7 @@ object FunctionInvoker {
           i += 1
         })
         apply.invoke(obj, lb.toArray: _*)
-      case None =>
-        throw new RuntimeException(
-          s"Can't find method `apply` in function $funcName")
+      case None => throw new RuntimeException(s"Can't find method `apply` in function $funcName")
     }
   }
 

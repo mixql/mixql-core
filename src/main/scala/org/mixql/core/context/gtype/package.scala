@@ -54,11 +54,8 @@ package object gtype {
                 " to bool" // bug in scala 2_12
             )
           }
-        case _: Null =>
-          throw new NullPointerException("cannot convert null to bool")
-        case value =>
-          throw new ClassCastException(
-            s"cannot convert ${value.getClass.getSimpleName} to bool")
+        case _: Null => throw new NullPointerException("cannot convert null to bool")
+        case value   => throw new ClassCastException(s"cannot convert ${value.getClass.getSimpleName} to bool")
       }
     }
 
@@ -72,11 +69,8 @@ package object gtype {
         case t: gDouble  => new gInt(t.getValue.toInt)
         case value: gInt => value
         case t: string   => new gInt(t.getValue.toInt)
-        case _: Null =>
-          throw new NullPointerException("cannot convert null to int")
-        case value =>
-          throw new ClassCastException(
-            s"cannot convert ${value.getClass.getSimpleName} to int")
+        case _: Null     => throw new NullPointerException("cannot convert null to int")
+        case value       => throw new ClassCastException(s"cannot convert ${value.getClass.getSimpleName} to int")
       }
     }
 
@@ -90,11 +84,8 @@ package object gtype {
         case value: gDouble => value
         case t: gInt        => t.getValue.toDouble
         case t: string      => t.getValue.toDouble
-        case _: Null =>
-          throw new NullPointerException("cannot convert null to double")
-        case value =>
-          throw new ClassCastException(
-            s"cannot convert ${value.getClass.getSimpleName} to double")
+        case _: Null        => throw new NullPointerException("cannot convert null to double")
+        case value          => throw new ClassCastException(s"cannot convert ${value.getClass.getSimpleName} to double")
       }
     }
   }
@@ -115,8 +106,7 @@ package object gtype {
       case p: Array[Any] => new array(p.map(pack))
       case p: Map[Any, Any] =>
         import scala.collection.JavaConverters._
-        new map(scala.collection.mutable.Map(p.map(kv =>
-          pack(kv._1) -> pack(kv._2)).toSeq: _*).asJava)
+        new map(scala.collection.mutable.Map(p.map(kv => pack(kv._1) -> pack(kv._2)).toSeq: _*).asJava)
       case p: SqlLambda => p
       case other        => new string(other.toString)
     }
@@ -125,14 +115,13 @@ package object gtype {
   def unpack(a: Type): Any = {
     import scala.collection.JavaConverters._
     a match {
-      case _: Null    => null
-      case t: string  => t.getValue
-      case t: gInt    => t.getValue
-      case t: gDouble => t.getValue
-      case t: bool    => t.getValue
-      case t: array   => t.getArr.map(unpack)
-      case t: map =>
-        t.getMap.asScala.map(kv => unpack(kv._1) -> unpack(kv._2)).toMap
+      case _: Null      => null
+      case t: string    => t.getValue
+      case t: gInt      => t.getValue
+      case t: gDouble   => t.getValue
+      case t: bool      => t.getValue
+      case t: array     => t.getArr.map(unpack)
+      case t: map       => t.getMap.asScala.map(kv => unpack(kv._1) -> unpack(kv._2)).toMap
       case v: SqlLambda => v
     }
   }

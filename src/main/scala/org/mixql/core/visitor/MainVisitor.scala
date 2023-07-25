@@ -6,10 +6,7 @@ import org.mixql.core.context.{Context, ControlContext}
 import org.mixql.core.context.gtype._
 import org.mixql.core.function.SqlLambda
 import org.mixql.core.generated.sql
-import org.mixql.core.generated.sql.{
-  Close_cursor_stmtContext,
-  Open_cursor_stmtContext
-}
+import org.mixql.core.generated.sql.{Close_cursor_stmtContext, Open_cursor_stmtContext}
 import org.mixql.core.logger.{logDebug, logInfo, logWarn}
 
 import scala.util.{Failure, Success}
@@ -62,8 +59,7 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
         exprRes match {
           case collection1: collection => execBlockInFor(collection1, ctx)
           case _ =>
-            logWarn(
-              "\"visitFor_cursor_stmt\": cursor must be collection. Ignore executing of for block")
+            logWarn("\"visitFor_cursor_stmt\": cursor must be collection. Ignore executing of for block")
             new Null()
 //            throw new IllegalArgumentException("cursor must be collection")
         }
@@ -108,8 +104,7 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
     visit(ctx.expr)
   }
 
-  override def visitChange_engine_stmt(
-    ctx: sql.Change_engine_stmtContext): Type = {
+  override def visitChange_engine_stmt(ctx: sql.Change_engine_stmtContext): Type = {
     if (ctx.choose_engine.expr)
       context.setCurrentEngine(visit(ctx.choose_engine.expr).toString)
     else
@@ -121,8 +116,7 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
     new Null()
   }
 
-  override def visitAssigment_default(
-    ctx: sql.Assigment_defaultContext): Type = {
+  override def visitAssigment_default(ctx: sql.Assigment_defaultContext): Type = {
     if (ctx.T_CURSOR() != null && ctx.T_IS() != null) {
       val cursor = new gcursor(context, tokenStream, ctx.expr())
       context.setVar(visit(ctx.ident).toString, cursor)
@@ -149,7 +143,8 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
       case _ =>
         throw new Exception(
           "You can only open cursor, not other type: " +
-            cursor.getClass.getName)
+            cursor.getClass.getName
+        )
     }
   }
 
@@ -164,12 +159,12 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
       case _ =>
         throw new Exception(
           "You can only close cursor, not other type: " +
-            cursor.getClass.getName)
+            cursor.getClass.getName
+        )
     }
   }
 
-  override def visitExpr_fetch_cursor(
-    ctx: sql.Expr_fetch_cursorContext): Type = {
+  override def visitExpr_fetch_cursor(ctx: sql.Expr_fetch_cursorContext): Type = {
     val cursor_name = visit(ctx.ident).toString
     val cursor = context.getVar(cursor_name)
     cursor match {
@@ -180,41 +175,34 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
       case _ =>
         throw new Exception(
           "You can only fetch from cursor, not other type: " +
-            cursor.getClass.getName)
+            cursor.getClass.getName
+        )
     }
   }
 
-  override def visitAssigment_by_index(
-    ctx: sql.Assigment_by_indexContext): Type = {
+  override def visitAssigment_by_index(ctx: sql.Assigment_by_indexContext): Type = {
     context.getVar(visit(ctx.ident).toString) match {
       case x: collection => x.update(visit(ctx.index), visit(ctx.value))
-      case _ =>
-        throw new NoSuchMethodException(
-          "only collections supports access by index")
+      case _             => throw new NoSuchMethodException("only collections supports access by index")
     }
     new Null()
   }
 
-  override def visitAssigment_multiple(
-    ctx: sql.Assigment_multipleContext): Type = {
+  override def visitAssigment_multiple(ctx: sql.Assigment_multipleContext): Type = {
     if (ctx.expr.size > 1) {
       if (ctx.ident.size > ctx.expr.size)
-        throw new IndexOutOfBoundsException(
-          "not enought argument for multiple assigment")
-      ctx.ident.asScala.zip(ctx.expr.asScala).foreach(variable =>
-        context.setVar(visit(variable._1).toString, visit(variable._2)))
+        throw new IndexOutOfBoundsException("not enought argument for multiple assigment")
+      ctx.ident.asScala.zip(ctx.expr.asScala)
+        .foreach(variable => context.setVar(visit(variable._1).toString, visit(variable._2)))
     } else {
       val res =
         visit(ctx.expr(0)) match {
           case arr: array =>
             if (ctx.ident.size > arr.size.getValue)
-              throw new IndexOutOfBoundsException(
-                "not enought argument for multiple assigment")
-            ctx.ident.asScala.zip(arr.getArr).foreach(variable =>
-              context.setVar(visit(variable._1).toString, variable._2))
-          case _ =>
-            throw new IllegalArgumentException(
-              "cannot unpack non array expression")
+              throw new IndexOutOfBoundsException("not enought argument for multiple assigment")
+            ctx.ident.asScala.zip(arr.getArr)
+              .foreach(variable => context.setVar(visit(variable._1).toString, variable._2))
+          case _ => throw new IllegalArgumentException("cannot unpack non array expression")
         }
     }
     new Null()
@@ -255,8 +243,7 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
     new string(res)
   }
 
-  override def visitInterpolation_expr(
-    ctx: sql.Interpolation_exprContext): Type = {
+  override def visitInterpolation_expr(ctx: sql.Interpolation_exprContext): Type = {
     new string(visit(ctx.expr).toString)
   }
 }

@@ -68,8 +68,7 @@ object Main {
       |print($mapa["1"]);""".stripMargin
 
   def main(args: Array[String]): Unit = {
-    val context =
-      new Context(MutMap[String, Engine]("demo" -> new DemoEngine), "demo")
+    val context = new Context(MutMap[String, Engine]("demo" -> new DemoEngine), "demo")
     val res = core.run(code, context)
     logDebug(context.getScope().head.toString())
     logDebug(res.toString)

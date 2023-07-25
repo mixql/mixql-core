@@ -28,11 +28,8 @@ class ArrayFunctionsTest extends MainVisitorBaseTest {
     val res = context.getVar("res")
     assert(res.isInstanceOf[array])
     assert(res.asInstanceOf[array].getArr.size == 3)
-    assert(
-      res.asInstanceOf[array](new gInt(0)).asInstanceOf[gInt].getValue == 1)
-    assert(
-      res.asInstanceOf[array](new gInt(1)).asInstanceOf[gInt].getValue == 2)
-    assert(
-      res.asInstanceOf[array](new gInt(2)).asInstanceOf[gInt].getValue == 3)
+    assert(res.asInstanceOf[array](new gInt(0)).asInstanceOf[gInt].getValue == 1)
+    assert(res.asInstanceOf[array](new gInt(1)).asInstanceOf[gInt].getValue == 2)
+    assert(res.asInstanceOf[array](new gInt(2)).asInstanceOf[gInt].getValue == 3)
   }
 }

@@ -33,7 +33,8 @@ abstract class Engine {
     import org.mixql.core.logger
     logger.logWarn(
       "getCursor was not defined in engine " + name +
-        ". Use execute method instead")
+        ". Use execute method instead"
+    )
     new gcursor(execute(stmt))
   }
 

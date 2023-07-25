@@ -29,12 +29,9 @@ trait ControlStmtsVisitor extends BaseVisitor {
         val block =
           if (ctx.exc) {
             val old_exc = context.getVar(visit(ctx.exc).toString)
-            val old_message = context
-              .getVar(visit(ctx.exc).toString + ".message")
-            context
-              .setVar(visit(ctx.exc).toString, new string(exception.exc_type))
-            context.setVar(visit(ctx.exc).toString + ".message",
-                           new string(exception.detailMessage))
+            val old_message = context.getVar(visit(ctx.exc).toString + ".message")
+            context.setVar(visit(ctx.exc).toString, new string(exception.exc_type))
+            context.setVar(visit(ctx.exc).toString + ".message", new string(exception.detailMessage))
             val block = visit(ctx.catch_block)
             context.setVar(visit(ctx.exc).toString, old_exc)
             context.setVar(visit(ctx.exc).toString + ".message", old_message)
@@ -85,11 +82,14 @@ trait ControlStmtsVisitor extends BaseVisitor {
         if (ctx.step)
           visit(ctx.step)
         else
-          new gInt(1))
+          new gInt(1)
+      )
     context.setVar(i_name, i)
     breakable {
-      while ((!ctx.T_REVERSE && i.LessThen(to)) ||
-             (ctx.T_REVERSE && i.MoreThen(to))) {
+      while (
+        (!ctx.T_REVERSE && i.LessThen(to)) ||
+        (ctx.T_REVERSE && i.MoreThen(to))
+      ) {
         val block = visit(ctx.block)
         if (controlState == ControlContext.RETURN) {
           context.setVar(i_name, old)
@@ -103,8 +103,10 @@ trait ControlStmtsVisitor extends BaseVisitor {
         context.setVar(i_name, i)
       }
     }
-    if ((!ctx.T_REVERSE && i.MoreEqualThen(to)) ||
-        (ctx.T_REVERSE && i.LessEqualThen(to))) {
+    if (
+      (!ctx.T_REVERSE && i.MoreEqualThen(to)) ||
+      (ctx.T_REVERSE && i.LessEqualThen(to))
+    ) {
       context.setVar(i_name, to)
       visit(ctx.block)
     }
@@ -112,8 +114,7 @@ trait ControlStmtsVisitor extends BaseVisitor {
     result
   }
 
-  def execForInGcursor(cursor: gcursor,
-                       ctx: sql.For_cursor_stmtContext): Type = {
+  def execForInGcursor(cursor: gcursor, ctx: sql.For_cursor_stmtContext): Type = {
     cursor.open()
 
     var fetchRes = cursor.fetch()
@@ -128,8 +129,7 @@ trait ControlStmtsVisitor extends BaseVisitor {
     new Null
   }
 
-  def execFetchBlockInFor(inRes: Type,
-                          ctx: sql.For_cursor_stmtContext): Type = {
+  def execFetchBlockInFor(inRes: Type, ctx: sql.For_cursor_stmtContext): Type = {
     var result: Type = new Null
     ctx.ident.size match {
       case 1 =>
@@ -150,13 +150,13 @@ trait ControlStmtsVisitor extends BaseVisitor {
         context.setVar(cursorName, old)
       case other =>
         throw new IllegalStateException(
-          "too many arguments to unpack result from cursor, which did not return collection")
+          "too many arguments to unpack result from cursor, which did not return collection"
+        )
     }
     result
   }
 
-  def execBlockInFor(inRes: collection,
-                     ctx: sql.For_cursor_stmtContext): Type = {
+  def execBlockInFor(inRes: collection, ctx: sql.For_cursor_stmtContext): Type = {
     var result: Type = new Null
     inRes match {
       case c: array =>
@@ -187,8 +187,7 @@ trait ControlStmtsVisitor extends BaseVisitor {
                 if (el.isInstanceOf[array]) {
                   val a = el.asInstanceOf[array]
                   if (a.getArr.size < cursors.size)
-                    throw new IllegalStateException(
-                      "not enough arguments to unpack")
+                    throw new IllegalStateException("not enough arguments to unpack")
                   cursors.zip(a.getArr).foreach(kv => {
                     context.setVar(kv._1, kv._2)
                   })
@@ -202,8 +201,7 @@ trait ControlStmtsVisitor extends BaseVisitor {
                     break
                   }
                 } else {
-                  throw new IllegalStateException(
-                    "not enough arguments to unpack")
+                  throw new IllegalStateException("not enough arguments to unpack")
                 }
               })
             }
@@ -253,8 +251,7 @@ trait ControlStmtsVisitor extends BaseVisitor {
             context.setVar(cursorName, oldCursor)
           case _ => throw new IllegalStateException("too many cursors for map")
         }
-      case other =>
-        throw new IllegalArgumentException("cursor must be collection")
+      case other => throw new IllegalArgumentException("cursor must be collection")
     }
     result
   }

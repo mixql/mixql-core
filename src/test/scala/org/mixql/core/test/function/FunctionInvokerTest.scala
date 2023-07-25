@@ -23,14 +23,12 @@ class FunctionInvokerTest extends AnyFunSuite {
 
   val lengthCustomContext: Any =
     new ((CustomTestContext, String) => Int) {
-      def apply(ctx: CustomTestContext, str: String): Int =
-        str.length + ctx.length
+      def apply(ctx: CustomTestContext, str: String): Int = str.length + ctx.length
     }
 
   val lengthMixQlCoreContext: Any =
     new ((Context, String) => Int) {
-      def apply(ctx: Context, str: String): Int =
-        str.length + ctx.getVar("a").asInstanceOf[gInt].getValue
+      def apply(ctx: Context, str: String): Int = str.length + ctx.getVar("a").asInstanceOf[gInt].getValue
     }
 
   val defArgFunc =
@@ -45,14 +43,12 @@ class FunctionInvokerTest extends AnyFunSuite {
 
   val firstDefArgAndSecondVariableArgFunc =
     new Object {
-      def apply(str: String, ints: Int*): String =
-        str + ints.toList.sum.toString
+      def apply(str: String, ints: Int*): String = str + ints.toList.sum.toString
     }
 
   val firstAndSecondDefArgAndThirdVariableArgFunc =
     new Object {
-      def apply(str1: String, str2: String, ints: Int*): String =
-        str1 + str2 + ints.toList.sum.toString
+      def apply(str1: String, str2: String, ints: Int*): String = str1 + str2 + ints.toList.sum.toString
     }
 
   val twoDefaultArgFunc =
@@ -115,54 +111,49 @@ class FunctionInvokerTest extends AnyFunSuite {
       def apply(f: Double): Double = f - 1
     }
 
-  val functions: Map[String, Any] = Map.apply("length" -> length,
-                                              "length_of_custom_context" ->
-                                                lengthCustomContext,
-                                              "length_with_mixql_core_context" ->
-                                                lengthMixQlCoreContext,
-                                              "def_arg_func" -> defArgFunc,
-                                              "two_def_arg_func" ->
-                                                twoDefaultArgFunc,
-                                              "default_second_arg_func" ->
-                                                defaultSecondArgFunc,
-                                              "substr" -> substr,
-                                              "variable_number_of_args" ->
-                                                variableArgFunc,
-                                              "first_def_arg_and_second_variable_args" ->
-                                                firstDefArgAndSecondVariableArgFunc,
-                                              "first_and_second_def_arg_and_third_variable_args" ->
-                                                firstAndSecondDefArgAndThirdVariableArgFunc,
-                                              "dec" ->
-                                                List(decInt,
-                                                     decListOfInt,
-                                                     decListOfString,
-                                                     decSting,
-                                                     decDouble))
+  val functions: Map[String, Any] = Map.apply(
+    "length" -> length,
+    "length_of_custom_context" ->
+      lengthCustomContext,
+    "length_with_mixql_core_context" ->
+      lengthMixQlCoreContext,
+    "def_arg_func" -> defArgFunc,
+    "two_def_arg_func" ->
+      twoDefaultArgFunc,
+    "default_second_arg_func" ->
+      defaultSecondArgFunc,
+    "substr" -> substr,
+    "variable_number_of_args" ->
+      variableArgFunc,
+    "first_def_arg_and_second_variable_args" ->
+      firstDefArgAndSecondVariableArgFunc,
+    "first_and_second_def_arg_and_third_variable_args" ->
+      firstAndSecondDefArgAndThirdVariableArgFunc,
+    "dec" ->
+      List(decInt, decListOfInt, decListOfString, decSting, decDouble)
+  )
 
   test("Invoke anonymous function") {
     val res = FunctionInvoker.invoke(functions, "length", null, List("123"))
     assert(res == 3)
   }
 
-  test(
-    "Invoke anonymous function length_of_custom_context with not mixql-core context") {
-    val res = FunctionInvoker
-      .invoke(functions,
-              "length_of_custom_context",
-              new CustomTestContext,
-              List("123"),
-              cc = "org.mixql.core.test.function.CustomTestContext")
+  test("Invoke anonymous function length_of_custom_context with not mixql-core context") {
+    val res = FunctionInvoker.invoke(
+      functions,
+      "length_of_custom_context",
+      new CustomTestContext,
+      List("123"),
+      cc = "org.mixql.core.test.function.CustomTestContext"
+    )
     assert(res == 100503)
   }
 
-  test(
-    "Invoke anonymous function length_with_mixql_core_context with mixql-core context") {
+  test("Invoke anonymous function length_with_mixql_core_context with mixql-core context") {
     import scala.collection.mutable.{Map => MutMap}
-    val context =
-      new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
+    val context = new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
     context.setVar("a", new gInt(12))
-    val res = FunctionInvoker
-      .invoke(functions, "length_with_mixql_core_context", context, List("123"))
+    val res = FunctionInvoker.invoke(functions, "length_with_mixql_core_context", context, List("123"))
     assert(res == 15)
   }
 
@@ -177,59 +168,43 @@ class FunctionInvokerTest extends AnyFunSuite {
   }
 
   test("Invoke function with default second argument") {
-    val res = FunctionInvoker
-      .invoke(functions, "default_second_arg_func", null, List("abc"))
+    val res = FunctionInvoker.invoke(functions, "default_second_arg_func", null, List("abc"))
     assert(res == "abc1234")
   }
 
   test("Invoke function with arguments was passed by name") {
-    val res = FunctionInvoker.invoke(functions,
-                                     "two_def_arg_func",
-                                     null,
-                                     Nil,
-                                     Map("a" -> "qw", "b" -> "erty"))
+    val res = FunctionInvoker.invoke(functions, "two_def_arg_func", null, Nil, Map("a" -> "qw", "b" -> "erty"))
 
     assert(res == "qwerty")
   }
 
   test("substr") {
-    val res = FunctionInvoker
-      .invoke(functions, "substr", null, List("123545", 3, 5))
+    val res = FunctionInvoker.invoke(functions, "substr", null, List("123545", 3, 5))
 
     assert(res == "123545".substring(3, 5))
   }
 
   test("substr2") {
-    val res = FunctionInvoker
-      .invoke(functions, "substr", null, List("123545", 3))
+    val res = FunctionInvoker.invoke(functions, "substr", null, List("123545", 3))
 
     assert(res == "123545".substring(3))
   }
 
   test("variable_number_of_args") {
-    val res = FunctionInvoker.invoke(functions,
-                                     "variable_number_of_args",
-                                     null,
-                                     List("1", "2", "3", "4"))
+    val res = FunctionInvoker.invoke(functions, "variable_number_of_args", null, List("1", "2", "3", "4"))
 
     assert(res == 4)
   }
 
   test("first_def_arg_and_second_variable_args") {
-    val res = FunctionInvoker.invoke(functions,
-                                     "first_def_arg_and_second_variable_args",
-                                     null,
-                                     List("ABC", 1, 2, 3))
+    val res = FunctionInvoker.invoke(functions, "first_def_arg_and_second_variable_args", null, List("ABC", 1, 2, 3))
 
     assert(res == "ABC6")
   }
 
   test("first_and_second_def_arg_and_third_variable_args") {
     val res = FunctionInvoker
-      .invoke(functions,
-              "first_and_second_def_arg_and_third_variable_args",
-              null,
-              List("ABC", "DE", 1, 2, 3, 4))
+      .invoke(functions, "first_and_second_def_arg_and_third_variable_args", null, List("ABC", "DE", 1, 2, 3, 4))
 
     assert(res == "ABCDE10")
   }
@@ -240,38 +215,31 @@ class FunctionInvokerTest extends AnyFunSuite {
   }
 
   test("Invoke overloading function[String]") {
-    val res = FunctionInvoker.invoke(functions, "dec", null, List("abc"))
-      .asInstanceOf[String]
+    val res = FunctionInvoker.invoke(functions, "dec", null, List("abc")).asInstanceOf[String]
 
     assert(res == "ab")
   }
 
   test("Invoke overloading function[Double]") {
-    val res = FunctionInvoker.invoke(functions, "dec", null, List(1.1))
-      .asInstanceOf[Double]
+    val res = FunctionInvoker.invoke(functions, "dec", null, List(1.1)).asInstanceOf[Double]
 
     assert((res - 0.1) < 0.0000000001)
   }
 
   test("Invoke overloading function[List[Int]]") {
-    val res = FunctionInvoker.invoke(functions, "dec", null, List(1, 2, 3))
-      .asInstanceOf[String]
+    val res = FunctionInvoker.invoke(functions, "dec", null, List(1, 2, 3)).asInstanceOf[String]
 
     assert(res == "0 1 2")
   }
 
   ignore("Invoke overloading function[List[String]]") {
-    val res = FunctionInvoker
-      .invoke(functions, "dec", null, List("ab", "cd", "ef"))
-      .asInstanceOf[String]
+    val res = FunctionInvoker.invoke(functions, "dec", null, List("ab", "cd", "ef")).asInstanceOf[String]
 
     assert(res == "a c e")
   }
 
   ignore("Invoke overloading function[List[List[String]]]") {
-    val res = FunctionInvoker
-      .invoke(functions, "dec", null, List(List("ab", "cd"), List("ef")))
-      .asInstanceOf[String]
+    val res = FunctionInvoker.invoke(functions, "dec", null, List(List("ab", "cd"), List("ef"))).asInstanceOf[String]
 
     assert(res == "a c e")
   }

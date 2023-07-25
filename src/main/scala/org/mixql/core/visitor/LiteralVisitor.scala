@@ -9,14 +9,11 @@ import scala.collection.mutable.{Map => MutMap}
 import scala.collection.JavaConverters._
 
 trait LiteralVisitor extends BaseVisitor {
-  override def visitSingle_quotedString(
-    ctx: sql.Single_quotedStringContext): Type = visit(ctx.s_string)
+  override def visitSingle_quotedString(ctx: sql.Single_quotedStringContext): Type = visit(ctx.s_string)
 
-  override def visitSlash_quotedString(
-    ctx: sql.Slash_quotedStringContext): Type = visit(ctx.b_string)
+  override def visitSlash_quotedString(ctx: sql.Slash_quotedStringContext): Type = visit(ctx.b_string)
 
-  override def visitDouble_quotedString(
-    ctx: sql.Double_quotedStringContext): Type = visit(ctx.d_string)
+  override def visitDouble_quotedString(ctx: sql.Double_quotedStringContext): Type = visit(ctx.d_string)
 
   override def visitS_string(ctx: sql.S_stringContext): Type = {
     var res = ""
@@ -25,8 +22,7 @@ trait LiteralVisitor extends BaseVisitor {
     new string(res, "'")
   }
 
-  override def visitS_interpolation_expr(
-    ctx: sql.S_interpolation_exprContext): Type = visit(ctx.expr)
+  override def visitS_interpolation_expr(ctx: sql.S_interpolation_exprContext): Type = visit(ctx.expr)
 
   override def visitB_string(ctx: sql.B_stringContext): Type = {
     var res = ""
@@ -35,8 +31,7 @@ trait LiteralVisitor extends BaseVisitor {
     new string(res, "`")
   }
 
-  override def visitB_interpolation_expr(
-    ctx: sql.B_interpolation_exprContext): Type = visit(ctx.expr)
+  override def visitB_interpolation_expr(ctx: sql.B_interpolation_exprContext): Type = visit(ctx.expr)
 
   override def visitD_string(ctx: sql.D_stringContext): Type = {
     var res = ""
@@ -45,11 +40,9 @@ trait LiteralVisitor extends BaseVisitor {
     new string(res, "\"")
   }
 
-  override def visitD_interpolation_expr(
-    ctx: sql.D_interpolation_exprContext): Type = visit(ctx.expr)
+  override def visitD_interpolation_expr(ctx: sql.D_interpolation_exprContext): Type = visit(ctx.expr)
 
-  override def visitLiteral_string(ctx: sql.Literal_stringContext): Type =
-    visit(ctx.string)
+  override def visitLiteral_string(ctx: sql.Literal_stringContext): Type = visit(ctx.string)
 
   override def visitLiteral_int(ctx: sql.Literal_intContext): Type =
     if (ctx.int_number.T_SUB)
@@ -71,19 +64,15 @@ trait LiteralVisitor extends BaseVisitor {
     else
       throw new IllegalArgumentException("unknown bool literal")
 
-  override def visitLiteral_null(ctx: sql.Literal_nullContext): Type =
-    new Null()
+  override def visitLiteral_null(ctx: sql.Literal_nullContext): Type = new Null()
 
-  override def visitLiteral_nothing(ctx: sql.Literal_nothingContext): Type =
-    new nothing()
+  override def visitLiteral_nothing(ctx: sql.Literal_nothingContext): Type = new nothing()
 
-  override def visitLiteral_current_date(
-    ctx: sql.Literal_current_dateContext): Type = {
+  override def visitLiteral_current_date(ctx: sql.Literal_current_dateContext): Type = {
     new string(LocalDate.now().toString)
   }
 
-  override def visitLiteral_current_timestamp(
-    ctx: sql.Literal_current_timestampContext): Type = {
+  override def visitLiteral_current_timestamp(ctx: sql.Literal_current_timestampContext): Type = {
     new string(LocalDateTime.now().toString)
   }
 
