@@ -2,14 +2,16 @@ package org.mixql.core.context
 
 import org.mixql.core.context.gtype.Type
 
+import scala.collection.mutable
+
 class ContextVars(val context: Context) {
   def setVar(key: String, value: Type): Unit = context.setVar(key, value)
 
   def getVar(key: String): Type = context.getVar(key)
 
-  def getVars(keys: List[String]): List[Type] = {
-    var res: List[Type] = List()
-    keys.foreach(key => res = res :+ context.getVar(key))
+  def getVars(keys: List[String]): mutable.Map[String, Type] = {
+    val res: mutable.Map[String, Type] = mutable.Map()
+    keys.foreach(key => res.put(key, context.getVar(key)))
     res
   }
 
