@@ -65,11 +65,9 @@ object FunctionInvoker {
   private def compareFunctionTypes(a: Method, paramsSeq: Seq[_]): Boolean = {
     val params = paramsSeq.toArray
     if (a.getParameters.length != params.length) {
-      if (
-        a.getParameters.last.getType.isAssignableFrom(
-          Try(Class.forName("scala.collection.immutable.Seq")).getOrElse(Class.forName("scala.collection.Seq"))
-        )
-      )
+      if (a.getParameters.last.getType.isAssignableFrom(
+            Try(Class.forName("scala.collection.immutable.Seq")).getOrElse(Class.forName("scala.collection.Seq"))
+          ))
         return true
       else
         return false
@@ -121,14 +119,11 @@ object FunctionInvoker {
           val seqc = "scala.collection.immutable.Seq"
           val seqcOld = "scala.collection.Seq" // In case of scala 2.12
           // argument is variable number of args like gg: String*
-          if (
-            i == size && (ptype.getName == seqc) ||
-            (ptype.getName == seqcOld)
-          ) { lb += args1 }
-          else if (
-            context != null &&
-            (ptype.getName == cc || ptype == context.getClass)
-          ) {
+          if (i == size && (ptype.getName == seqc) ||
+              (ptype.getName == seqcOld)) {
+            lb += args1
+          } else if (context != null &&
+                     (ptype.getName == cc || ptype == context.getClass)) {
             lb += context
           } else if (kwargs1.contains(pname)) {
             lb += kwargs1(pname)
@@ -136,7 +131,9 @@ object FunctionInvoker {
           } else if (args1.nonEmpty) {
             lb += args1.head
             args1 = args1.tail
-          } else { lb += getDefParamsFor(obj, i) }
+          } else {
+            lb += getDefParamsFor(obj, i)
+          }
           i += 1
         })
         apply.invoke(obj, lb.toArray: _*)

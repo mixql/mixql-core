@@ -415,9 +415,9 @@ class Context(val engines: MutMap[String, Engine],
       new gInt(value.asInstanceOf[Integer])
     else if (value.isInstanceOf[Double])
       new gDouble(value.asInstanceOf[Double])
-    else if (value.isInstanceOf[ju.List[Object]]) {
+    else if (value.isInstanceOf[ju.List[Object]])
       new array(value.asInstanceOf[ju.List[Object]].asScala.map(convertConfigValue).toArray)
-    } else
+    else
       throw new Exception("unknown param type")
   }
 

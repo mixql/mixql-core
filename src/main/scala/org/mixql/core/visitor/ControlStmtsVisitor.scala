@@ -36,7 +36,9 @@ trait ControlStmtsVisitor extends BaseVisitor {
             context.setVar(visit(ctx.exc).toString, old_exc)
             context.setVar(visit(ctx.exc).toString + ".message", old_message)
             block
-          } else { visit(ctx.catch_block) }
+          } else {
+            visit(ctx.catch_block)
+          }
         if (controlState == ControlContext.RETURN)
           return block
     }
@@ -45,11 +47,13 @@ trait ControlStmtsVisitor extends BaseVisitor {
 
   override def visitIf_stmt(ctx: sql.If_stmtContext): Type = {
     val condition: Boolean = visit(ctx.expr)
-    if (condition) { visit(ctx.block) }
-    else {
+    if (condition) {
+      visit(ctx.block)
+    } else {
       ctx.elseif_block().forEach(elif => {
         val elsecondition: Boolean = visit(elif.expr)
-        if (elsecondition) { return visit(elif.block) }
+        if (elsecondition)
+          return visit(elif.block)
       })
       if (ctx.else_block)
         visit(ctx.else_block.block)
@@ -86,10 +90,8 @@ trait ControlStmtsVisitor extends BaseVisitor {
       )
     context.setVar(i_name, i)
     breakable {
-      while (
-        (!ctx.T_REVERSE && i.LessThen(to)) ||
-        (ctx.T_REVERSE && i.MoreThen(to))
-      ) {
+      while ((!ctx.T_REVERSE && i.LessThen(to)) ||
+             (ctx.T_REVERSE && i.MoreThen(to))) {
         val block = visit(ctx.block)
         if (controlState == ControlContext.RETURN) {
           context.setVar(i_name, old)
@@ -103,10 +105,8 @@ trait ControlStmtsVisitor extends BaseVisitor {
         context.setVar(i_name, i)
       }
     }
-    if (
-      (!ctx.T_REVERSE && i.MoreEqualThen(to)) ||
-      (ctx.T_REVERSE && i.LessEqualThen(to))
-    ) {
+    if ((!ctx.T_REVERSE && i.MoreEqualThen(to)) ||
+        (ctx.T_REVERSE && i.LessEqualThen(to))) {
       context.setVar(i_name, to)
       visit(ctx.block)
     }
