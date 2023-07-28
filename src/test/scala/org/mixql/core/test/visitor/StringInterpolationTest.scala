@@ -106,8 +106,7 @@ class StringInterpolationTest extends MainVisitorBaseTest {
   }
 
   test("Test set with space 2") {
-    val code =
-      "let foo = 'abc cde';".stripMargin
+    val code = "let foo = 'abc cde';".stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
     assert(foo.isInstanceOf[string])
@@ -115,8 +114,7 @@ class StringInterpolationTest extends MainVisitorBaseTest {
   }
 
   test("Test set with space started with new line") {
-    val code =
-      "let foo = '\nabc cde';".stripMargin
+    val code = "let foo = '\nabc cde';".stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
     assert(foo.isInstanceOf[string])
@@ -124,8 +122,7 @@ class StringInterpolationTest extends MainVisitorBaseTest {
   }
 
   test("Test set with new lines") {
-    val code =
-      "let foo = '\n\n abc\n cde\n\n\n';".stripMargin
+    val code = "let foo = '\n\n abc\n cde\n\n\n';".stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
     assert(foo.isInstanceOf[string])
@@ -133,8 +130,7 @@ class StringInterpolationTest extends MainVisitorBaseTest {
   }
 
   test("Test set with new lines and double quotes") {
-    val code =
-      "let foo = \"\n\n abc\n cde\n\n\n\";".stripMargin
+    val code = "let foo = \"\n\n abc\n cde\n\n\n\";".stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
     assert(foo.isInstanceOf[string])
@@ -142,8 +138,7 @@ class StringInterpolationTest extends MainVisitorBaseTest {
   }
 
   test("Test set with new lines and slash quotes") {
-    val code =
-      "let foo = `\n\n abc\n cde\n\n\n`;".stripMargin
+    val code = "let foo = `\n\n abc\n cde\n\n\n`;".stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
     assert(foo.isInstanceOf[string])
@@ -151,8 +146,7 @@ class StringInterpolationTest extends MainVisitorBaseTest {
   }
 
   test("Test set with new lines and single quote") {
-    val code =
-      "let foo = '\t\n\n abc\n \tcde\n\n\n';".stripMargin
+    val code = "let foo = '\t\n\n abc\n \tcde\n\n\n';".stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
     assert(foo.isInstanceOf[string])
@@ -169,8 +163,7 @@ class StringInterpolationTest extends MainVisitorBaseTest {
   //  }
 
   test("Test when single quotes contains double quotes") {
-    val code =
-      "let foo = '\"';".stripMargin
+    val code = "let foo = '\"';".stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
     assert(foo.isInstanceOf[string])
@@ -178,8 +171,7 @@ class StringInterpolationTest extends MainVisitorBaseTest {
   }
 
   test("Test when double quotes contains two double quotes") {
-    val code =
-      "let foo = '\"\"';".stripMargin
+    val code = "let foo = '\"\"';".stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
     assert(foo.isInstanceOf[string])
@@ -187,8 +179,7 @@ class StringInterpolationTest extends MainVisitorBaseTest {
   }
 
   test("Test when double quotes contains single quote") {
-    val code =
-      "let foo = \"'\";".stripMargin
+    val code = "let foo = \"'\";".stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
     assert(foo.isInstanceOf[string])
@@ -196,8 +187,7 @@ class StringInterpolationTest extends MainVisitorBaseTest {
   }
 
   test("Test when double quotes contains two single quotes") {
-    val code =
-      "let foo = \"''\";".stripMargin
+    val code = "let foo = \"''\";".stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
     assert(foo.isInstanceOf[string])
@@ -205,8 +195,7 @@ class StringInterpolationTest extends MainVisitorBaseTest {
   }
 
   test("Test when slashed quotes contains single quote") {
-    val code =
-      "let foo = `'`;".stripMargin
+    val code = "let foo = `'`;".stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
     assert(foo.isInstanceOf[string])
@@ -214,8 +203,7 @@ class StringInterpolationTest extends MainVisitorBaseTest {
   }
 
   test("Test when slashed quotes contains two single quotes") {
-    val code =
-      "let foo = `''`;".stripMargin
+    val code = "let foo = `''`;".stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
     assert(foo.isInstanceOf[string])

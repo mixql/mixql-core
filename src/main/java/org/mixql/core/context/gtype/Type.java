@@ -1,17 +1,6 @@
 package org.mixql.core.context.gtype;
 
-import javax.swing.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Map;
-
 public abstract class Type {
-    public enum Control {
-        RETURN, BREAK, CONTINUE, NONE
-    }
-    
-    public Control control = Control.NONE;
-
     // +
     public Type Add(Type other) {
         throw new UnsupportedOperationException(
@@ -143,5 +132,3 @@ public abstract class Type {
         );
     }
 }
-
-

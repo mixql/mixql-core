@@ -29,32 +29,25 @@ class ContextTest extends AnyFunSuite {
   }
 
   test("Test get vars from config") {
-    val context =
-      new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
+    val context = new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
     assert(isNull(context.getVar("nullVariable")))
     assert(context.getVar("boolVariable").isInstanceOf[bool])
     assert(context.getVar("boolVariable").asInstanceOf[bool].getValue == true)
     assert(context.getVar("intVariable").isInstanceOf[gInt])
     assert(context.getVar("intVariable").asInstanceOf[gInt].getValue == 42)
     assert(context.getVar("doubleVariable").isInstanceOf[gDouble])
-    assert(
-      context.getVar("doubleVariable").asInstanceOf[gDouble].getValue == 42.42
-    )
+    assert(context.getVar("doubleVariable").asInstanceOf[gDouble].getValue == 42.42)
     assert(context.getVar("strVariable").isInstanceOf[string])
     assert(context.getVar("strVariable").asInstanceOf[string].getValue == "str")
     assert(context.getVar("variable.with.points").isInstanceOf[string])
     assert(
-      context
-        .getVar("variable.with.points")
-        .asInstanceOf[string]
-        .getValue == "var with pt"
+      context.getVar("variable.with.points").asInstanceOf[string].getValue ==
+        "var with pt"
     )
     assert(context.getVar("variable.with.points2").isInstanceOf[gInt])
     assert(
-      context
-        .getVar("variable.with.points2")
-        .asInstanceOf[gInt]
-        .getValue == 1725
+      context.getVar("variable.with.points2").asInstanceOf[gInt].getValue ==
+        1725
     )
     assert(context.getVar("listVariable").isInstanceOf[array])
     val arr = context.getVar("listVariable").asInstanceOf[array]
@@ -66,29 +59,25 @@ class ContextTest extends AnyFunSuite {
   }
 
   test("Test add var value to context") {
-    val context =
-      new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
+    val context = new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
     context.setVar("a", new gInt(12))
     assert(context.getVar("a").isInstanceOf[gInt])
     assert(context.getVar("a").asInstanceOf[gInt].getValue == 12)
   }
 
   test("Test add null var to context") {
-    val context =
-      new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
+    val context = new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
     context.setVar("a", new Null)
     assert(isNull(context.getVar("a")))
   }
 
   test("Test get undefined variable") {
-    val context =
-      new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
+    val context = new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
     assert(isNull(context.getVar("a")))
   }
 
   test("Test change var value in context") {
-    val context =
-      new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
+    val context = new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
     context.setVar("a", new gInt(12))
     context.setVar("a", new string("value"))
     assert(context.getVar("a").isInstanceOf[string])
@@ -98,8 +87,7 @@ class ContextTest extends AnyFunSuite {
   }
 
   test("Test add engine to context") {
-    val context =
-      new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
+    val context = new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
     context.addEngine(new MyEngine())
     val e = context.getEngine("MyEngine")
     assert(e != None)
@@ -107,8 +95,7 @@ class ContextTest extends AnyFunSuite {
   }
 
   test("Test add engine to context with allias") {
-    val context =
-      new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
+    val context = new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
     context.addEngine("MyEngine1", new MyEngine())
     context.addEngine("MyEngine2", new MyEngine())
     val e = context.getEngine("MyEngine")
@@ -122,8 +109,7 @@ class ContextTest extends AnyFunSuite {
   }
 
   test("Test get engine by class") {
-    val context =
-      new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
+    val context = new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
     context.addEngine(new MyEngine())
     context.addEngine("MyEngine1", new MyEngine())
     val e = context.getEngine[MyEngine]
@@ -132,19 +118,17 @@ class ContextTest extends AnyFunSuite {
   }
 
   test("Test get undefined engine by class") {
-    val context =
-      new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
+    val context = new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
     val e = context.getEngine[MyEngine]
     assert(e == None)
   }
 
   test("Test change current engine") {
-    val context =
-      new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
+    val context = new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
     val e = new MyEngine()
     context.addEngine(e)
     context.setCurrentEngine("MyEngine")
-    context.execute("select a from b",false)
+    context.execute("select a from b", false)
     assert(context.currentEngine == e)
     assert(e.query == "select a from b")
     val engine_name = context.getVar("mixql.execution.engine")
@@ -152,8 +136,7 @@ class ContextTest extends AnyFunSuite {
   }
 
   test("Test interpolator") {
-    val context =
-      new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
+    val context = new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
     context.setVar("stub.a", new gInt(12))
     context.setVar("a", new gInt(25))
     val res = context.interpolate("select ${$a + $stub.a}")
@@ -161,140 +144,40 @@ class ContextTest extends AnyFunSuite {
   }
 
   test("Test engine.variables.update = all") {
-    val context =
-      new Context(
-        MutMap[String, Engine](
-          "stub1" -> new StubEngine,
-          "stub2" -> new StubEngine
-        ),
-        "stub1"
-      )
+    val context = new Context(MutMap[String, Engine]("stub1" -> new StubEngine, "stub2" -> new StubEngine), "stub1")
     context.setVar("mixql.engine.variables.update", new string("all"))
     context.setVar("a", new gInt(12))
     assert(context.getVar("a").isInstanceOf[gInt])
     assert(context.getVar("a").asInstanceOf[gInt].getValue == 12)
-    assert(
-      context
-        .getEngine("stub1")
-        .get
-        .asInstanceOf[StubEngine]
-        .param("a")
-        .isInstanceOf[gInt]
-    )
-    assert(
-      context
-        .getEngine("stub1")
-        .get
-        .asInstanceOf[StubEngine]
-        .param("a")
-        .asInstanceOf[gInt]
-        .getValue == 12
-    )
-    assert(
-      context
-        .getEngine("stub2")
-        .get
-        .asInstanceOf[StubEngine]
-        .param("a")
-        .isInstanceOf[gInt]
-    )
-    assert(
-      context
-        .getEngine("stub2")
-        .get
-        .asInstanceOf[StubEngine]
-        .param("a")
-        .asInstanceOf[gInt]
-        .getValue == 12
-    )
+    assert(context.getEngine("stub1").get.asInstanceOf[StubEngine].param("a").isInstanceOf[gInt])
+    assert(context.getEngine("stub1").get.asInstanceOf[StubEngine].param("a").asInstanceOf[gInt].getValue == 12)
+    assert(context.getEngine("stub2").get.asInstanceOf[StubEngine].param("a").isInstanceOf[gInt])
+    assert(context.getEngine("stub2").get.asInstanceOf[StubEngine].param("a").asInstanceOf[gInt].getValue == 12)
   }
 
   test("Test engine.variables.update = current") {
-    val context =
-      new Context(
-        MutMap[String, Engine](
-          "stub1" -> new StubEngine,
-          "stub2" -> new StubEngine
-        ),
-        "stub1"
-      )
+    val context = new Context(MutMap[String, Engine]("stub1" -> new StubEngine, "stub2" -> new StubEngine), "stub1")
     context.setVar("mixql.engine.variables.update", new string("current"))
     context.setVar("a", new gInt(12))
     assert(context.getVar("a").isInstanceOf[gInt])
     assert(context.getVar("a").asInstanceOf[gInt].getValue == 12)
-    assert(
-      context
-        .getEngine("stub1")
-        .get
-        .asInstanceOf[StubEngine]
-        .param("a")
-        .isInstanceOf[gInt]
-    )
-    assert(
-      context
-        .getEngine("stub1")
-        .get
-        .asInstanceOf[StubEngine]
-        .param("a")
-        .asInstanceOf[gInt]
-        .getValue == 12
-    )
-    assert(
-      isNull(
-        context
-          .getEngine("stub2")
-          .get
-          .asInstanceOf[StubEngine]
-          .param
-          .getOrElse("a", new Null)
-      )
-    )
+    assert(context.getEngine("stub1").get.asInstanceOf[StubEngine].param("a").isInstanceOf[gInt])
+    assert(context.getEngine("stub1").get.asInstanceOf[StubEngine].param("a").asInstanceOf[gInt].getValue == 12)
+    assert(isNull(context.getEngine("stub2").get.asInstanceOf[StubEngine].param.getOrElse("a", new Null)))
   }
 
   test("Test engine.variables.update = none") {
-    val context =
-      new Context(
-        MutMap[String, Engine](
-          "stub1" -> new StubEngine,
-          "stub2" -> new StubEngine
-        ),
-        "stub1"
-      )
+    val context = new Context(MutMap[String, Engine]("stub1" -> new StubEngine, "stub2" -> new StubEngine), "stub1")
     context.setVar("mixql.engine.variables.update", new string("none"))
     context.setVar("a", new gInt(12))
     assert(context.getVar("a").isInstanceOf[gInt])
     assert(context.getVar("a").asInstanceOf[gInt].getValue == 12)
-    assert(
-      isNull(
-        context
-          .getEngine("stub1")
-          .get
-          .asInstanceOf[StubEngine]
-          .param
-          .getOrElse("a", new Null)
-      )
-    )
-    assert(
-      isNull(
-        context
-          .getEngine("stub2")
-          .get
-          .asInstanceOf[StubEngine]
-          .param
-          .getOrElse("a", new Null)
-      )
-    )
+    assert(isNull(context.getEngine("stub1").get.asInstanceOf[StubEngine].param.getOrElse("a", new Null)))
+    assert(isNull(context.getEngine("stub2").get.asInstanceOf[StubEngine].param.getOrElse("a", new Null)))
   }
 
   test("Test scope engine.variables.update = all") {
-    val context =
-      new Context(
-        MutMap[String, Engine](
-          "stub1" -> new StubEngine,
-          "stub2" -> new StubEngine
-        ),
-        "stub1"
-      )
+    val context = new Context(MutMap[String, Engine]("stub1" -> new StubEngine, "stub2" -> new StubEngine), "stub1")
     context.setVar("mixql.engine.variables.update", new string("all"))
     context.setVar("a", new gInt(12))
     context.push_scope()
@@ -302,47 +185,16 @@ class ContextTest extends AnyFunSuite {
     context.pop_scope()
     assert(context.getVar("a").isInstanceOf[gInt])
     assert(context.getVar("a").asInstanceOf[gInt].getValue == 12)
-    assert(
-      context
-        .getEngine("stub1")
-        .get
-        .asInstanceOf[StubEngine]
-        .param("a")
-        .isInstanceOf[gInt]
-    )
-    assert(
-      context
-        .getEngine("stub1")
-        .get
-        .asInstanceOf[StubEngine]
-        .param("a")
-        .asInstanceOf[gInt]
-        .getValue == 12
-    )
-    assert(
-      context
-        .getEngine("stub2")
-        .get
-        .asInstanceOf[StubEngine]
-        .param("a")
-        .isInstanceOf[gInt]
-    )
-    assert(
-      context
-        .getEngine("stub2")
-        .get
-        .asInstanceOf[StubEngine]
-        .param("a")
-        .asInstanceOf[gInt]
-        .getValue == 12
-    )
+    assert(context.getEngine("stub1").get.asInstanceOf[StubEngine].param("a").isInstanceOf[gInt])
+    assert(context.getEngine("stub1").get.asInstanceOf[StubEngine].param("a").asInstanceOf[gInt].getValue == 12)
+    assert(context.getEngine("stub2").get.asInstanceOf[StubEngine].param("a").isInstanceOf[gInt])
+    assert(context.getEngine("stub2").get.asInstanceOf[StubEngine].param("a").asInstanceOf[gInt].getValue == 12)
   }
 
   test("Test change current engine with scope") {
     val e1 = new StubEngine()
     val e2 = new MyEngine()
-    val context =
-      new Context(MutMap[String, Engine]("stub" -> e1), "stub")
+    val context = new Context(MutMap[String, Engine]("stub" -> e1), "stub")
     context.addEngine(e2)
     context.push_scope()
     context.setCurrentEngine("MyEngine")

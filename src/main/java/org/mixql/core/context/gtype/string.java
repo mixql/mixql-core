@@ -2,7 +2,6 @@ package org.mixql.core.context.gtype;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 public class string extends Type {
     String value;
