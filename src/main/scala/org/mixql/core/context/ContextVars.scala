@@ -15,7 +15,7 @@ class ContextVars(val context: Context) {
     res
   }
 
-  def setVars(vars: Map[String, Type]): Unit = {
+  def setVars(vars: mutable.Map[String, Type]): Unit = {
     vars.foreach(variable => context.setVar(variable._1, variable._2))
   }
 
