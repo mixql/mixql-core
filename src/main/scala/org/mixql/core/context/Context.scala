@@ -105,10 +105,10 @@ class Context(
     engineVariablesUpdate match {
       case "all" =>
         head.foreach(v =>
-          engines.foreach(e => e._2.paramChanged(v._1, new ContextVars(this)))
+          engines.foreach(e => e._2._paramChanged(v._1, new ContextVars(this)))
         )
       case "current" =>
-        head.foreach(v => currentEngine.paramChanged(v._1, new ContextVars(this)))
+        head.foreach(v => currentEngine._paramChanged(v._1, new ContextVars(this)))
       case _ =>
     }
     setVar("mixql.execution.engine", getVar("mixql.execution.engine"))
@@ -135,10 +135,10 @@ class Context(
     engineVariablesUpdate match {
       case "all" =>
         engines.foreach(e =>
-          e._2.paramChanged("mixql.execution.engine", new ContextVars(this))
+          e._2._paramChanged("mixql.execution.engine", new ContextVars(this))
         )
       case "current" =>
-        currentEngine.paramChanged("mixql.execution.engine", new ContextVars(this))
+        currentEngine._paramChanged("mixql.execution.engine", new ContextVars(this))
       case _ =>
     }
   }
@@ -208,9 +208,9 @@ class Context(
    */
   def execute(stmt: String, expect_cursor: Boolean): Type = {
     if (!expect_cursor)
-      currentEngine.execute(stmt, new ContextVars(this))
+      currentEngine._execute(stmt, new ContextVars(this))
     else
-      currentEngine.getCursor(stmt, new ContextVars(this))
+      currentEngine._getCursor(stmt, new ContextVars(this))
   }
 
   /** execute statement on engine
@@ -224,8 +224,8 @@ class Context(
    */
   def execute(stmt: String, engine: String, expect_cursor: Boolean): Type =
     getEngine(engine) match {
-      case Some(value) => if (!expect_cursor) value.execute(stmt, new ContextVars(this)) else
-        value.getCursor(stmt, new ContextVars(this))
+      case Some(value) => if (!expect_cursor) value._execute(stmt, new ContextVars(this)) else
+        value._getCursor(stmt, new ContextVars(this))
       case None => throw new NoSuchElementException(s"unknown engine $engine")
     }
 
@@ -246,10 +246,10 @@ class Context(
     getEngine(engine) match {
       case Some(eng) =>
         val res = if (!expect_cursor)
-          eng.execute(stmt, new ContextVars(this))
+          eng._execute(stmt, new ContextVars(this))
         else
-          eng.getCursor(stmt, new ContextVars(this))
-        params.foreach(p => eng.paramChanged(p._1, new ContextVars(this)))
+          eng._getCursor(stmt, new ContextVars(this))
+        params.foreach(p => eng._paramChanged(p._1, new ContextVars(this)))
         res
       case None => throw new NoSuchElementException(s"unknown engine $engine")
     }
@@ -290,8 +290,8 @@ class Context(
         scope.head.put(key, value)
     }
     engineVariablesUpdate match {
-      case "all" => engines.foreach(e => e._2.paramChanged(key, new ContextVars(this)))
-      case "current" => currentEngine.paramChanged(key, new ContextVars(this))
+      case "all" => engines.foreach(e => e._2._paramChanged(key, new ContextVars(this)))
+      case "current" => currentEngine._paramChanged(key, new ContextVars(this))
       case _ =>
     }
   }
@@ -396,9 +396,9 @@ class Context(
     currentEngine = engines(defaultEngine)
     engineVariablesUpdate match {
       case "all" =>
-        scope.head.foreach(v => engines.foreach(e => e._2.paramChanged(v._1, new ContextVars(this))))
+        scope.head.foreach(v => engines.foreach(e => e._2._paramChanged(v._1, new ContextVars(this))))
       case "current" =>
-        scope.head.foreach(v => currentEngine.paramChanged(v._1, new ContextVars(this)))
+        scope.head.foreach(v => currentEngine._paramChanged(v._1, new ContextVars(this)))
       case _ =>
     }
   }
