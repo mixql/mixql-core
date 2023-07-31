@@ -92,7 +92,7 @@ abstract class Engine {
    * @return
    * list of defined functions names in lower case
    */
-  def getDefinedFunctions(ctx: ContextVars): List[String] = {
+  def getDefinedFunctions(): List[String] = {
     //Not to trigger engine by defined functions request
     //We will know what functions are defined, so can return just predefined list of functions names
     //otherwise we can add

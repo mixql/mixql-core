@@ -63,12 +63,12 @@ object FunctionInvoker {
               "named args for engine function not supported"
             )
           if (
-            ctx.currentEngine.getDefinedFunctions(new ContextVars(ctx)).contains(funcName.toLowerCase)
+            ctx.currentEngine.getDefinedFunctions().contains(funcName.toLowerCase)
           )
             unpack(ctx.currentEngine._executeFunc(funcName,new ContextVars(ctx), args.map(pack): _*))
           else {
             val engine = ctx.engines.find(eng =>
-              eng._2.getDefinedFunctions(new ContextVars(ctx)).contains(funcName)
+              eng._2.getDefinedFunctions().contains(funcName)
             )
             engine match {
               case Some(value) =>

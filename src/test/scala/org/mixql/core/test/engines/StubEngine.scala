@@ -35,5 +35,5 @@ class StubEngine extends Engine {
     changedParams(name)
   }
 
-  override def getDefinedFunctions(ctx: ContextVars): List[String] = List("getnum", "getstr")
+  override def getDefinedFunctions(): List[String] = List("getnum", "getstr")
 }
