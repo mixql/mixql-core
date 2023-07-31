@@ -27,7 +27,7 @@ abstract class Engine {
 
   final def _execute(stmt: String, ctx: ContextVars): Type = {
     if (!engineStarted)
-      logInfo(s" was triggered by execute request")
+      logInfo(s"Engine $name was triggered by execute request")
 
     engineStarted = true
 
@@ -36,7 +36,7 @@ abstract class Engine {
 
   final def _getCursor(stmt: String, ctx: ContextVars): cursor = {
     if (!engineStarted)
-      logInfo(s" was triggered by execute request expecting cursor")
+      logInfo(s"Engine $name was triggered by execute request expecting cursor")
 
     engineStarted = true
     getCursor(stmt, ctx)
@@ -51,7 +51,7 @@ abstract class Engine {
    */
   def getCursor(stmt: String, ctx: ContextVars): cursor = {
     import org.mixql.core.logger
-    logger.logWarn("getCursor was not defined in engine " +
+    logger.logWarn(s"getCursor was not defined in engine $name" +
       name + ". Use execute method instead"
     )
     new gcursor(_execute(stmt, ctx))
@@ -69,7 +69,7 @@ abstract class Engine {
 
   final def _executeFunc(name: String, ctx: ContextVars, params: Type*): Type = {
     if (!engineStarted)
-      logInfo(s" was triggered by executeFunc request")
+      logInfo(s"Engine $name was triggered by executeFunc request")
     engineStarted = true
     executeFunc(name, ctx, params: _*)
   }
