@@ -19,6 +19,10 @@ class ContextVars(val context: Context) {
     vars.foreach(variable => context.setVar(variable._1, variable._2))
   }
 
+  def setVars(vars: Map[String, Type]): Unit = {
+    vars.foreach(variable => context.setVar(variable._1, variable._2))
+  }
+
   def getVarsNames(): List[String] = {
     context.getScope().flatMap(scope => scope.keys.toList)
   }
