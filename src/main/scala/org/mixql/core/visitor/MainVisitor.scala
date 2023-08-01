@@ -2,7 +2,7 @@ package org.mixql.core.visitor
 
 import org.antlr.v4.runtime.TokenStream
 import org.antlr.v4.runtime.misc.Interval
-import org.mixql.core.context.{Context, ContextVars}
+import org.mixql.core.context.{Context, EngineContext}
 import org.mixql.core.context.gtype._
 import org.mixql.core.function.SqlLambda
 import org.mixql.core.generated.sql
@@ -92,7 +92,7 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
         .zip(ctx.choose_engine.engine_params.expr.asScala.map(visit))
         .foreach(p => {
           context.setVar(p._1.toString, p._2)
-          context.currentEngine._paramChanged(p._1.toString, new ContextVars(context))
+          context.currentEngine._paramChanged(p._1.toString, new EngineContext(context))
         })
     new Null()
   }

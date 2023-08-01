@@ -1,7 +1,7 @@
 package org.mixql.core.test.context
 
 import org.mixql.core.context.gtype._
-import org.mixql.core.context.{Context, ContextVars}
+import org.mixql.core.context.{Context, EngineContext}
 import org.mixql.core.engine.Engine
 import org.mixql.core.test.engines.StubEngine
 import org.scalatest.funsuite.AnyFunSuite
@@ -19,12 +19,12 @@ class ContextTest extends AnyFunSuite {
   class MyEngine extends Engine {
     var query: String = ""
     override def name: String = "MyEngine"
-    override def execute(stmt: String, ctx: ContextVars): Type = {
+    override def execute(stmt: String, ctx: EngineContext): Type = {
       query = stmt
       new Null()
     }
-    override def executeFunc(name: String, ctx: ContextVars, params: Type*): Type = ???
-    override def paramChanged(name: String, ctx: ContextVars): Unit = {}
+    override def executeFunc(name: String, ctx: EngineContext, params: Type*): Type = ???
+    override def paramChanged(name: String, ctx: EngineContext): Unit = {}
   }
 
   test("Test get vars from config") {

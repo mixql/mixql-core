@@ -1,6 +1,6 @@
 package org.mixql.core.engine
 
-import org.mixql.core.context.ContextVars
+import org.mixql.core.context.EngineContext
 import org.mixql.core.context.gtype._
 import org.mixql.core.logger.logInfo
 
@@ -23,9 +23,9 @@ abstract class Engine {
    * @return
    * the result of exection
    */
-  def execute(stmt: String, ctx: ContextVars): Type
+  def execute(stmt: String, ctx: EngineContext): Type
 
-  final def _execute(stmt: String, ctx: ContextVars): Type = {
+  final def _execute(stmt: String, ctx: EngineContext): Type = {
     if (!engineStarted)
       logInfo(s"Engine $name was triggered by execute request")
 
@@ -34,7 +34,7 @@ abstract class Engine {
     execute(stmt, ctx)
   }
 
-  final def _getCursor(stmt: String, ctx: ContextVars): cursor = {
+  final def _getCursor(stmt: String, ctx: EngineContext): cursor = {
     if (!engineStarted)
       logInfo(s"Engine $name was triggered by execute request expecting cursor")
 
@@ -49,7 +49,7 @@ abstract class Engine {
    * @return
    * the result of execution as cursor
    */
-  def getCursor(stmt: String, ctx: ContextVars): cursor = {
+  def getCursor(stmt: String, ctx: EngineContext): cursor = {
     import org.mixql.core.logger
     logger.logWarn(s"getCursor was not defined in engine $name" +
       name + ". Use execute method instead"
@@ -65,9 +65,9 @@ abstract class Engine {
    * function params
    * @return
    */
-  def executeFunc(name: String, ctx: ContextVars, params: Type*): Type
+  def executeFunc(name: String, ctx: EngineContext, params: Type*): Type
 
-  final def _executeFunc(name: String, ctx: ContextVars, params: Type*): Type = {
+  final def _executeFunc(name: String, ctx: EngineContext, params: Type*): Type = {
     if (!engineStarted)
       logInfo(s"Engine $name was triggered by executeFunc request")
     engineStarted = true
@@ -81,8 +81,8 @@ abstract class Engine {
    * @param value
    * of the param
    */
-  def paramChanged(name: String, ctx: ContextVars): Unit
-  final def _paramChanged(name: String, ctx: ContextVars): Unit = {
+  def paramChanged(name: String, ctx: EngineContext): Unit
+  final def _paramChanged(name: String, ctx: EngineContext): Unit = {
     if (!engineStarted)
       paramChanged(name, ctx)
   }

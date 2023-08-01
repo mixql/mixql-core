@@ -4,7 +4,7 @@ import com.typesafe.config.ConfigFactory
 import org.mixql.core.test.MainVisitorBaseTest
 import org.mixql.core.context.gtype._
 import org.mixql.core.engine.Engine
-import org.mixql.core.context.{Context, ContextVars}
+import org.mixql.core.context.{Context, EngineContext}
 import org.mixql.core
 import org.mixql.core.test.engines.StubEngine
 
@@ -252,11 +252,11 @@ class ControlStmtsTest extends MainVisitorBaseTest {
     class Other extends Engine {
       override def name: String = "other"
 
-      override def execute(stmt: String, ctx: ContextVars): Type = ???
+      override def execute(stmt: String, ctx: EngineContext): Type = ???
 
-      override def executeFunc(name: String, ctx: ContextVars, params: Type*): Type = ???
+      override def executeFunc(name: String, ctx: EngineContext, params: Type*): Type = ???
 
-      override def paramChanged(name: String, ctx: ContextVars): Unit = {}
+      override def paramChanged(name: String, ctx: EngineContext): Unit = {}
 
     }
     val context = runMainVisitor(
@@ -321,7 +321,7 @@ class ControlStmtsTest extends MainVisitorBaseTest {
     class Other extends StubEngine {
       override def name: String = "stub"
 
-      override def execute(stmt: String, ctx: ContextVars): Type = {
+      override def execute(stmt: String, ctx: EngineContext): Type = {
         queue += stmt + " spark.execution.memory=" + ctx.getVar("spark.execution.memory").toString
         new Null()
       }
@@ -409,7 +409,7 @@ class ControlStmtsTest extends MainVisitorBaseTest {
                 """.stripMargin
 
     class Other extends StubEngine {
-      override def execute(stmt: String, ctx: ContextVars): Type = {
+      override def execute(stmt: String, ctx: EngineContext): Type = {
         throw new NullPointerException("hello")
       }
     }
@@ -564,7 +564,7 @@ class ControlStmtsTest extends MainVisitorBaseTest {
         |let end_var = 12;
                 """.stripMargin
     class Other extends StubEngine {
-      override def execute(stmt: String, ctx: ContextVars): Type = {
+      override def execute(stmt: String, ctx: EngineContext): Type = {
         throw new NullPointerException("hello")
       }
     }

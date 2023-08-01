@@ -1,6 +1,6 @@
 package org.mixql.core.test.engines
 
-import org.mixql.core.context.{ContextVars, gtype}
+import org.mixql.core.context.{EngineContext, gtype}
 import org.mixql.core.context.gtype.{Type, bool, cursor, gInt, nothing}
 import org.mixql.core.engine.Engine
 import org.mixql.core.logger.logInfo
@@ -12,19 +12,19 @@ class CursorTestEngine2 extends Engine {
 
   override def name: String = "CursorTestEngine2"
 
-  override def execute(stmt: String, ctx: ContextVars): Type = {
+  override def execute(stmt: String, ctx: EngineContext): Type = {
     query = stmt
     throw new Exception("execute was triggered instead of executeCursor")
   }
 
-  override def getCursor(stmt: String, ctx: ContextVars): cursor = {
+  override def getCursor(stmt: String, ctx: EngineContext): cursor = {
     query = stmt
     new CursorTest2(this, stmt: String)
   }
 
-  override def executeFunc(name: String, ctx: ContextVars, params: Type*): Type = ???
+  override def executeFunc(name: String, ctx: EngineContext, params: Type*): Type = ???
 
-  override def paramChanged(name: String, ctx: ContextVars): Unit = {}
+  override def paramChanged(name: String, ctx: EngineContext): Unit = {}
 }
 
 class CursorTest2(engine: CursorTestEngine2, stmt: String) extends cursor {

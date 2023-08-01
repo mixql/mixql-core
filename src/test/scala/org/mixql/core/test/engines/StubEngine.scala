@@ -1,6 +1,6 @@
 package org.mixql.core.test.engines
 
-import org.mixql.core.context.ContextVars
+import org.mixql.core.context.EngineContext
 
 import scala.collection.mutable.{Queue, Map => MutMap}
 import org.mixql.core.engine.Engine
@@ -12,14 +12,14 @@ class StubEngine extends Engine {
 
   override def name: String = "stub"
 
-  override def execute(stmt: String, ctx: ContextVars): Type = {
+  override def execute(stmt: String, ctx: EngineContext): Type = {
     queue += stmt
     new Null()
   }
 
   val changedParams: MutMap[String, Type] = MutMap()
 
-  override def executeFunc(name: String, ctx: ContextVars, params: Type*): Type = {
+  override def executeFunc(name: String, ctx: EngineContext, params: Type*): Type = {
     name match {
       case "getnum" => 42
       case "getstr" => "42"
@@ -27,7 +27,7 @@ class StubEngine extends Engine {
     }
   }
 
-  override def paramChanged(name: String, ctx: ContextVars): Unit = {
+  override def paramChanged(name: String, ctx: EngineContext): Unit = {
     changedParams.put(name, ctx.getVar(name))
   }
 
