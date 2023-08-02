@@ -145,11 +145,7 @@ class ContextTest extends AnyFunSuite {
   test("Test engine.variables.update = all") {
     val context =
       new Context(
-        MutMap[String, Engine](
-          "stub1" -> new StubEngine,
-          "stub2" -> new StubEngine,
-          "stub3" -> new StubEngine
-        ),
+        MutMap[String, Engine]("stub1" -> new StubEngine, "stub2" -> new StubEngine, "stub3" -> new StubEngine),
         "stub1"
       )
     context.getEngine("stub1").get._execute("sdfdsfsdf sd fs", new EngineContext(context))
@@ -158,61 +154,22 @@ class ContextTest extends AnyFunSuite {
     context.setVar("a", new gInt(12))
     assert(context.getVar("a").isInstanceOf[gInt])
     assert(context.getVar("a").asInstanceOf[gInt].getValue == 12)
-    //paramChanged was triggered as engine was started before
+    // paramChanged was triggered as engine was started before
+    assert(context.getEngine("stub1").get.asInstanceOf[StubEngine].changedParams("a").isInstanceOf[gInt])
+    // paramChanged was triggered as engine was started before
+    assert(context.getEngine("stub1").get.asInstanceOf[StubEngine].changedParams("a").asInstanceOf[gInt].getValue == 12)
+    // paramChanged was triggered as engine was started before
+    assert(context.getEngine("stub2").get.asInstanceOf[StubEngine].changedParams("a").isInstanceOf[gInt])
+    // paramChanged was triggered as engine was started before
     assert(
-      context
-        .getEngine("stub1")
-        .get
-        .asInstanceOf[StubEngine]
-        .changedParams("a")
-        .isInstanceOf[gInt]
-    )
-    //paramChanged was triggered as engine was started before
-    assert(
-      context
-        .getEngine("stub1")
-        .get
-        .asInstanceOf[StubEngine]
-        .changedParams("a")
-        .asInstanceOf[gInt]
-        .getValue == 12
-    )
-    //paramChanged was triggered as engine was started before
-    assert(
-      context
-        .getEngine("stub2")
-        .get
-        .asInstanceOf[StubEngine]
-        .changedParams("a")
-        .isInstanceOf[gInt]
-    )
-    //paramChanged was triggered as engine was started before
-    assert(
-      context
-        .getEngine("stub2")
-        .get
-        .asInstanceOf[StubEngine]
-        .changedParams("a")
-        .asInstanceOf[gInt]
-        .getValue == 12
-    )//paramChanged was not triggered as engine did not started
+      context.getEngine("stub2").get.asInstanceOf[StubEngine].changedParams("a").asInstanceOf[gInt].getValue == 12
+    ) // paramChanged was not triggered as engine did not started
     assertThrows[java.util.NoSuchElementException](
-      context
-        .getEngine("stub3")
-        .get
-        .asInstanceOf[StubEngine]
-        .changedParams("a")
-        .isInstanceOf[gInt]
+      context.getEngine("stub3").get.asInstanceOf[StubEngine].changedParams("a").isInstanceOf[gInt]
     )
-    //paramChanged was not triggered as engine did not started
+    // paramChanged was not triggered as engine did not started
     assertThrows[java.util.NoSuchElementException](
-      context
-        .getEngine("stub3")
-        .get
-        .asInstanceOf[StubEngine]
-        .changedParams("a")
-        .asInstanceOf[gInt]
-        .getValue == 12
+      context.getEngine("stub3").get.asInstanceOf[StubEngine].changedParams("a").asInstanceOf[gInt].getValue == 12
     )
   }
 
@@ -224,36 +181,12 @@ class ContextTest extends AnyFunSuite {
     context.setVar("a", new gInt(12))
     assert(context.getVar("a").isInstanceOf[gInt])
     assert(context.getVar("a").asInstanceOf[gInt].getValue == 12)
-    //paramChanged was triggered as engine was started before
-    assert(
-      context
-        .getEngine("stub1")
-        .get
-        .asInstanceOf[StubEngine]
-        .changedParams("a")
-        .isInstanceOf[gInt]
-    )
-    //paramChanged was triggered as engine was started before
-    assert(
-      context
-        .getEngine("stub1")
-        .get
-        .asInstanceOf[StubEngine]
-        .changedParams("a")
-        .asInstanceOf[gInt]
-        .getValue == 12
-    )
-    //paramChanged was triggered as engine was started before
-    assert(
-      isNull(
-        context
-          .getEngine("stub2")
-          .get
-          .asInstanceOf[StubEngine]
-          .changedParams
-          .getOrElse("a", new Null)
-      )
-    )
+    // paramChanged was triggered as engine was started before
+    assert(context.getEngine("stub1").get.asInstanceOf[StubEngine].changedParams("a").isInstanceOf[gInt])
+    // paramChanged was triggered as engine was started before
+    assert(context.getEngine("stub1").get.asInstanceOf[StubEngine].changedParams("a").asInstanceOf[gInt].getValue == 12)
+    // paramChanged was triggered as engine was started before
+    assert(isNull(context.getEngine("stub2").get.asInstanceOf[StubEngine].changedParams.getOrElse("a", new Null)))
   }
 
   test("Test engine.variables.update = none") {
@@ -264,26 +197,8 @@ class ContextTest extends AnyFunSuite {
     context.setVar("a", new gInt(12))
     assert(context.getVar("a").isInstanceOf[gInt])
     assert(context.getVar("a").asInstanceOf[gInt].getValue == 12)
-    assert(
-      isNull(
-        context
-          .getEngine("stub1")
-          .get
-          .asInstanceOf[StubEngine]
-          .changedParams
-          .getOrElse("a", new Null)
-      )
-    )
-    assert(
-      isNull(
-        context
-          .getEngine("stub2")
-          .get
-          .asInstanceOf[StubEngine]
-          .changedParams
-          .getOrElse("a", new Null)
-      )
-    )
+    assert(isNull(context.getEngine("stub1").get.asInstanceOf[StubEngine].changedParams.getOrElse("a", new Null)))
+    assert(isNull(context.getEngine("stub2").get.asInstanceOf[StubEngine].changedParams.getOrElse("a", new Null)))
   }
 
   test("Test scope engine.variables.update = all") {
@@ -297,44 +212,14 @@ class ContextTest extends AnyFunSuite {
     context.pop_scope()
     assert(context.getVar("a").isInstanceOf[gInt])
     assert(context.getVar("a").asInstanceOf[gInt].getValue == 12)
-    //paramChanged was triggered as engine was started before
-    assert(
-      context
-        .getEngine("stub1")
-        .get
-        .asInstanceOf[StubEngine]
-        .changedParams("a")
-        .isInstanceOf[gInt]
-    )
-    //paramChanged was triggered as engine was started before
-    assert(
-      context
-        .getEngine("stub1")
-        .get
-        .asInstanceOf[StubEngine]
-        .changedParams("a")
-        .asInstanceOf[gInt]
-        .getValue == 12
-    )
-    //paramChanged was triggered as engine was started before
-    assert(
-      context
-        .getEngine("stub2")
-        .get
-        .asInstanceOf[StubEngine]
-        .changedParams("a")
-        .isInstanceOf[gInt]
-    )
-    //paramChanged was triggered as engine was started before
-    assert(
-      context
-        .getEngine("stub2")
-        .get
-        .asInstanceOf[StubEngine]
-        .changedParams("a")
-        .asInstanceOf[gInt]
-        .getValue == 12
-    )
+    // paramChanged was triggered as engine was started before
+    assert(context.getEngine("stub1").get.asInstanceOf[StubEngine].changedParams("a").isInstanceOf[gInt])
+    // paramChanged was triggered as engine was started before
+    assert(context.getEngine("stub1").get.asInstanceOf[StubEngine].changedParams("a").asInstanceOf[gInt].getValue == 12)
+    // paramChanged was triggered as engine was started before
+    assert(context.getEngine("stub2").get.asInstanceOf[StubEngine].changedParams("a").isInstanceOf[gInt])
+    // paramChanged was triggered as engine was started before
+    assert(context.getEngine("stub2").get.asInstanceOf[StubEngine].changedParams("a").asInstanceOf[gInt].getValue == 12)
   }
 
   test("Test change current engine with scope") {

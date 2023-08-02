@@ -23,7 +23,7 @@ class StubEngine extends Engine {
     name match {
       case "getnum" => 42
       case "getstr" => "42"
-      case _ => throw new NoSuchMethodException(s"unknown func $name")
+      case _        => throw new NoSuchMethodException(s"unknown func $name")
     }
   }
 

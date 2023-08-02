@@ -111,8 +111,7 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
       context.setCurrentEngine(visit(ctx.choose_engine.ident).toString)
     if (ctx.choose_engine.engine_params)
       ctx.choose_engine.engine_params.ident.asScala.map(visit)
-        .zip(ctx.choose_engine.engine_params.expr.asScala.map(visit))
-        .foreach(p => {
+        .zip(ctx.choose_engine.engine_params.expr.asScala.map(visit)).foreach(p => {
           context.setVar(p._1.toString, p._2)
           context.currentEngine._paramChanged(p._1.toString, new EngineContext(context))
         })

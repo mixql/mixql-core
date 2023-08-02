@@ -28,6 +28,5 @@ class CursorTestEngine1 extends Engine {
 
   override def executeFunc(name: String, ctx: EngineContext, params: Type*): Type = ???
 
-
   override def paramChanged(name: String, ctx: EngineContext): Unit = {}
 }

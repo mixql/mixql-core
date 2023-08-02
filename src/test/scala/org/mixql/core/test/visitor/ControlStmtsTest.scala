@@ -276,7 +276,7 @@ class ControlStmtsTest extends MainVisitorBaseTest {
     //      }).getOrElse(true)
     //    })
     val code =
-    """
+      """
       |let engine stub(spark.execution.memory="16G");
                 """.stripMargin
 
@@ -284,22 +284,14 @@ class ControlStmtsTest extends MainVisitorBaseTest {
       override def name: String = "other"
     }
 
-    val context = runMainVisitor(
-      code,
-      new Context(
-        MutMap("stub" -> new StubEngine, "stub1" -> new Other),
-        "stub"
-      )
-    )
+    val context = runMainVisitor(code, new Context(MutMap("stub" -> new StubEngine, "stub1" -> new Other), "stub"))
 
     assert(context.currentEngine.isInstanceOf[StubEngine])
     assert(context.currentEngine.name == "stub")
     assert(context.currentEngineAllias == "stub")
-    //paramChanged was not triggered as engine was not started before
+    // paramChanged was not triggered as engine was not started before
     assertThrows[java.util.NoSuchElementException](
-      context.currentEngine.asInstanceOf[StubEngine]
-        .getChangedParam("spark.execution.memory")
-        .toString() == "16G"
+      context.currentEngine.asInstanceOf[StubEngine].getChangedParam("spark.execution.memory").toString() == "16G"
     )
   }
 
@@ -322,20 +314,13 @@ class ControlStmtsTest extends MainVisitorBaseTest {
       }
     }
 
-    val context = runMainVisitor(
-      code,
-      new Context(
-        MutMap("stub" -> new Other),
-        "stub"
-      )
-    )
+    val context = runMainVisitor(code, new Context(MutMap("stub" -> new Other), "stub"))
 
     assert(context.currentEngine.isInstanceOf[Other])
     assert(context.currentEngine.name == "stub")
     assert(context.currentEngineAllias == "stub")
     assert(
-      context.currentEngine.asInstanceOf[Other]
-        .queue.last == "select * from table that does not exist:) using param " +
+      context.currentEngine.asInstanceOf[Other].queue.last == "select * from table that does not exist:) using param " +
         "spark.execution.memory=16G"
     )
   }
@@ -347,45 +332,36 @@ class ControlStmtsTest extends MainVisitorBaseTest {
         |select gg from wp on engine stub1(spark.execution.memory="16G");
                 """.stripMargin
 
-    val context = runMainVisitor(
-      code,
-      new Context(MutMap("stub" -> new StubEngine, "stub1" -> new StubEngine), "stub")
-    )
+    val context = runMainVisitor(code, new Context(MutMap("stub" -> new StubEngine, "stub1" -> new StubEngine), "stub"))
 
     assert(context.currentEngine.isInstanceOf[StubEngine])
     assert(context.currentEngine.name == "stub")
     assert(context.currentEngineAllias == "stub")
-    //Was executed on stub1 engine and not on stub
-    assert(
-      context.getEngine("stub1").get.asInstanceOf[StubEngine]
-        .queue.last == "select gg from wp"
-    )
-    assertThrows[java.util.NoSuchElementException](
-      context.getEngine("stub").get.asInstanceOf[StubEngine]
-        .queue.last
-    )
+    // Was executed on stub1 engine and not on stub
+    assert(context.getEngine("stub1").get.asInstanceOf[StubEngine].queue.last == "select gg from wp")
+    assertThrows[java.util.NoSuchElementException](context.getEngine("stub").get.asInstanceOf[StubEngine].queue.last)
     ///////////////////////////////////////////////
-    //Will not trigger paramChanged if not all
-    if ( {
+    // Will not trigger paramChanged if not all
+    if ({
       val config = ConfigFactory.load()
       Try({
         val param = config.getString("mixql.engine.variables.update")
-        if (param.trim != "all") false
-        else true
+        if (param.trim != "all")
+          false
+        else
+          true
       }).getOrElse(true)
     }) {
       assert(
-        context.getEngine("stub").get.asInstanceOf[StubEngine]
-          .getChangedParam("spark.execution.memory")
+        context.getEngine("stub").get.asInstanceOf[StubEngine].getChangedParam("spark.execution.memory")
           .toString() == "16G"
       )
     }
     ////////////////////////////////////////////////
-    //ParamChanged was not triggered as it was triggered before engine started
+    // ParamChanged was not triggered as it was triggered before engine started
     // -> paramChanged -> not trigger engine did not started -> execute select -> engine started
     assertThrows[java.util.NoSuchElementException](
-      context.getEngine("stub1").get.asInstanceOf[StubEngine]
-        .getChangedParam("spark.execution.memory")
+      context.getEngine("stub1").get.asInstanceOf[StubEngine].getChangedParam("spark.execution.memory")
         .toString() == "16G"
     )
   }
@@ -409,37 +385,31 @@ class ControlStmtsTest extends MainVisitorBaseTest {
     assert(context.currentEngine.isInstanceOf[StubEngine])
     assert(context.currentEngine.name == "stub")
     assert(context.currentEngineAllias == "stub1")
-    //Was executed on stub1 engine and not on stub
-    assert(
-      context.getEngine("stub1").get.asInstanceOf[StubEngine]
-        .queue.last == "select gg from wp"
-    )
-    assertThrows[java.util.NoSuchElementException](
-      context.getEngine("stub").get.asInstanceOf[StubEngine]
-        .queue.last
-    )
+    // Was executed on stub1 engine and not on stub
+    assert(context.getEngine("stub1").get.asInstanceOf[StubEngine].queue.last == "select gg from wp")
+    assertThrows[java.util.NoSuchElementException](context.getEngine("stub").get.asInstanceOf[StubEngine].queue.last)
     ///////////////////////////////////////////////
-    //Will not trigger paramChanged if not all
-    if ( {
+    // Will not trigger paramChanged if not all
+    if ({
       val config = ConfigFactory.load()
       Try({
         val param = config.getString("mixql.engine.variables.update")
-        if (param.trim != "all") false
-        else true
+        if (param.trim != "all")
+          false
+        else
+          true
       }).getOrElse(true)
     }) {
       assert(
-        context.getEngine("stub").get.asInstanceOf[StubEngine]
-          .getChangedParam("spark.execution.memory")
+        context.getEngine("stub").get.asInstanceOf[StubEngine].getChangedParam("spark.execution.memory")
           .toString() == "16G"
       )
     }
     ////////////////////////////////////////////////
-    //ParamChanged was not triggered as it was triggered before engine started
+    // ParamChanged was not triggered as it was triggered before engine started
     // -> paramChanged -> not trigger engine did not started -> execute select -> engine started
     assert(
-      context.getEngine("stub1").get.asInstanceOf[StubEngine]
-        .getChangedParam("spark.execution.memory")
+      context.getEngine("stub1").get.asInstanceOf[StubEngine].getChangedParam("spark.execution.memory")
         .toString() == "16G"
     )
   }

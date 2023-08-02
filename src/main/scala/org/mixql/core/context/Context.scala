@@ -98,13 +98,9 @@ class Context(val engines: MutMap[String, Engine],
     val head = scope.head
     scope = scope.tail
     engineVariablesUpdate match {
-      case "all" =>
-        head.foreach(v =>
-          engines.foreach(e => e._2._paramChanged(v._1, new EngineContext(this)))
-        )
-      case "current" =>
-        head.foreach(v => currentEngine._paramChanged(v._1, new EngineContext(this)))
-      case _ =>
+      case "all"     => head.foreach(v => engines.foreach(e => e._2._paramChanged(v._1, new EngineContext(this))))
+      case "current" => head.foreach(v => currentEngine._paramChanged(v._1, new EngineContext(this)))
+      case _         =>
     }
     setVar("mixql.execution.engine", getVar("mixql.execution.engine"))
   }
@@ -126,13 +122,9 @@ class Context(val engines: MutMap[String, Engine],
         case None => throw new NoSuchElementException(s"no engine with name $name")
       }
     engineVariablesUpdate match {
-      case "all" =>
-        engines.foreach(e =>
-          e._2._paramChanged("mixql.execution.engine", new EngineContext(this))
-        )
-      case "current" =>
-        currentEngine._paramChanged("mixql.execution.engine", new EngineContext(this))
-      case _ =>
+      case "all"     => engines.foreach(e => e._2._paramChanged("mixql.execution.engine", new EngineContext(this)))
+      case "current" => currentEngine._paramChanged("mixql.execution.engine", new EngineContext(this))
+      case _         =>
     }
   }
 
@@ -202,41 +194,44 @@ class Context(val engines: MutMap[String, Engine],
   }
 
   /** execute statement on engine
-   *
-   * @param stmt
-   * statement to execute
-   * @param engine
-   * engine name to execute
-   * @return
-   * the result of execution
-   */
+    *
+    * @param stmt
+    *   statement to execute
+    * @param engine
+    *   engine name to execute
+    * @return
+    *   the result of execution
+    */
   def execute(stmt: String, engine: String, expect_cursor: Boolean): Type =
     getEngine(engine) match {
-      case Some(value) => if (!expect_cursor) value._execute(stmt, new EngineContext(this)) else
-        value._getCursor(stmt, new EngineContext(this))
+      case Some(value) =>
+        if (!expect_cursor)
+          value._execute(stmt, new EngineContext(this))
+        else
+          value._getCursor(stmt, new EngineContext(this))
       case None => throw new NoSuchElementException(s"unknown engine $engine")
     }
 
   /** execute statement on engine with specific params
-   *
-   * @param stmt
-   * statement to execute
-   * @param engine
-   * engine name to execute
-   * @param params
-   * params used to execute. old params sets after
-   * @return
-   * the result of execution
-   */
-  def execute(stmt: String, engine: String, params: Map[String, Type],
-              expect_cursor: Boolean): Type = {
+    *
+    * @param stmt
+    *   statement to execute
+    * @param engine
+    *   engine name to execute
+    * @param params
+    *   params used to execute. old params sets after
+    * @return
+    *   the result of execution
+    */
+  def execute(stmt: String, engine: String, params: Map[String, Type], expect_cursor: Boolean): Type = {
     params.keys.foreach(k => setVar(k, params(k)))
     getEngine(engine) match {
       case Some(eng) =>
-        val res = if (!expect_cursor)
-          eng._execute(stmt, new EngineContext(this))
-        else
-          eng._getCursor(stmt, new EngineContext(this))
+        val res =
+          if (!expect_cursor)
+            eng._execute(stmt, new EngineContext(this))
+          else
+            eng._getCursor(stmt, new EngineContext(this))
         params.foreach(p => eng._paramChanged(p._1, new EngineContext(this)))
         res
       case None => throw new NoSuchElementException(s"unknown engine $engine")
@@ -273,9 +268,9 @@ class Context(val engines: MutMap[String, Engine],
       case _       => scope.head.put(key, value)
     }
     engineVariablesUpdate match {
-      case "all" => engines.foreach(e => e._2._paramChanged(key, new EngineContext(this)))
+      case "all"     => engines.foreach(e => e._2._paramChanged(key, new EngineContext(this)))
       case "current" => currentEngine._paramChanged(key, new EngineContext(this))
-      case _ =>
+      case _         =>
     }
   }
 
@@ -371,11 +366,9 @@ class Context(val engines: MutMap[String, Engine],
 
     currentEngine = engines(defaultEngine)
     engineVariablesUpdate match {
-      case "all" =>
-        scope.head.foreach(v => engines.foreach(e => e._2._paramChanged(v._1, new EngineContext(this))))
-      case "current" =>
-        scope.head.foreach(v => currentEngine._paramChanged(v._1, new EngineContext(this)))
-      case _ =>
+      case "all"     => scope.head.foreach(v => engines.foreach(e => e._2._paramChanged(v._1, new EngineContext(this))))
+      case "current" => scope.head.foreach(v => currentEngine._paramChanged(v._1, new EngineContext(this)))
+      case _         =>
     }
   }
 
@@ -442,9 +435,7 @@ class Context(val engines: MutMap[String, Engine],
     }
 
     override def executeFunc(name: String, ctx: EngineContext, params: Type*) =
-      throw new UnsupportedOperationException(
-        "interpolator dont have specific funcs"
-      )
+      throw new UnsupportedOperationException("interpolator dont have specific funcs")
 
     override def paramChanged(name: String, ctx: EngineContext): Unit = {}
 
