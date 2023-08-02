@@ -1,7 +1,7 @@
 package org.mixql.core.test.context
 
 import org.mixql.core.context.gtype._
-import org.mixql.core.context.Context
+import org.mixql.core.context.{Context, EngineContext}
 import org.mixql.core.engine.Engine
 import org.mixql.core.test.engines.StubEngine
 import org.scalatest.funsuite.AnyFunSuite
@@ -19,13 +19,12 @@ class ContextTest extends AnyFunSuite {
   class MyEngine extends Engine {
     var query: String = ""
     override def name: String = "MyEngine"
-    override def execute(stmt: String): Type = {
+    override def execute(stmt: String, ctx: EngineContext): Type = {
       query = stmt
       new Null()
     }
-    override def executeFunc(name: String, params: Type*): Type = ???
-    override def getParam(name: String): Type = new Null()
-    override def setParam(name: String, value: Type): Unit = {}
+    override def executeFunc(name: String, ctx: EngineContext, params: Type*): Type = ???
+    override def paramChanged(name: String, ctx: EngineContext): Unit = {}
   }
 
   test("Test get vars from config") {
@@ -144,51 +143,83 @@ class ContextTest extends AnyFunSuite {
   }
 
   test("Test engine.variables.update = all") {
-    val context = new Context(MutMap[String, Engine]("stub1" -> new StubEngine, "stub2" -> new StubEngine), "stub1")
+    val context =
+      new Context(
+        MutMap[String, Engine]("stub1" -> new StubEngine, "stub2" -> new StubEngine, "stub3" -> new StubEngine),
+        "stub1"
+      )
+    context.getEngine("stub1").get._execute("sdfdsfsdf sd fs", new EngineContext(context))
+    context.getEngine("stub2").get._execute("sdfdsfsdf sd fsdfg", new EngineContext(context))
     context.setVar("mixql.engine.variables.update", new string("all"))
     context.setVar("a", new gInt(12))
     assert(context.getVar("a").isInstanceOf[gInt])
     assert(context.getVar("a").asInstanceOf[gInt].getValue == 12)
-    assert(context.getEngine("stub1").get.asInstanceOf[StubEngine].param("a").isInstanceOf[gInt])
-    assert(context.getEngine("stub1").get.asInstanceOf[StubEngine].param("a").asInstanceOf[gInt].getValue == 12)
-    assert(context.getEngine("stub2").get.asInstanceOf[StubEngine].param("a").isInstanceOf[gInt])
-    assert(context.getEngine("stub2").get.asInstanceOf[StubEngine].param("a").asInstanceOf[gInt].getValue == 12)
+    // paramChanged was triggered as engine was started before
+    assert(context.getEngine("stub1").get.asInstanceOf[StubEngine].changedParams("a").isInstanceOf[gInt])
+    // paramChanged was triggered as engine was started before
+    assert(context.getEngine("stub1").get.asInstanceOf[StubEngine].changedParams("a").asInstanceOf[gInt].getValue == 12)
+    // paramChanged was triggered as engine was started before
+    assert(context.getEngine("stub2").get.asInstanceOf[StubEngine].changedParams("a").isInstanceOf[gInt])
+    // paramChanged was triggered as engine was started before
+    assert(
+      context.getEngine("stub2").get.asInstanceOf[StubEngine].changedParams("a").asInstanceOf[gInt].getValue == 12
+    ) // paramChanged was not triggered as engine did not started
+    assertThrows[java.util.NoSuchElementException](
+      context.getEngine("stub3").get.asInstanceOf[StubEngine].changedParams("a").isInstanceOf[gInt]
+    )
+    // paramChanged was not triggered as engine did not started
+    assertThrows[java.util.NoSuchElementException](
+      context.getEngine("stub3").get.asInstanceOf[StubEngine].changedParams("a").asInstanceOf[gInt].getValue == 12
+    )
   }
 
   test("Test engine.variables.update = current") {
     val context = new Context(MutMap[String, Engine]("stub1" -> new StubEngine, "stub2" -> new StubEngine), "stub1")
     context.setVar("mixql.engine.variables.update", new string("current"))
+    context.getEngine("stub1").get._execute("sdfdsfsdf sd fs", new EngineContext(context))
+    context.getEngine("stub2").get._execute("sdfdsfsdf sd fsdfg", new EngineContext(context))
     context.setVar("a", new gInt(12))
     assert(context.getVar("a").isInstanceOf[gInt])
     assert(context.getVar("a").asInstanceOf[gInt].getValue == 12)
-    assert(context.getEngine("stub1").get.asInstanceOf[StubEngine].param("a").isInstanceOf[gInt])
-    assert(context.getEngine("stub1").get.asInstanceOf[StubEngine].param("a").asInstanceOf[gInt].getValue == 12)
-    assert(isNull(context.getEngine("stub2").get.asInstanceOf[StubEngine].param.getOrElse("a", new Null)))
+    // paramChanged was triggered as engine was started before
+    assert(context.getEngine("stub1").get.asInstanceOf[StubEngine].changedParams("a").isInstanceOf[gInt])
+    // paramChanged was triggered as engine was started before
+    assert(context.getEngine("stub1").get.asInstanceOf[StubEngine].changedParams("a").asInstanceOf[gInt].getValue == 12)
+    // paramChanged was triggered as engine was started before
+    assert(isNull(context.getEngine("stub2").get.asInstanceOf[StubEngine].changedParams.getOrElse("a", new Null)))
   }
 
   test("Test engine.variables.update = none") {
     val context = new Context(MutMap[String, Engine]("stub1" -> new StubEngine, "stub2" -> new StubEngine), "stub1")
     context.setVar("mixql.engine.variables.update", new string("none"))
+    context.getEngine("stub1").get._execute("sdfdsfsdf sd fs", new EngineContext(context))
+    context.getEngine("stub2").get._execute("sdfdsfsdf sd fsdfg", new EngineContext(context))
     context.setVar("a", new gInt(12))
     assert(context.getVar("a").isInstanceOf[gInt])
     assert(context.getVar("a").asInstanceOf[gInt].getValue == 12)
-    assert(isNull(context.getEngine("stub1").get.asInstanceOf[StubEngine].param.getOrElse("a", new Null)))
-    assert(isNull(context.getEngine("stub2").get.asInstanceOf[StubEngine].param.getOrElse("a", new Null)))
+    assert(isNull(context.getEngine("stub1").get.asInstanceOf[StubEngine].changedParams.getOrElse("a", new Null)))
+    assert(isNull(context.getEngine("stub2").get.asInstanceOf[StubEngine].changedParams.getOrElse("a", new Null)))
   }
 
   test("Test scope engine.variables.update = all") {
     val context = new Context(MutMap[String, Engine]("stub1" -> new StubEngine, "stub2" -> new StubEngine), "stub1")
     context.setVar("mixql.engine.variables.update", new string("all"))
+    context.getEngine("stub1").get._execute("sdfdsfsdf sd fs", new EngineContext(context))
+    context.getEngine("stub2").get._execute("sdfdsfsdf sd fsdfg", new EngineContext(context))
     context.setVar("a", new gInt(12))
     context.push_scope()
     context.setVar("a", new gInt(15))
     context.pop_scope()
     assert(context.getVar("a").isInstanceOf[gInt])
     assert(context.getVar("a").asInstanceOf[gInt].getValue == 12)
-    assert(context.getEngine("stub1").get.asInstanceOf[StubEngine].param("a").isInstanceOf[gInt])
-    assert(context.getEngine("stub1").get.asInstanceOf[StubEngine].param("a").asInstanceOf[gInt].getValue == 12)
-    assert(context.getEngine("stub2").get.asInstanceOf[StubEngine].param("a").isInstanceOf[gInt])
-    assert(context.getEngine("stub2").get.asInstanceOf[StubEngine].param("a").asInstanceOf[gInt].getValue == 12)
+    // paramChanged was triggered as engine was started before
+    assert(context.getEngine("stub1").get.asInstanceOf[StubEngine].changedParams("a").isInstanceOf[gInt])
+    // paramChanged was triggered as engine was started before
+    assert(context.getEngine("stub1").get.asInstanceOf[StubEngine].changedParams("a").asInstanceOf[gInt].getValue == 12)
+    // paramChanged was triggered as engine was started before
+    assert(context.getEngine("stub2").get.asInstanceOf[StubEngine].changedParams("a").isInstanceOf[gInt])
+    // paramChanged was triggered as engine was started before
+    assert(context.getEngine("stub2").get.asInstanceOf[StubEngine].changedParams("a").asInstanceOf[gInt].getValue == 12)
   }
 
   test("Test change current engine with scope") {

@@ -2,7 +2,7 @@ package org.mixql.core.visitor
 
 import org.antlr.v4.runtime.TokenStream
 import org.antlr.v4.runtime.misc.Interval
-import org.mixql.core.context.{Context, ControlContext}
+import org.mixql.core.context.{Context, EngineContext, ControlContext}
 import org.mixql.core.context.gtype._
 import org.mixql.core.function.SqlLambda
 import org.mixql.core.generated.sql
@@ -61,7 +61,7 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
           case _ =>
             logWarn("\"visitFor_cursor_stmt\": cursor must be collection. Ignore executing of for block")
             new Null()
-//            throw new IllegalArgumentException("cursor must be collection")
+          //            throw new IllegalArgumentException("cursor must be collection")
         }
       }
     }
@@ -111,8 +111,10 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
       context.setCurrentEngine(visit(ctx.choose_engine.ident).toString)
     if (ctx.choose_engine.engine_params)
       ctx.choose_engine.engine_params.ident.asScala.map(visit)
-        .zip(ctx.choose_engine.engine_params.expr.asScala.map(visit))
-        .foreach(p => context.currentEngine.setParam(p._1.toString, p._2))
+        .zip(ctx.choose_engine.engine_params.expr.asScala.map(visit)).foreach(p => {
+          context.setVar(p._1.toString, p._2)
+          context.currentEngine._paramChanged(p._1.toString, new EngineContext(context))
+        })
     new Null()
   }
 
