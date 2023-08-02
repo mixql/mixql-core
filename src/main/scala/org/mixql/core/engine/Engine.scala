@@ -83,7 +83,7 @@ abstract class Engine {
    */
   def paramChanged(name: String, ctx: EngineContext): Unit
   final def _paramChanged(name: String, ctx: EngineContext): Unit = {
-    if (!engineStarted)
+    if (engineStarted)
       paramChanged(name, ctx)
   }
 

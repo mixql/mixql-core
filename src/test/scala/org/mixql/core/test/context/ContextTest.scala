@@ -164,14 +164,18 @@ class ContextTest extends AnyFunSuite {
       new Context(
         MutMap[String, Engine](
           "stub1" -> new StubEngine,
-          "stub2" -> new StubEngine
+          "stub2" -> new StubEngine,
+          "stub3" -> new StubEngine
         ),
         "stub1"
       )
+    context.getEngine("stub1").get._execute("sdfdsfsdf sd fs", new EngineContext(context))
+    context.getEngine("stub2").get._execute("sdfdsfsdf sd fsdfg", new EngineContext(context))
     context.setVar("mixql.engine.variables.update", new string("all"))
     context.setVar("a", new gInt(12))
     assert(context.getVar("a").isInstanceOf[gInt])
     assert(context.getVar("a").asInstanceOf[gInt].getValue == 12)
+    //paramChanged was triggered as engine was started before
     assert(
       context
         .getEngine("stub1")
@@ -180,6 +184,7 @@ class ContextTest extends AnyFunSuite {
         .changedParams("a")
         .isInstanceOf[gInt]
     )
+    //paramChanged was triggered as engine was started before
     assert(
       context
         .getEngine("stub1")
@@ -189,6 +194,7 @@ class ContextTest extends AnyFunSuite {
         .asInstanceOf[gInt]
         .getValue == 12
     )
+    //paramChanged was triggered as engine was started before
     assert(
       context
         .getEngine("stub2")
@@ -197,9 +203,28 @@ class ContextTest extends AnyFunSuite {
         .changedParams("a")
         .isInstanceOf[gInt]
     )
+    //paramChanged was triggered as engine was started before
     assert(
       context
         .getEngine("stub2")
+        .get
+        .asInstanceOf[StubEngine]
+        .changedParams("a")
+        .asInstanceOf[gInt]
+        .getValue == 12
+    )//paramChanged was not triggered as engine did not started
+    assertThrows[java.util.NoSuchElementException](
+      context
+        .getEngine("stub3")
+        .get
+        .asInstanceOf[StubEngine]
+        .changedParams("a")
+        .isInstanceOf[gInt]
+    )
+    //paramChanged was not triggered as engine did not started
+    assertThrows[java.util.NoSuchElementException](
+      context
+        .getEngine("stub3")
         .get
         .asInstanceOf[StubEngine]
         .changedParams("a")
@@ -218,9 +243,12 @@ class ContextTest extends AnyFunSuite {
         "stub1"
       )
     context.setVar("mixql.engine.variables.update", new string("current"))
+    context.getEngine("stub1").get._execute("sdfdsfsdf sd fs", new EngineContext(context))
+    context.getEngine("stub2").get._execute("sdfdsfsdf sd fsdfg", new EngineContext(context))
     context.setVar("a", new gInt(12))
     assert(context.getVar("a").isInstanceOf[gInt])
     assert(context.getVar("a").asInstanceOf[gInt].getValue == 12)
+    //paramChanged was triggered as engine was started before
     assert(
       context
         .getEngine("stub1")
@@ -229,6 +257,7 @@ class ContextTest extends AnyFunSuite {
         .changedParams("a")
         .isInstanceOf[gInt]
     )
+    //paramChanged was triggered as engine was started before
     assert(
       context
         .getEngine("stub1")
@@ -238,6 +267,7 @@ class ContextTest extends AnyFunSuite {
         .asInstanceOf[gInt]
         .getValue == 12
     )
+    //paramChanged was triggered as engine was started before
     assert(
       isNull(
         context
@@ -260,6 +290,8 @@ class ContextTest extends AnyFunSuite {
         "stub1"
       )
     context.setVar("mixql.engine.variables.update", new string("none"))
+    context.getEngine("stub1").get._execute("sdfdsfsdf sd fs", new EngineContext(context))
+    context.getEngine("stub2").get._execute("sdfdsfsdf sd fsdfg", new EngineContext(context))
     context.setVar("a", new gInt(12))
     assert(context.getVar("a").isInstanceOf[gInt])
     assert(context.getVar("a").asInstanceOf[gInt].getValue == 12)
@@ -295,12 +327,15 @@ class ContextTest extends AnyFunSuite {
         "stub1"
       )
     context.setVar("mixql.engine.variables.update", new string("all"))
+    context.getEngine("stub1").get._execute("sdfdsfsdf sd fs", new EngineContext(context))
+    context.getEngine("stub2").get._execute("sdfdsfsdf sd fsdfg", new EngineContext(context))
     context.setVar("a", new gInt(12))
     context.push_scope()
     context.setVar("a", new gInt(15))
     context.pop_scope()
     assert(context.getVar("a").isInstanceOf[gInt])
     assert(context.getVar("a").asInstanceOf[gInt].getValue == 12)
+    //paramChanged was triggered as engine was started before
     assert(
       context
         .getEngine("stub1")
@@ -309,6 +344,7 @@ class ContextTest extends AnyFunSuite {
         .changedParams("a")
         .isInstanceOf[gInt]
     )
+    //paramChanged was triggered as engine was started before
     assert(
       context
         .getEngine("stub1")
@@ -318,6 +354,7 @@ class ContextTest extends AnyFunSuite {
         .asInstanceOf[gInt]
         .getValue == 12
     )
+    //paramChanged was triggered as engine was started before
     assert(
       context
         .getEngine("stub2")
@@ -326,6 +363,7 @@ class ContextTest extends AnyFunSuite {
         .changedParams("a")
         .isInstanceOf[gInt]
     )
+    //paramChanged was triggered as engine was started before
     assert(
       context
         .getEngine("stub2")

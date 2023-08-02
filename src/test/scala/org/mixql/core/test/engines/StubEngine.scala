@@ -17,7 +17,7 @@ class StubEngine extends Engine {
     new Null()
   }
 
-  val changedParams: MutMap[String, Type] = MutMap()
+  var changedParams: Map[String, Type] = Map()
 
   override def executeFunc(name: String, ctx: EngineContext, params: Type*): Type = {
     name match {
@@ -28,7 +28,7 @@ class StubEngine extends Engine {
   }
 
   override def paramChanged(name: String, ctx: EngineContext): Unit = {
-    changedParams.put(name, ctx.getVar(name))
+    changedParams = changedParams ++ Map(name -> ctx.getVar(name))
   }
 
   def getChangedParam(name: String): Type = {
