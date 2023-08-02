@@ -24,6 +24,7 @@ statment:
     | for_cursor_stmt
     | for_range_stmt
     | try_catch_stmt
+    | raise_stmt
     | other_stmt
     ;
 

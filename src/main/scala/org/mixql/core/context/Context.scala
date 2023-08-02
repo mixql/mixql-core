@@ -40,23 +40,22 @@ object Context {
 }
 
 /** the entry point to gsql api. Context stores registered engines, variables
- * and functions
- *
- * @param engines
- * map engineName -> engine
- * @param defaultEngine
- * name of current engine
- * @param function
- * map functionName -> function
- * @param variables
- * map variableName -> variableValue
- */
-class Context(
-               val engines: MutMap[String, Engine],
-               defaultEngine: String,
-               functionsInit: MutMap[String, Any] = MutMap[String, Any](),
-               variables: MutMap[String, Type] = MutMap[String, Type]()
-             ) extends java.lang.AutoCloseable {
+  * and functions
+  *
+  * @param engines
+  *   map engineName -> engine
+  * @param defaultEngine
+  *   name of current engine
+  * @param function
+  *   map functionName -> function
+  * @param variables
+  *   map variableName -> variableValue
+  */
+class Context(val engines: MutMap[String, Engine],
+              defaultEngine: String,
+              functionsInit: MutMap[String, Any] = MutMap[String, Any](),
+              variablesInit: MutMap[String, Type] = MutMap[String, Type]())
+    extends java.lang.AutoCloseable {
 
   import Context.defaultFunctions
 
@@ -65,40 +64,36 @@ class Context(
   var currentEngine: Engine = null
 
   /** current engine name
-   *
-   * @return
-   * mixql.execution.engine param value
-   */
+    *
+    * @return
+    *   mixql.execution.engine param value
+    */
   def currentEngineAllias: String = getVar("mixql.execution.engine").toString
 
   /** mixql.error.skip
-   *
-   * @return
-   * mixql.error.skip param value
-   */
-  def errorSkip: Boolean = getVar("mixql.error.skip") match {
-    case t: bool => t.getValue
-    case _: Type =>
-      throw new Exception("something wrong mixql.error.skip must be bool")
-  }
+    *
+    * @return
+    *   mixql.error.skip param value
+    */
+  def errorSkip: Boolean =
+    getVar("mixql.error.skip") match {
+      case t: bool => t.getValue
+      case _: Type => throw new Exception("something wrong mixql.error.skip must be bool")
+    }
 
   /** mixql.engine.variables.update: one of "all", "current", "none"
-   *
-   * @return
-   * mixql.engine.variables.update param value
-   */
-  def engineVariablesUpdate: String = getVar(
-    "mixql.engine.variables.update"
-  ).toString
+    *
+    * @return
+    *   mixql.engine.variables.update param value
+    */
+  def engineVariablesUpdate: String = getVar("mixql.engine.variables.update").toString
 
   /** add variable scope
-   */
-  def push_scope(): Unit = {
-    scope = MutMap[String, Type]() :: scope
-  }
+    */
+  def push_scope(): Unit = { scope = MutMap[String, Type]() :: scope }
 
   /** remove top variable scope
-   */
+    */
   def pop_scope(): Unit = {
     val head = scope.head
     scope = scope.tail
@@ -115,23 +110,21 @@ class Context(
   }
 
   /** Set current engine by name that registered in this context. Throws
-   * [[java.util.NoSuchElementException]] if no engine with this name
-   *
-   * @param name
-   * of engine
-   */
+    * [[java.util.NoSuchElementException]] if no engine with this name
+    *
+    * @param name
+    *   of engine
+    */
   def setCurrentEngine(name: String): Unit = {
     if (name == "interpolator")
-      throw new IllegalArgumentException(
-        "interpolator could not be set as current engine"
-      )
-    currentEngine = engines.get(name) match {
-      case Some(value) =>
-        scope.head.put("mixql.execution.engine", new string(name))
-        value
-      case None =>
-        throw new NoSuchElementException(s"no engine with name $name")
-    }
+      throw new IllegalArgumentException("interpolator could not be set as current engine")
+    currentEngine =
+      engines.get(name) match {
+        case Some(value) =>
+          scope.head.put("mixql.execution.engine", new string(name))
+          value
+        case None => throw new NoSuchElementException(s"no engine with name $name")
+      }
     engineVariablesUpdate match {
       case "all" =>
         engines.foreach(e =>
@@ -144,54 +137,49 @@ class Context(
   }
 
   /** register engine by this name. If there was other engine with this name it
-   * would be removed from context
-   *
-   * @param engine
-   * to register
-   */
+    * would be removed from context
+    *
+    * @param engine
+    *   to register
+    */
   def addEngine(engine: Engine): Unit = {
     if (engine.name == "interpolator")
-      throw new IllegalArgumentException(
-        "engine cannot be registered as interpolator"
-      )
+      throw new IllegalArgumentException("engine cannot be registered as interpolator")
     engines.put(engine.name, engine)
   }
 
   /** register engine with passed name. name may differ to engine.name if there
-   * was other engine with this name it would be removed from context
-   *
-   * @param name
-   * of engine to register. must not be "interpolator"
-   * @param engine
-   * to register
-   */
+    * was other engine with this name it would be removed from context
+    *
+    * @param name
+    *   of engine to register. must not be "interpolator"
+    * @param engine
+    *   to register
+    */
   def addEngine(name: String, engine: Engine): Unit = {
     if (name == "interpolator")
-      throw new IllegalArgumentException(
-        "engine cannot be registered as interpolator"
-      )
+      throw new IllegalArgumentException("engine cannot be registered as interpolator")
     engines.put(name, engine)
   }
 
   /** get execution engine by name
-   *
-   * @param name
-   * of execution engine
-   * @return
-   * engine
-   */
-  def getEngine(name: String): Option[Engine] =
-    engines.get(name)
+    *
+    * @param name
+    *   of execution engine
+    * @return
+    *   engine
+    */
+  def getEngine(name: String): Option[Engine] = engines.get(name)
 
   /** get exectution engine by class
-   *
-   * @return
-   * the first engine isInstanceOf[T]
-   */
-  def getEngine[T <: Engine : ClassTag]: Option[T] = {
+    *
+    * @return
+    *   the first engine isInstanceOf[T]
+    */
+  def getEngine[T <: Engine: ClassTag]: Option[T] = {
     val res = engines.values.flatMap {
       case e: T => Some(e)
-      case _ => None
+      case _    => None
     }
     if (res.isEmpty)
       None
@@ -200,12 +188,12 @@ class Context(
   }
 
   /** execute statement on current engine
-   *
-   * @param stmt
-   * statement to execute
-   * @return
-   * the result of execution
-   */
+    *
+    * @param stmt
+    *   statement to execute
+    * @return
+    *   the result of execution
+    */
   def execute(stmt: String, expect_cursor: Boolean): Type = {
     if (!expect_cursor)
       currentEngine._execute(stmt, new EngineContext(this))
@@ -256,13 +244,13 @@ class Context(
   }
 
   /** set variable value. if key starts with some engines name then this engines
-   * param updates by value
-   *
-   * @param key
-   * the variable or engine param name
-   * @param value
-   * the value of variable or param
-   */
+    * param updates by value
+    *
+    * @param key
+    *   the variable or engine param name
+    * @param value
+    *   the value of variable or param
+    */
   def setVar(key: String, value: Type): Unit = {
     // set mixql param
     key match {
@@ -272,22 +260,17 @@ class Context(
       case "mixql.error.skip" =>
         value match {
           case _: bool =>
-          case _ =>
-            throw new IllegalArgumentException("mixql.error.skip must be bool")
+          case _       => throw new IllegalArgumentException("mixql.error.skip must be bool")
         }
       case "mixql.engine.variables.update" =>
         if (!(Set("all", "current", "none") contains value.toString))
-          throw new IllegalArgumentException(
-            "mixql.engine.variables.update must be one of: all, current, none"
-          )
+          throw new IllegalArgumentException("mixql.engine.variables.update must be one of: all, current, none")
       case _ =>
     }
     // set variable value
     value match {
-      case _: Null =>
-        scope.head.remove(key)
-      case _ =>
-        scope.head.put(key, value)
+      case _: Null => scope.head.remove(key)
+      case _       => scope.head.put(key, value)
     }
     engineVariablesUpdate match {
       case "all" => engines.foreach(e => e._2._paramChanged(key, new EngineContext(this)))
@@ -297,30 +280,30 @@ class Context(
   }
 
   /** get the variable value by name
-   *
-   * @param key
-   * variable name
-   * @return
-   * variable value
-   */
+    *
+    * @param key
+    *   variable name
+    * @return
+    *   variable value
+    */
   def getVar(key: String): Type = {
     scope.foreach(vars => {
       val res = vars.getOrElse(key, new Null())
       res match {
         case _: Null =>
-        case other => return other
+        case other   => return other
       }
     })
     new Null()
   }
 
   /** interpolate statement via current context
-   *
-   * @param stmt
-   * statement to interpolate
-   * @return
-   * interpolated statement
-   */
+    *
+    * @param stmt
+    *   statement to interpolate
+    * @return
+    *   interpolated statement
+    */
   def interpolate(stmt: String): String = {
     interpolator.currentEngine = currentEngine
     currentEngine = interpolator
@@ -330,34 +313,32 @@ class Context(
   }
 
   /** register function with passed name. If there was other function with this
-   * name it would be removed from context
-   *
-   * @param name
-   * of funtion
-   * @param function
-   */
+    * name it would be removed from context
+    *
+    * @param name
+    *   of funtion
+    * @param function
+    */
   def addFunction(name: String, function: Any): Unit = {
     if (functions.contains(name.toLowerCase()))
       throw new InstantiationException(s"function $name is already defined")
     else {
       logDebug(
-        "Functions map after adding function: " + functions.keySet.toList.sorted
-          .toString()
+        "Functions map after adding function: " +
+          functions.keySet.toList.sorted.toString()
       )
       val map = Map(name.toLowerCase() -> function)
       functions = functions ++ map;
       logDebug(
-        "Functions map after adding function: " + functions.keySet.toList.sorted
-          .toString()
+        "Functions map after adding function: " +
+          functions.keySet.toList.sorted.toString()
       )
     }
   }
 
   override def close(): Unit = {
     logDebug("mixql core context: starting close")
-    logDebug(
-      "mixql core context: stop engines, if they were not closed before by shutdown command"
-    )
+    logDebug("mixql core context: stop engines, if they were not closed before by shutdown command")
     engines.values.foreach(engine => {
       import java.lang.AutoCloseable
       if (engine.isInstanceOf[AutoCloseable]) {
@@ -369,25 +350,20 @@ class Context(
   }
 
   def getScope(): List[Map[String, Type]] = {
-    for {w <- scope} yield Map(w.toSeq: _*)
+    for { w <- scope } yield Map(w.toSeq: _*)
   }
 
   private var scope: List[MutMap[String, Type]] = null
   private val interpolator = new Interpolator()
 
-  _init_(defaultEngine, variables)
+  _init_(defaultEngine, variablesInit)
 
-  private def _init_(
-                      defaultEngine: String,
-                      variables: MutMap[String, Type] = MutMap[String, Type]()
-                    ) = {
+  private def _init_(defaultEngine: String, variables: MutMap[String, Type] = MutMap[String, Type]()) = {
     val config = ConfigFactory.load()
 
     val mixqlParams = initMixqlParams(config, defaultEngine)
     if (config.hasPath("mixql.variables.init")) {
-      val confVars = recurseParseParams(
-        config.getObject("mixql.variables.init")
-      )
+      val confVars = recurseParseParams(config.getObject("mixql.variables.init"))
       mixqlParams ++= confVars
     }
     mixqlParams ++= variables
@@ -403,10 +379,7 @@ class Context(
     }
   }
 
-  private def initMixqlParams(
-                               config: Config,
-                               defaultEngine: String
-                             ): MutMap[String, Type] = {
+  private def initMixqlParams(config: Config, defaultEngine: String): MutMap[String, Type] = {
     val result: MutMap[String, Type] = MutMap[String, Type]()
 
     val errorSkip = config.getBoolean("mixql.error.skip")
@@ -414,9 +387,7 @@ class Context(
 
     val evu = config.getString("mixql.engine.variables.update")
     if (!(Set("all", "current", "none") contains evu))
-      throw new IllegalArgumentException(
-        "mixql.engine.variables.update must be one of: all, current, none"
-      )
+      throw new IllegalArgumentException("mixql.engine.variables.update must be one of: all, current, none")
     result += "mixql.engine.variables.update" -> new string(evu)
 
     val currentEngineAllias =
@@ -429,17 +400,11 @@ class Context(
     result
   }
 
-  private def recurseParseParams(
-                                  params: ConfigObject,
-                                  scope: String = ""
-                                ): MutMap[String, Type] = {
+  private def recurseParseParams(params: ConfigObject, scope: String = ""): MutMap[String, Type] = {
     val res = MutMap[String, Type]()
     params.asScala.foreach(kv => {
       if (kv._2.valueType() == OBJECT)
-        res ++= recurseParseParams(
-          kv._2.asInstanceOf[ConfigObject],
-          scope + kv._1 + "."
-        )
+        res ++= recurseParseParams(kv._2.asInstanceOf[ConfigObject], scope + kv._1 + ".")
       else
         res += scope + kv._1 -> convertConfigValue(kv._2.unwrapped)
     })
@@ -457,15 +422,10 @@ class Context(
       new gInt(value.asInstanceOf[Integer])
     else if (value.isInstanceOf[Double])
       new gDouble(value.asInstanceOf[Double])
-    else if (value.isInstanceOf[ju.List[Object]]) {
-      new array(
-        value
-          .asInstanceOf[ju.List[Object]]
-          .asScala
-          .map(convertConfigValue)
-          .toArray
-      )
-    } else throw new Exception("unknown param type")
+    else if (value.isInstanceOf[ju.List[Object]])
+      new array(value.asInstanceOf[ju.List[Object]].asScala.map(convertConfigValue).toArray)
+    else
+      throw new Exception("unknown param type")
   }
 
   private sealed class Interpolator extends Engine {

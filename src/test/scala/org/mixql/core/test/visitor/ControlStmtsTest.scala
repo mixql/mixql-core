@@ -259,13 +259,7 @@ class ControlStmtsTest extends MainVisitorBaseTest {
       override def paramChanged(name: String, ctx: EngineContext): Unit = {}
 
     }
-    val context = runMainVisitor(
-      code,
-      new Context(
-        MutMap("stub" -> new StubEngine, "stub1" -> new Other),
-        "stub"
-      )
-    )
+    val context = runMainVisitor(code, new Context(MutMap("stub" -> new StubEngine, "stub1" -> new Other), "stub"))
 
     assert(context.currentEngine.isInstanceOf[Other])
     assert(context.currentEngine.name == "other")
@@ -466,14 +460,35 @@ class ControlStmtsTest extends MainVisitorBaseTest {
         throw new NullPointerException("hello")
       }
     }
-    val context =
-      runMainVisitor(code, new Context(MutMap("stub" -> new Other), "stub"))
+    val context = runMainVisitor(code, new Context(MutMap("stub" -> new Other), "stub"))
     val res = context.getVar("res")
     assert(res.isInstanceOf[string])
     assert(res.asInstanceOf[string].getValue == "NullPointerException")
     val res_msg = context.getVar("res_msg")
     assert(res_msg.isInstanceOf[string])
     assert(res_msg.asInstanceOf[string].getValue == "hello")
+
+    assert(isNull(context.getVar("ex")))
+    assert(isNull(context.getVar("ex.message")))
+  }
+
+  test("Test try/catch: user exception") {
+    val code =
+      """
+        |TRY
+        |  raise "gg", "wp";
+        |CATCH ex THEN
+        |  let res = $ex;
+        |  let res_msg = $ex.message;
+        |END
+                """.stripMargin
+    val context = runMainVisitor(code)
+    val res = context.getVar("res")
+    assert(res.isInstanceOf[string])
+    assert(res.asInstanceOf[string].getValue == "gg")
+    val res_msg = context.getVar("res_msg")
+    assert(res_msg.isInstanceOf[string])
+    assert(res_msg.asInstanceOf[string].getValue == "wp")
 
     assert(isNull(context.getVar("ex")))
     assert(isNull(context.getVar("ex.message")))
@@ -488,10 +503,7 @@ class ControlStmtsTest extends MainVisitorBaseTest {
         |return $y;
         |$x + $y;
                 """.stripMargin
-    val res = core.run(
-      code,
-      new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
-    )
+    val res = core.run(code, new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub"))
     assert(res.isInstanceOf[gInt])
     assert(res.asInstanceOf[gInt].getValue == 1)
   }
@@ -621,8 +633,7 @@ class ControlStmtsTest extends MainVisitorBaseTest {
         throw new NullPointerException("hello")
       }
     }
-    val context =
-      runMainVisitor(code, new Context(MutMap("stub" -> new Other), "stub"))
+    val context = runMainVisitor(code, new Context(MutMap("stub" -> new Other), "stub"))
     val res = context.getVar("res")
     assert(res.isInstanceOf[gInt])
     assert(res.asInstanceOf[gInt].getValue == 1)
