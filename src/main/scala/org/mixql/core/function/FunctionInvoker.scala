@@ -50,7 +50,12 @@ object FunctionInvoker {
           if (ctx.currentEngine.getDefinedFunctions().contains(funcName.toLowerCase))
             unpack(ctx.currentEngine._executeFunc(funcName, new EngineContext(ctx), args.map(pack): _*))
           else {
-            val engine = ctx.engines.find(eng => eng._2.getDefinedFunctions().contains(funcName))
+            val engine = ctx.engines.find(eng => {
+              if (eng._2.name != ctx.currentEngine.name)
+                eng._2.getDefinedFunctions().contains(funcName)
+              else
+                false
+            })
             engine match {
               case Some(value) => unpack(value._2._executeFunc(funcName, new EngineContext(ctx), args.map(pack): _*))
               case None        => throw new NoSuchMethodException(s"no function $funcName found for any engine")
