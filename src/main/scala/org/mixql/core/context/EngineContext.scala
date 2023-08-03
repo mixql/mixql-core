@@ -50,7 +50,7 @@ class EngineContext(val context: Context) {
             e.getMessage + "\n" +
             "target exception: " + e.getTargetException.getClass.getName + "\n" +
             "target exception msg: \n" + e.getTargetException.getMessage + "\n" +
-            "target exception stacktrace: \n" + e.getTargetException.getStackTraceString
+            "target exception stacktrace: \n" + e.getTargetException.printStackTrace()
         throw new Exception(errorMsg)
       case e: Exception => throw e
     }
