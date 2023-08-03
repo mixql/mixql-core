@@ -65,9 +65,10 @@ object FunctionInvoker {
   private def compareFunctionTypes(a: Method, paramsSeq: Seq[_]): Boolean = {
     val params = paramsSeq.toArray
     if (a.getParameters.length != params.length) {
-      if (a.getParameters.last.getType.isAssignableFrom(
-            Try(Class.forName("scala.collection.immutable.Seq")).getOrElse(Class.forName("scala.collection.Seq"))
-          ))
+      if (a.getParameters.last.getType.isAssignableFrom({
+            Try({ Class.forName("scala.collection.immutable.Seq") })
+              .getOrElse({ Class.forName("scala.collection.Seq") })
+          }))
         return true
       else
         return false
