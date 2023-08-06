@@ -6,6 +6,7 @@ import org.mixql.core.test.tag.Interpolation
 
 @Interpolation
 class StringInterpolationTest extends MainVisitorBaseTest {
+
   test("Test set with semicolon") {
     val code =
       """

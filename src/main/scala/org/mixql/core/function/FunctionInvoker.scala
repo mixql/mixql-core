@@ -9,6 +9,7 @@ import scala.collection.mutable.ListBuffer
 import scala.util.Try
 
 object FunctionInvoker {
+
   def invoke(functions: Map[String, Any],
              funcName: String,
              context: Object, // To support not only mixql-core context

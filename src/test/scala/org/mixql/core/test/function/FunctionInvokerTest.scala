@@ -53,6 +53,7 @@ class FunctionInvokerTest extends AnyFunSuite {
 
   val twoDefaultArgFunc =
     new Object {
+
       def apply(a: String = "abc", b: String = "1234"): String = {
         a + b
       }
@@ -60,6 +61,7 @@ class FunctionInvokerTest extends AnyFunSuite {
 
   val defaultSecondArgFunc =
     new Object {
+
       def apply(a: String, b: String = "1234"): String = {
         a + b
       }
@@ -67,6 +69,7 @@ class FunctionInvokerTest extends AnyFunSuite {
 
   val substr =
     new ((String, Int, Int) => String) {
+
       def apply(str: String, pos: Int, len: Int = Int.MaxValue): String = {
         if (len == Int.MaxValue)
           str.substring(pos)
@@ -82,6 +85,7 @@ class FunctionInvokerTest extends AnyFunSuite {
 
   val decListOfInt =
     new Object {
+
       def apply(ints: Int*): String = {
         ints.map(_ - 1).mkString(" ")
       }
@@ -89,6 +93,7 @@ class FunctionInvokerTest extends AnyFunSuite {
 
   val decListOfString =
     new Object {
+
       def apply(str: String*): String = {
         str.map(_.dropRight(1)).mkString(" ")
       }
@@ -96,6 +101,7 @@ class FunctionInvokerTest extends AnyFunSuite {
 
   val decListOfListOfString =
     new Object {
+
       def apply(str: Seq[String]*): String = {
         str.flatMap(x => x.map(y => y.dropRight(1))).mkString(" ")
       }

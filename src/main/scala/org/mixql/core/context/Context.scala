@@ -14,6 +14,7 @@ import scala.reflect.ClassTag
 import scala.collection.JavaConverters._
 
 object Context {
+
   val defaultFunctions: MutMap[String, Any] = MutMap[String, Any](
     "ascii" -> StringFunction.ascii,
     "base64" -> StringFunction.base64,

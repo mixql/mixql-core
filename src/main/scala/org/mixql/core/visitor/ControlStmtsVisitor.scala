@@ -12,6 +12,7 @@ import scala.util.control.Breaks.{break, _}
 import org.mixql.core.exception.UserSqlException
 
 trait ControlStmtsVisitor extends BaseVisitor {
+
   def toUserSqlException(e: Throwable): UserSqlException = {
     if (e.isInstanceOf[UserSqlException])
       return e.asInstanceOf[UserSqlException]

@@ -5,8 +5,10 @@ import java.text.{DecimalFormat, DecimalFormatSymbols}
 import java.util.Locale
 
 object StringFunction {
+
   val ascii =
     new (String => Int) {
+
       override def apply(str: String): Int =
         if (str.isEmpty)
           0
@@ -37,6 +39,7 @@ object StringFunction {
 
   val substr =
     new ((String, Int, Int) => String) {
+
       def apply(str: String, pos: Int, len: Int = Int.MaxValue): String = {
         if (len < 1) { return "" }
         val pre =
@@ -78,6 +81,7 @@ object StringFunction {
 
   val startsWith =
     new ((String, String) => Boolean) {
+
       def apply(str: String, prefix: String): Boolean = {
         str.startsWith(prefix)
       }
@@ -100,6 +104,7 @@ object StringFunction {
 
   val findFirstIn =
     new ((String, String) => Any) {
+
       def apply(str: String, findPattern: String): Any = {
         findPattern.r.findFirstIn(str) match {
           case None    => null
@@ -110,6 +115,7 @@ object StringFunction {
 
   val findAllIn =
     new ((String, String) => Array[String]) {
+
       def apply(str: String, findPattern: String): Array[String] = {
         findPattern.r.findAllIn(str).toList.toArray
       }
@@ -117,6 +123,7 @@ object StringFunction {
 
   val replaceAllIn =
     new ((String, String, String) => String) {
+
       def apply(str: String, pattern: String, replacement: String): String = {
         pattern.r.replaceAllIn(str, replacement)
       }
@@ -124,6 +131,7 @@ object StringFunction {
 
   val replaceFirstIn =
     new ((String, String, String) => String) {
+
       def apply(str: String, pattern: String, replacement: String): String = {
         pattern.r.replaceFirstIn(str, replacement)
       }
@@ -131,6 +139,7 @@ object StringFunction {
 
   val split =
     new ((String, String) => Array[String]) {
+
       def apply(str: String, pattern: String): Array[String] = {
         str.split(pattern)
       }

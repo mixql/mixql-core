@@ -4,6 +4,7 @@ import org.mixql.core.context.gtype._
 import org.mixql.core.test.MainVisitorBaseTest
 
 class AsciFunctionsTest extends MainVisitorBaseTest {
+
   test("Test `ascii('') == 0`") {
     val code =
       """

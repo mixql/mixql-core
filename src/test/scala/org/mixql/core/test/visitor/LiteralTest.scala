@@ -4,6 +4,7 @@ import org.mixql.core.context.gtype.bool
 import org.mixql.core.test.MainVisitorBaseTest
 
 class LiteralTest extends MainVisitorBaseTest {
+
   test("Test if double not null") {
     import scala.collection.mutable.{Map => MutMap}
 

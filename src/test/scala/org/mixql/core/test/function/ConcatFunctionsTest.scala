@@ -4,6 +4,7 @@ import org.mixql.core.context.gtype._
 import org.mixql.core.test.MainVisitorBaseTest
 
 class ConcatFunctionsTest extends MainVisitorBaseTest {
+
   test("Test `concat('Spark', 'SQL') == 'SparkSQL'`") {
     val code =
       """

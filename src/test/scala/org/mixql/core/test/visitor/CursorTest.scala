@@ -7,6 +7,7 @@ import org.mixql.core.test.MainVisitorBaseTest
 import org.mixql.core.test.engines.{CursorTestEngine1, CursorTestEngine2}
 
 class CursorTest extends MainVisitorBaseTest {
+
   test("Test cursor is array, fetch, open, close") {
     val code =
       """

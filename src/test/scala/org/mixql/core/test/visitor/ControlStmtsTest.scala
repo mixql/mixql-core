@@ -12,6 +12,7 @@ import scala.collection.mutable.{Map => MutMap}
 import scala.util.Try
 
 class ControlStmtsTest extends MainVisitorBaseTest {
+
   test("Test if: then") {
     val code =
       """

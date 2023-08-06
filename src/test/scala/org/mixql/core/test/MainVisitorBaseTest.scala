@@ -11,6 +11,7 @@ import org.scalatest.funsuite.AnyFunSuite
 import scala.collection.mutable.{Map => MutMap}
 
 class MainVisitorBaseTest extends AnyFunSuite {
+
   def runMainVisitor(code: String,
                      context: Context = {
                        new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")

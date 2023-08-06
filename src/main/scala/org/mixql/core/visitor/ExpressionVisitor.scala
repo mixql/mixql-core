@@ -11,6 +11,7 @@ import scala.collection.JavaConverters._
 import org.mixql.core.context.ControlContext
 
 trait ExpressionVisitor extends BaseVisitor {
+
   def executeOther(stmt: String, engine: sql.Choose_engineContext): Try[Type] =
     Try {
       if (engine) {

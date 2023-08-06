@@ -83,6 +83,7 @@ val Scala212 = "2.12.17"
 val ScalaVersions = Seq(Scala212, Scala213, Scala3)
 
 lazy val format = taskKey[Unit]("format src, test, sbt")
+
 format := {
   (mixQLCore / scalafmtAll).value
   (Compile / scalafmtSbt).value

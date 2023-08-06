@@ -9,9 +9,11 @@ import org.scalatest.funsuite.AnyFunSuite
 import scala.collection.mutable.{Map => MutMap}
 
 class ContextTest extends AnyFunSuite {
+
   class MyEngine extends Engine {
     var query: String = ""
     override def name: String = "MyEngine"
+
     override def execute(stmt: String, ctx: EngineContext): Type = {
       query = stmt
       new Null()

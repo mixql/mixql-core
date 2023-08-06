@@ -83,6 +83,7 @@ abstract class Engine {
     *   of the param
     */
   def paramChanged(name: String, ctx: EngineContext): Unit
+
   final def _paramChanged(name: String, ctx: EngineContext): Unit = {
     if (engineStarted)
       paramChanged(name, ctx)

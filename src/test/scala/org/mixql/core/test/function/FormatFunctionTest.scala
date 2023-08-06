@@ -4,6 +4,7 @@ import org.mixql.core.context.gtype._
 import org.mixql.core.test.MainVisitorBaseTest
 
 class FormatFunctionTest extends MainVisitorBaseTest {
+
   test("Test `format_number(12332.123456, 4) == '12,332.1235'`") {
     val code =
       """
