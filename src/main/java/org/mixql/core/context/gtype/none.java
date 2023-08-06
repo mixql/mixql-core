@@ -1,15 +1,15 @@
 package org.mixql.core.context.gtype;
 
-public class nothing extends Type {
+public class none extends Type {
 
     @Override
     public String toString() {
-        return "nothing";
+        return "none";
     }
 
     @Override
     public Type Equal(Type other) {
-        if (other instanceof nothing) {
+        if (other instanceof none) {
             return new bool(true);
         }
         return new bool(false);
@@ -17,7 +17,7 @@ public class nothing extends Type {
 
     @Override
     public Type NotEqual(Type other) {
-        if (other instanceof nothing) {
+        if (other instanceof none) {
             return new bool(false);
         }
         return new bool(true);
@@ -25,7 +25,7 @@ public class nothing extends Type {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof nothing)
+        if (obj instanceof none)
             return true;
         else
             return false;

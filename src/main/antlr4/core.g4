@@ -158,7 +158,7 @@ literal:
      | array_literal            #literal_array
      | map_literal              #literal_map
      | T_NULL                   #literal_null
-     | T_NOTHING                #literal_nothing
+     | T_NONE                   #literal_none
      | T_CURRENT_DATE           #literal_current_date
      | T_CURRENT_TIMESTAMP      #literal_current_timestamp
      ;

@@ -264,7 +264,7 @@ class Context(val engines: MutMap[String, Engine],
     }
     // set variable value
     value match {
-      case _: Null => scope.head.remove(key)
+      case _: none => scope.head.remove(key)
       case _       => scope.head.put(key, value)
     }
     engineVariablesUpdate match {
@@ -283,13 +283,13 @@ class Context(val engines: MutMap[String, Engine],
     */
   def getVar(key: String): Type = {
     scope.foreach(vars => {
-      val res = vars.getOrElse(key, new Null())
+      val res = vars.getOrElse(key, new none())
       res match {
-        case _: Null =>
+        case _: none =>
         case other   => return other
       }
     })
-    new Null()
+    new none()
   }
 
   /** interpolate statement via current context

@@ -1,6 +1,9 @@
 package org.mixql.core.exception
 
-class UserSqlException(e_type: String, m: String) extends Exception {
-  val exc_type = e_type
-  val detailMessage = m
+import org.mixql.core.context.gtype.{map, string, Type}
+import java.util.HashMap;
+
+class UserSqlException(e_type: String, message: String) extends map(new HashMap) {
+  update(new string("type"), new string(e_type))
+  update(new string("message"), new string(message))
 }

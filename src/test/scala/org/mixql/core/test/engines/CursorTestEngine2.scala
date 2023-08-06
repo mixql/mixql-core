@@ -1,7 +1,7 @@
 package org.mixql.core.test.engines
 
 import org.mixql.core.context.{EngineContext, gtype}
-import org.mixql.core.context.gtype.{Type, bool, cursor, gInt, nothing}
+import org.mixql.core.context.gtype._
 import org.mixql.core.engine.Engine
 import org.mixql.core.logger.logInfo
 
@@ -53,6 +53,6 @@ class CursorTest2(engine: CursorTestEngine2, stmt: String) extends cursor {
       currentCount = currentCount + 1;
       new gInt(stream.nextInt())
     } else
-      new nothing()
+      new none()
   }
 }

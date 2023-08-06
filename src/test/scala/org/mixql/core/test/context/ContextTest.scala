@@ -9,13 +9,6 @@ import org.scalatest.funsuite.AnyFunSuite
 import scala.collection.mutable.{Map => MutMap}
 
 class ContextTest extends AnyFunSuite {
-  def isNull(v: Type): Boolean = {
-    v match {
-      case _: Null => true
-      case _       => false
-    }
-  }
-
   class MyEngine extends Engine {
     var query: String = ""
     override def name: String = "MyEngine"
@@ -72,7 +65,7 @@ class ContextTest extends AnyFunSuite {
 
   test("Test get undefined variable") {
     val context = new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
-    assert(isNull(context.getVar("a")))
+    assert(isNone(context.getVar("a")))
   }
 
   test("Test change var value in context") {

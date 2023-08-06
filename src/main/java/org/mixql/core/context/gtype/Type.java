@@ -1,6 +1,6 @@
 package org.mixql.core.context.gtype;
 
-public abstract class Type {
+public abstract class Type extends Exception {
     // +
     public Type Add(Type other) {
         throw new UnsupportedOperationException(

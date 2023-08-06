@@ -126,7 +126,7 @@ class ControlStmtsTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val i = context.getVar("i")
-    assert(isNull(i))
+    assert(isNone(i))
     val res = context.getVar("res")
     assert(res.isInstanceOf[string])
     assert(res.asInstanceOf[string].getValue == "13579111315171920")
@@ -142,7 +142,7 @@ class ControlStmtsTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val i = context.getVar("i")
-    assert(isNull(i))
+    assert(isNone(i))
     val res = context.getVar("res")
     assert(res.isInstanceOf[string])
     assert(res.asInstanceOf[string].getValue == "20181614121086421")
@@ -198,7 +198,7 @@ class ControlStmtsTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val i = context.getVar("i")
-    assert(isNull(i))
+    assert(isNone(i))
     val res = context.getVar("res")
     assert(res.isInstanceOf[string])
     assert(res.asInstanceOf[string].getValue == "135")
@@ -420,8 +420,8 @@ class ControlStmtsTest extends MainVisitorBaseTest {
         |TRY
         |  select gg from wp;
         |CATCH ex THEN
-        |  let res = $ex;
-        |  let res_msg = $ex.message;
+        |  let res = $ex["type"];
+        |  let res_msg = $ex["message"];
         |END
                 """.stripMargin
 
@@ -438,8 +438,7 @@ class ControlStmtsTest extends MainVisitorBaseTest {
     assert(res_msg.isInstanceOf[string])
     assert(res_msg.asInstanceOf[string].getValue == "hello")
 
-    assert(isNull(context.getVar("ex")))
-    assert(isNull(context.getVar("ex.message")))
+    assert(isNone(context.getVar("ex")))
   }
 
   test("Test try/catch: user exception") {
@@ -448,8 +447,8 @@ class ControlStmtsTest extends MainVisitorBaseTest {
         |TRY
         |  raise "gg", "wp";
         |CATCH ex THEN
-        |  let res = $ex;
-        |  let res_msg = $ex.message;
+        |  let res = $ex["type"];
+        |  let res_msg = $ex["message"];
         |END
                 """.stripMargin
     val context = runMainVisitor(code)
@@ -460,8 +459,7 @@ class ControlStmtsTest extends MainVisitorBaseTest {
     assert(res_msg.isInstanceOf[string])
     assert(res_msg.asInstanceOf[string].getValue == "wp")
 
-    assert(isNull(context.getVar("ex")))
-    assert(isNull(context.getVar("ex.message")))
+    assert(isNone(context.getVar("ex")))
   }
 
   test("Test return") {

@@ -1,7 +1,7 @@
 package org.mixql.core.test.visitor
 
 import org.mixql.core.context.Context
-import org.mixql.core.context.gtype.{array, bool, gInt, nothing, string}
+import org.mixql.core.context.gtype._
 import org.mixql.core.engine.Engine
 import org.mixql.core.test.MainVisitorBaseTest
 import org.mixql.core.test.engines.{CursorTestEngine1, CursorTestEngine2}
@@ -48,9 +48,9 @@ class CursorTest extends MainVisitorBaseTest {
     assert(res3.asInstanceOf[gInt].getValue == 12)
 
     val res4 = context.getVar("res4")
-    assert(res4.isInstanceOf[nothing])
+    assert(res4.isInstanceOf[none])
     val res5 = context.getVar("res5")
-    assert(res5.isInstanceOf[nothing])
+    assert(res5.isInstanceOf[none])
   }
 
   test("Test cursor is map, fetch, open, close") {
@@ -107,9 +107,9 @@ class CursorTest extends MainVisitorBaseTest {
     )
 
     val res4 = context.getVar("res4")
-    assert(res4.isInstanceOf[nothing])
+    assert(res4.isInstanceOf[none])
     val res5 = context.getVar("res5")
-    assert(res5.isInstanceOf[nothing])
+    assert(res5.isInstanceOf[none])
   }
 
   test("Test cursor will not fetch without open") {
@@ -162,7 +162,7 @@ class CursorTest extends MainVisitorBaseTest {
       if (i < 7)
         assert(arr1.apply(new gInt(i)).isInstanceOf[gInt])
       else
-        assert(arr1.apply(new gInt(i)).isInstanceOf[nothing])
+        assert(arr1.apply(new gInt(i)).isInstanceOf[none])
     }
   }
 
@@ -179,7 +179,7 @@ class CursorTest extends MainVisitorBaseTest {
         |let arr = [];
         |
         |let res = null;
-        |while $res != nothing do
+        |while $res != none do
         |   if $res != null then
         |       let arr = $arr + $res;
         |   end if
