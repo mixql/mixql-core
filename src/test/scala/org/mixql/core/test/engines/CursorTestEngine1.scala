@@ -11,7 +11,7 @@ class CursorTestEngine1 extends Engine {
 
   val rand = new scala.util.Random
 
-  override def execute(stmt: String, ctx: EngineContext): Type = {
+  override def executeImpl(stmt: String, ctx: EngineContext): Type = {
     query = stmt
     new array(
       Array[Type](
@@ -26,7 +26,7 @@ class CursorTestEngine1 extends Engine {
     )
   }
 
-  override def executeFunc(name: String, ctx: EngineContext, params: Type*): Type = ???
+  override def executeFuncImpl(name: String, ctx: EngineContext, params: Type*): Type = ???
 
-  override def paramChanged(name: String, ctx: EngineContext): Unit = {}
+  override def paramChangedImpl(name: String, ctx: EngineContext): Unit = {}
 }

@@ -12,19 +12,19 @@ class CursorTestEngine2 extends Engine {
 
   override def name: String = "CursorTestEngine2"
 
-  override def execute(stmt: String, ctx: EngineContext): Type = {
+  override def executeImpl(stmt: String, ctx: EngineContext): Type = {
     query = stmt
     throw new Exception("execute was triggered instead of executeCursor")
   }
 
-  override def getCursor(stmt: String, ctx: EngineContext): cursor = {
+  override def getCursorImpl(stmt: String, ctx: EngineContext): cursor = {
     query = stmt
     new CursorTest2(this, stmt: String)
   }
 
-  override def executeFunc(name: String, ctx: EngineContext, params: Type*): Type = ???
+  override def executeFuncImpl(name: String, ctx: EngineContext, params: Type*): Type = ???
 
-  override def paramChanged(name: String, ctx: EngineContext): Unit = {}
+  override def paramChangedImpl(name: String, ctx: EngineContext): Unit = {}
 }
 
 class CursorTest2(engine: CursorTestEngine2, stmt: String) extends cursor {
