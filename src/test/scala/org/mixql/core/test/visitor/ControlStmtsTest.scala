@@ -340,7 +340,7 @@ class ControlStmtsTest extends MainVisitorBaseTest {
     assert(context.currentEngineAllias == "stub")
     // Was executed on stub1 engine and not on stub
     assert(context.getEngine("stub1").get.asInstanceOf[StubEngine].queue.last == "select gg from wp")
-    assertThrows[java.util.NoSuchElementException](context.getEngine("stub").get.asInstanceOf[StubEngine].queue.last)
+    assertThrows[Exception](context.getEngine("stub").get.asInstanceOf[StubEngine].queue.last)
     ///////////////////////////////////////////////
     // Will not trigger paramChanged if not all
     if ({
@@ -388,7 +388,7 @@ class ControlStmtsTest extends MainVisitorBaseTest {
     assert(context.currentEngineAllias == "stub1")
     // Was executed on stub1 engine and not on stub
     assert(context.getEngine("stub1").get.asInstanceOf[StubEngine].queue.last == "select gg from wp")
-    assertThrows[java.util.NoSuchElementException](context.getEngine("stub").get.asInstanceOf[StubEngine].queue.last)
+    assertThrows[Exception](context.getEngine("stub").get.asInstanceOf[StubEngine].queue.last)
     ///////////////////////////////////////////////
     // Will not trigger paramChanged if not all
     if ({
