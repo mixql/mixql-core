@@ -236,7 +236,7 @@ class Context(val engines: MutMap[String, Engine],
             eng.execute(stmt, new EngineContext(this))
           else
             eng.getCursor(stmt, new EngineContext(this))
-        old.keys.foreach(k => setVar(k, params(k)))
+        old.keys.foreach(k => setVar(k, old(k)))
         params.foreach(p => eng.paramChanged(p._1, new EngineContext(this)))
         res
       case None => throw new NoSuchElementException(s"unknown engine $engine")
