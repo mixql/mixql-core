@@ -13,6 +13,12 @@ import org.mixql.core.exception.UserSqlException
 
 trait ControlStmtsVisitor extends BaseVisitor {
 
+  def toUserSqlException(e: Throwable): UserSqlException = {
+    if (e.isInstanceOf[UserSqlException])
+      return e.asInstanceOf[UserSqlException]
+    return new UserSqlException(e.getClass.getSimpleName, e.getMessage)
+  }
+
   override def visitTry_catch_stmt(ctx: sql.Try_catch_stmtContext): Type = {
     try {
       val block = visit(ctx.try_bock)
@@ -20,7 +26,7 @@ trait ControlStmtsVisitor extends BaseVisitor {
         return block
     } catch {
       case e: Throwable =>
-        val exception = new UserSqlException(e)
+        val exception = toUserSqlException(e)
         val block =
           if (ctx.exc) {
             val exc_var_name = visit(ctx.exc).toString

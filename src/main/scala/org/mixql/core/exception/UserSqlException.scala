@@ -6,8 +6,4 @@ import java.util.HashMap;
 class UserSqlException(e_type: String, message: String) extends map(new HashMap) {
   update(new string("type"), new string(e_type))
   update(new string("message"), new string(message))
-
-  def this(ex: Throwable) {
-    this(ex.getClass.getSimpleName, ex.getMessage)
-  }
 }
