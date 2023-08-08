@@ -9,6 +9,7 @@ import scala.collection.mutable.ListBuffer
 import scala.util.Try
 
 object FunctionInvoker {
+
   def invoke(functions: Map[String, Any],
              funcName: String,
              context: Object, // To support not only mixql-core context
@@ -48,7 +49,7 @@ object FunctionInvoker {
           if (kwargs.nonEmpty)
             throw new UnsupportedOperationException("named args for engine function not supported")
           if (ctx.currentEngine.getDefinedFunctions().contains(funcName.toLowerCase))
-            unpack(ctx.currentEngine._executeFunc(funcName, new EngineContext(ctx), args.map(pack): _*))
+            unpack(ctx.currentEngine.executeFunc(funcName, new EngineContext(ctx), args.map(pack): _*))
           else {
             val engine = ctx.engines.find(eng => {
               if (eng._2.name != ctx.currentEngine.name)
@@ -57,7 +58,7 @@ object FunctionInvoker {
                 false
             })
             engine match {
-              case Some(value) => unpack(value._2._executeFunc(funcName, new EngineContext(ctx), args.map(pack): _*))
+              case Some(value) => unpack(value._2.executeFunc(funcName, new EngineContext(ctx), args.map(pack): _*))
               case None        => throw new NoSuchMethodException(s"no function $funcName found for any engine")
             }
           }

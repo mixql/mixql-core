@@ -6,6 +6,7 @@ import org.mixql.core.test.tag.Interpolation
 
 @Interpolation
 class OtherInterpolationTest extends MainVisitorBaseTest {
+
   test("Test any statement variable interpolation") {
     val code =
       """

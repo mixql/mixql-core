@@ -5,6 +5,7 @@ import org.mixql.core.generated.sql.BlockContext
 import org.mixql.core.visitor.BaseVisitor
 
 final class SqlLambda(paramNames: List[String], body: BlockContext, visitor: BaseVisitor) extends Type {
+
   def apply(params: Any*): Any = {
     if (paramNames.size > params.size)
       throw new IllegalArgumentException("not enough arguments")

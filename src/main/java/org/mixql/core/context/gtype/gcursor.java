@@ -56,7 +56,7 @@ public class gcursor extends cursor {
             array arr = (array) source;
             gInt arr_size = arr.size();
             if (arr_size.value == 0)
-                return new nothing();
+                return new none();
 
             if (arr_index == -1) {
                 arr_index = 0;
@@ -67,7 +67,7 @@ public class gcursor extends cursor {
                 return elem;
             }
 
-            return new nothing();
+            return new none();
         }
 
         if (source instanceof map) {
@@ -80,7 +80,7 @@ public class gcursor extends cursor {
             }
 
             if (mSize == 0)
-                return new nothing();
+                return new none();
 
             if (keySetIndex == -1) {
                 keySetIndex = 0;
@@ -91,7 +91,7 @@ public class gcursor extends cursor {
                         new Type[]{keySet[keySetIndex], m.apply(keySet[keySetIndex++])}
                 );
             }
-            return new nothing();
+            return new none();
         }
 
         throw new Exception("Expexted source of type array or map for cursor, not type: " +

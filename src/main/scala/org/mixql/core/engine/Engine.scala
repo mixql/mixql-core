@@ -23,23 +23,13 @@ abstract class Engine {
     * @return
     *   the result of exection
     */
-  def execute(stmt: String, ctx: EngineContext): Type
-
-  final def _execute(stmt: String, ctx: EngineContext): Type = {
+  final def execute(stmt: String, ctx: EngineContext): Type = {
     if (!engineStarted)
       logInfo(s"Engine $name was triggered by execute request")
 
     engineStarted = true
 
-    execute(stmt, ctx)
-  }
-
-  final def _getCursor(stmt: String, ctx: EngineContext): cursor = {
-    if (!engineStarted)
-      logInfo(s"Engine $name was triggered by execute request expecting cursor")
-
-    engineStarted = true
-    getCursor(stmt, ctx)
+    executeImpl(stmt, ctx)
   }
 
   /** execute statement
@@ -49,13 +39,12 @@ abstract class Engine {
     * @return
     *   the result of execution as cursor
     */
-  def getCursor(stmt: String, ctx: EngineContext): cursor = {
-    import org.mixql.core.logger
-    logger.logWarn(
-      s"getCursor was not defined in engine $name" +
-        name + ". Use execute method instead"
-    )
-    new gcursor(_execute(stmt, ctx))
+  final def getCursor(stmt: String, ctx: EngineContext): cursor = {
+    if (!engineStarted)
+      logInfo(s"Engine $name was triggered by execute request expecting cursor")
+
+    engineStarted = true
+    getCursorImpl(stmt, ctx)
   }
 
   /** execute engine specific user function
@@ -66,13 +55,11 @@ abstract class Engine {
     *   function params
     * @return
     */
-  def executeFunc(name: String, ctx: EngineContext, params: Type*): Type
-
-  final def _executeFunc(name: String, ctx: EngineContext, params: Type*): Type = {
+  final def executeFunc(name: String, ctx: EngineContext, params: Type*): Type = {
     if (!engineStarted)
       logInfo(s"Engine $name was triggered by executeFunc request")
     engineStarted = true
-    executeFunc(name, ctx, params: _*)
+    executeFuncImpl(name, ctx, params: _*)
   }
 
   /** set param for engine
@@ -82,10 +69,9 @@ abstract class Engine {
     * @param value
     *   of the param
     */
-  def paramChanged(name: String, ctx: EngineContext): Unit
-  final def _paramChanged(name: String, ctx: EngineContext): Unit = {
+  final def paramChanged(name: String, ctx: EngineContext): Unit = {
     if (engineStarted)
-      paramChanged(name, ctx)
+      paramChangedImpl(name, ctx)
   }
 
   /** get list of defined functions names in lower case
@@ -102,4 +88,19 @@ abstract class Engine {
     //    engineStarted = true
     Nil
   }
+
+  def executeImpl(stmt: String, ctx: EngineContext): Type
+
+  def getCursorImpl(stmt: String, ctx: EngineContext): cursor = {
+    import org.mixql.core.logger
+    logger.logWarn(
+      s"getCursor was not defined in engine $name" +
+        name + ". Use execute method instead"
+    )
+    new gcursor(execute(stmt, ctx))
+  }
+
+  def executeFuncImpl(name: String, ctx: EngineContext, params: Type*): Type
+
+  def paramChangedImpl(name: String, ctx: EngineContext): Unit
 }

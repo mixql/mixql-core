@@ -12,14 +12,14 @@ class StubEngine extends Engine {
 
   override def name: String = "stub"
 
-  override def execute(stmt: String, ctx: EngineContext): Type = {
+  override def executeImpl(stmt: String, ctx: EngineContext): Type = {
     queue += stmt
     new Null()
   }
 
   var changedParams: Map[String, Type] = Map()
 
-  override def executeFunc(name: String, ctx: EngineContext, params: Type*): Type = {
+  override def executeFuncImpl(name: String, ctx: EngineContext, params: Type*): Type = {
     name match {
       case "getnum" => 42
       case "getstr" => "42"
@@ -27,7 +27,7 @@ class StubEngine extends Engine {
     }
   }
 
-  override def paramChanged(name: String, ctx: EngineContext): Unit = {
+  override def paramChangedImpl(name: String, ctx: EngineContext): Unit = {
     changedParams = changedParams ++ Map(name -> ctx.getVar(name))
   }
 

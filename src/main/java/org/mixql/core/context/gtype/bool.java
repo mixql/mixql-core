@@ -52,7 +52,7 @@ public class bool extends Type {
         if (other instanceof Null) {
             return false;
         }
-        if (other instanceof nothing) {
+        if (other instanceof none) {
             return false;
         }
         return super.equals(other);
@@ -66,7 +66,7 @@ public class bool extends Type {
         if (other instanceof Null) {
             return new bool(false);
         }
-        if (other instanceof nothing) {
+        if (other instanceof none) {
             return new bool(false);
         }
         return super.Equal(other);
@@ -80,7 +80,7 @@ public class bool extends Type {
         if (other instanceof Null) {
             return new bool(true);
         }
-        if (other instanceof nothing) {
+        if (other instanceof none) {
             return new bool(true);
         }
         return super.NotEqual(other);

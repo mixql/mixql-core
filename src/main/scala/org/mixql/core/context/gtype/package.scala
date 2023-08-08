@@ -96,6 +96,12 @@ package object gtype {
       case _       => false
     }
 
+  def isNone(a: Type): Boolean =
+    a match {
+      case _: none => true
+      case _       => false
+    }
+
   def pack(a: Any): Type = {
     a match {
       case null          => new Null()

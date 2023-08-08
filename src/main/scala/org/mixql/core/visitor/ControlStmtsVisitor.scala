@@ -12,6 +12,7 @@ import scala.util.control.Breaks.{break, _}
 import org.mixql.core.exception.UserSqlException
 
 trait ControlStmtsVisitor extends BaseVisitor {
+
   def toUserSqlException(e: Throwable): UserSqlException = {
     if (e.isInstanceOf[UserSqlException])
       return e.asInstanceOf[UserSqlException]
@@ -28,13 +29,11 @@ trait ControlStmtsVisitor extends BaseVisitor {
         val exception = toUserSqlException(e)
         val block =
           if (ctx.exc) {
-            val old_exc = context.getVar(visit(ctx.exc).toString)
-            val old_message = context.getVar(visit(ctx.exc).toString + ".message")
-            context.setVar(visit(ctx.exc).toString, new string(exception.exc_type))
-            context.setVar(visit(ctx.exc).toString + ".message", new string(exception.detailMessage))
+            val exc_var_name = visit(ctx.exc).toString
+            val old_exc = context.getVar(exc_var_name)
+            context.setVar(exc_var_name, exception)
             val block = visit(ctx.catch_block)
-            context.setVar(visit(ctx.exc).toString, old_exc)
-            context.setVar(visit(ctx.exc).toString + ".message", old_message)
+            context.setVar(exc_var_name, old_exc)
             block
           } else {
             visit(ctx.catch_block)
@@ -118,7 +117,7 @@ trait ControlStmtsVisitor extends BaseVisitor {
     cursor.open()
 
     var fetchRes = cursor.fetch()
-    while (!fetchRes.isInstanceOf[nothing]) {
+    while (!fetchRes.isInstanceOf[none]) {
 //      fetchRes match {
 //        case collection1: collection => execBlockInFor(collection1, ctx)
 //        case _ => execFetchBlockInFor(fetchRes, ctx)

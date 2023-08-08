@@ -41,14 +41,14 @@ class LiteralTest extends MainVisitorBaseTest {
     assert(res1.asInstanceOf[bool].getValue)
   }
 
-  test("Test if int not nothing") {
+  test("Test if int not none") {
     import scala.collection.mutable.{Map => MutMap}
 
     val code =
       """
         |let res = 5;
         |let flag = false;
-        |if $res != nothing then
+        |if $res != none then
         |let flag = true;
         |end if
               """.stripMargin
@@ -59,14 +59,14 @@ class LiteralTest extends MainVisitorBaseTest {
     assert(res1.asInstanceOf[bool].getValue)
   }
 
-  test("Test if nothing is nothing") {
+  test("Test if none is none") {
     import scala.collection.mutable.{Map => MutMap}
 
     val code =
       """
-        |let res = nothing;
+        |let res = none;
         |let flag = true;
-        |if $res != nothing then
+        |if $res != none then
         |   let flag = false;
         |end if
               """.stripMargin
@@ -95,14 +95,14 @@ class LiteralTest extends MainVisitorBaseTest {
     assert(res1.asInstanceOf[bool].getValue)
   }
 
-  test("Test if double is nothing") {
+  test("Test if double is none") {
     import scala.collection.mutable.{Map => MutMap}
 
     val code =
       """
         |let res = 5.3;
         |let flag = false;
-        |if $res != nothing then
+        |if $res != none then
         |let flag = true;
         |end if
               """.stripMargin
@@ -149,14 +149,14 @@ class LiteralTest extends MainVisitorBaseTest {
     assert(res1.asInstanceOf[bool].getValue)
   }
 
-  test("Test if array not nothing") {
+  test("Test if array not none") {
     import scala.collection.mutable.{Map => MutMap}
 
     val code =
       """
         |let res = [5.3];
         |let flag = false;
-        |if $res != nothing then
+        |if $res != none then
         |let flag = true;
         |end if
               """.stripMargin
@@ -185,14 +185,14 @@ class LiteralTest extends MainVisitorBaseTest {
     assert(res1.asInstanceOf[bool].getValue)
   }
 
-  test("Test if map not nothing") {
+  test("Test if map not none") {
     import scala.collection.mutable.{Map => MutMap}
 
     val code =
       """
         |let res =  {"5.3": 5.3};
         |let flag = false;
-        |if $res != nothing then
+        |if $res != none then
         |let flag = true;
         |end if
               """.stripMargin
@@ -221,14 +221,14 @@ class LiteralTest extends MainVisitorBaseTest {
     assert(res1.asInstanceOf[bool].getValue)
   }
 
-  test("Test if bool not nothing") {
+  test("Test if bool not none") {
     import scala.collection.mutable.{Map => MutMap}
 
     val code =
       """
         |let res =  true;
         |let flag = false;
-        |if $res != nothing then
+        |if $res != none then
         |let flag = true;
         |end if
               """.stripMargin
@@ -257,14 +257,14 @@ class LiteralTest extends MainVisitorBaseTest {
     assert(res1.asInstanceOf[bool].getValue)
   }
 
-  test("Test if string not nothing") {
+  test("Test if string not none") {
     import scala.collection.mutable.{Map => MutMap}
 
     val code =
       """
         |let res =  "true";
         |let flag = false;
-        |if $res != nothing then
+        |if $res != none then
         |let flag = true;
         |end if
               """.stripMargin

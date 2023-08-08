@@ -10,6 +10,7 @@ import org.mixql.core.logger.logDebug
 import scala.collection.mutable.{Map => MutMap}
 
 class ExpressionTest extends MainVisitorBaseTest {
+
   test("Test empty string") {
     val code =
       """

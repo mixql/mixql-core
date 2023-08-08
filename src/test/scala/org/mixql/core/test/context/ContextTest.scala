@@ -9,22 +9,17 @@ import org.scalatest.funsuite.AnyFunSuite
 import scala.collection.mutable.{Map => MutMap}
 
 class ContextTest extends AnyFunSuite {
-  def isNull(v: Type): Boolean = {
-    v match {
-      case _: Null => true
-      case _       => false
-    }
-  }
 
   class MyEngine extends Engine {
     var query: String = ""
     override def name: String = "MyEngine"
-    override def execute(stmt: String, ctx: EngineContext): Type = {
+
+    override def executeImpl(stmt: String, ctx: EngineContext): Type = {
       query = stmt
       new Null()
     }
-    override def executeFunc(name: String, ctx: EngineContext, params: Type*): Type = ???
-    override def paramChanged(name: String, ctx: EngineContext): Unit = {}
+    override def executeFuncImpl(name: String, ctx: EngineContext, params: Type*): Type = ???
+    override def paramChangedImpl(name: String, ctx: EngineContext): Unit = {}
   }
 
   test("Test get vars from config") {
@@ -72,7 +67,7 @@ class ContextTest extends AnyFunSuite {
 
   test("Test get undefined variable") {
     val context = new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
-    assert(isNull(context.getVar("a")))
+    assert(isNone(context.getVar("a")))
   }
 
   test("Test change var value in context") {
@@ -148,8 +143,8 @@ class ContextTest extends AnyFunSuite {
         MutMap[String, Engine]("stub1" -> new StubEngine, "stub2" -> new StubEngine, "stub3" -> new StubEngine),
         "stub1"
       )
-    context.getEngine("stub1").get._execute("sdfdsfsdf sd fs", new EngineContext(context))
-    context.getEngine("stub2").get._execute("sdfdsfsdf sd fsdfg", new EngineContext(context))
+    context.getEngine("stub1").get.execute("sdfdsfsdf sd fs", new EngineContext(context))
+    context.getEngine("stub2").get.execute("sdfdsfsdf sd fsdfg", new EngineContext(context))
     context.setVar("mixql.engine.variables.update", new string("all"))
     context.setVar("a", new gInt(12))
     assert(context.getVar("a").isInstanceOf[gInt])
@@ -176,8 +171,8 @@ class ContextTest extends AnyFunSuite {
   test("Test engine.variables.update = current") {
     val context = new Context(MutMap[String, Engine]("stub1" -> new StubEngine, "stub2" -> new StubEngine), "stub1")
     context.setVar("mixql.engine.variables.update", new string("current"))
-    context.getEngine("stub1").get._execute("sdfdsfsdf sd fs", new EngineContext(context))
-    context.getEngine("stub2").get._execute("sdfdsfsdf sd fsdfg", new EngineContext(context))
+    context.getEngine("stub1").get.execute("sdfdsfsdf sd fs", new EngineContext(context))
+    context.getEngine("stub2").get.execute("sdfdsfsdf sd fsdfg", new EngineContext(context))
     context.setVar("a", new gInt(12))
     assert(context.getVar("a").isInstanceOf[gInt])
     assert(context.getVar("a").asInstanceOf[gInt].getValue == 12)
@@ -192,8 +187,8 @@ class ContextTest extends AnyFunSuite {
   test("Test engine.variables.update = none") {
     val context = new Context(MutMap[String, Engine]("stub1" -> new StubEngine, "stub2" -> new StubEngine), "stub1")
     context.setVar("mixql.engine.variables.update", new string("none"))
-    context.getEngine("stub1").get._execute("sdfdsfsdf sd fs", new EngineContext(context))
-    context.getEngine("stub2").get._execute("sdfdsfsdf sd fsdfg", new EngineContext(context))
+    context.getEngine("stub1").get.execute("sdfdsfsdf sd fs", new EngineContext(context))
+    context.getEngine("stub2").get.execute("sdfdsfsdf sd fsdfg", new EngineContext(context))
     context.setVar("a", new gInt(12))
     assert(context.getVar("a").isInstanceOf[gInt])
     assert(context.getVar("a").asInstanceOf[gInt].getValue == 12)
@@ -204,8 +199,8 @@ class ContextTest extends AnyFunSuite {
   test("Test scope engine.variables.update = all") {
     val context = new Context(MutMap[String, Engine]("stub1" -> new StubEngine, "stub2" -> new StubEngine), "stub1")
     context.setVar("mixql.engine.variables.update", new string("all"))
-    context.getEngine("stub1").get._execute("sdfdsfsdf sd fs", new EngineContext(context))
-    context.getEngine("stub2").get._execute("sdfdsfsdf sd fsdfg", new EngineContext(context))
+    context.getEngine("stub1").get.execute("sdfdsfsdf sd fs", new EngineContext(context))
+    context.getEngine("stub2").get.execute("sdfdsfsdf sd fsdfg", new EngineContext(context))
     context.setVar("a", new gInt(12))
     context.push_scope()
     context.setVar("a", new gInt(15))

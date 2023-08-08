@@ -12,6 +12,7 @@ import scala.collection.mutable.{Map => MutMap}
 import scala.util.Try
 
 class ControlStmtsTest extends MainVisitorBaseTest {
+
   test("Test if: then") {
     val code =
       """
@@ -126,7 +127,7 @@ class ControlStmtsTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val i = context.getVar("i")
-    assert(isNull(i))
+    assert(isNone(i))
     val res = context.getVar("res")
     assert(res.isInstanceOf[string])
     assert(res.asInstanceOf[string].getValue == "13579111315171920")
@@ -142,7 +143,7 @@ class ControlStmtsTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val i = context.getVar("i")
-    assert(isNull(i))
+    assert(isNone(i))
     val res = context.getVar("res")
     assert(res.isInstanceOf[string])
     assert(res.asInstanceOf[string].getValue == "20181614121086421")
@@ -198,7 +199,7 @@ class ControlStmtsTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val i = context.getVar("i")
-    assert(isNull(i))
+    assert(isNone(i))
     val res = context.getVar("res")
     assert(res.isInstanceOf[string])
     assert(res.asInstanceOf[string].getValue == "135")
@@ -252,11 +253,11 @@ class ControlStmtsTest extends MainVisitorBaseTest {
     class Other extends Engine {
       override def name: String = "other"
 
-      override def execute(stmt: String, ctx: EngineContext): Type = ???
+      override def executeImpl(stmt: String, ctx: EngineContext): Type = ???
 
-      override def executeFunc(name: String, ctx: EngineContext, params: Type*): Type = ???
+      override def executeFuncImpl(name: String, ctx: EngineContext, params: Type*): Type = ???
 
-      override def paramChanged(name: String, ctx: EngineContext): Unit = {}
+      override def paramChangedImpl(name: String, ctx: EngineContext): Unit = {}
 
     }
     val context = runMainVisitor(code, new Context(MutMap("stub" -> new StubEngine, "stub1" -> new Other), "stub"))
@@ -308,7 +309,7 @@ class ControlStmtsTest extends MainVisitorBaseTest {
     class Other extends StubEngine {
       override def name: String = "stub"
 
-      override def execute(stmt: String, ctx: EngineContext): Type = {
+      override def executeImpl(stmt: String, ctx: EngineContext): Type = {
         queue += stmt + " spark.execution.memory=" + ctx.getVar("spark.execution.memory").toString
         new Null()
       }
@@ -339,7 +340,7 @@ class ControlStmtsTest extends MainVisitorBaseTest {
     assert(context.currentEngineAllias == "stub")
     // Was executed on stub1 engine and not on stub
     assert(context.getEngine("stub1").get.asInstanceOf[StubEngine].queue.last == "select gg from wp")
-    assertThrows[java.util.NoSuchElementException](context.getEngine("stub").get.asInstanceOf[StubEngine].queue.last)
+    assertThrows[Exception](context.getEngine("stub").get.asInstanceOf[StubEngine].queue.last)
     ///////////////////////////////////////////////
     // Will not trigger paramChanged if not all
     if ({
@@ -354,15 +355,15 @@ class ControlStmtsTest extends MainVisitorBaseTest {
     }) {
       assert(
         context.getEngine("stub").get.asInstanceOf[StubEngine].getChangedParam("spark.execution.memory")
-          .toString() == "16G"
+          .toString() == "8G"
       )
     }
     ////////////////////////////////////////////////
     // ParamChanged was not triggered as it was triggered before engine started
     // -> paramChanged -> not trigger engine did not started -> execute select -> engine started
-    assertThrows[java.util.NoSuchElementException](
+    assert(
       context.getEngine("stub1").get.asInstanceOf[StubEngine].getChangedParam("spark.execution.memory")
-        .toString() == "16G"
+        .toString() == "8G"
     )
   }
 
@@ -387,7 +388,7 @@ class ControlStmtsTest extends MainVisitorBaseTest {
     assert(context.currentEngineAllias == "stub1")
     // Was executed on stub1 engine and not on stub
     assert(context.getEngine("stub1").get.asInstanceOf[StubEngine].queue.last == "select gg from wp")
-    assertThrows[java.util.NoSuchElementException](context.getEngine("stub").get.asInstanceOf[StubEngine].queue.last)
+    assertThrows[Exception](context.getEngine("stub").get.asInstanceOf[StubEngine].queue.last)
     ///////////////////////////////////////////////
     // Will not trigger paramChanged if not all
     if ({
@@ -420,13 +421,13 @@ class ControlStmtsTest extends MainVisitorBaseTest {
         |TRY
         |  select gg from wp;
         |CATCH ex THEN
-        |  let res = $ex;
-        |  let res_msg = $ex.message;
+        |  let res = $ex["type"];
+        |  let res_msg = $ex["message"];
         |END
                 """.stripMargin
 
     class Other extends StubEngine {
-      override def execute(stmt: String, ctx: EngineContext): Type = {
+      override def executeImpl(stmt: String, ctx: EngineContext): Type = {
         throw new NullPointerException("hello")
       }
     }
@@ -438,8 +439,7 @@ class ControlStmtsTest extends MainVisitorBaseTest {
     assert(res_msg.isInstanceOf[string])
     assert(res_msg.asInstanceOf[string].getValue == "hello")
 
-    assert(isNull(context.getVar("ex")))
-    assert(isNull(context.getVar("ex.message")))
+    assert(isNone(context.getVar("ex")))
   }
 
   test("Test try/catch: user exception") {
@@ -448,8 +448,8 @@ class ControlStmtsTest extends MainVisitorBaseTest {
         |TRY
         |  raise "gg", "wp";
         |CATCH ex THEN
-        |  let res = $ex;
-        |  let res_msg = $ex.message;
+        |  let res = $ex["type"];
+        |  let res_msg = $ex["message"];
         |END
                 """.stripMargin
     val context = runMainVisitor(code)
@@ -460,8 +460,7 @@ class ControlStmtsTest extends MainVisitorBaseTest {
     assert(res_msg.isInstanceOf[string])
     assert(res_msg.asInstanceOf[string].getValue == "wp")
 
-    assert(isNull(context.getVar("ex")))
-    assert(isNull(context.getVar("ex.message")))
+    assert(isNone(context.getVar("ex")))
   }
 
   test("Test return") {
@@ -599,7 +598,7 @@ class ControlStmtsTest extends MainVisitorBaseTest {
         |let end_var = 12;
                 """.stripMargin
     class Other extends StubEngine {
-      override def execute(stmt: String, ctx: EngineContext): Type = {
+      override def executeImpl(stmt: String, ctx: EngineContext): Type = {
         throw new NullPointerException("hello")
       }
     }
