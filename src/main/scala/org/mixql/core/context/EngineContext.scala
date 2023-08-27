@@ -25,7 +25,7 @@ class EngineContext(val context: Context) {
   }
 
   def getVarsNames(): List[String] = {
-    context.getScope().flatMap(scope => scope.keys.toList)
+    context.getParams().keys.toList
   }
 
   /** invoke function using context, can call also functions from other engines

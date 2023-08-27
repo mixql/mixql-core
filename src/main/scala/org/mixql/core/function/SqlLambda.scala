@@ -12,10 +12,10 @@ final class SqlLambda(paramNames: List[String], body: BlockContext, visitor: Bas
     else if (paramNames.size < params.size)
       throw new IllegalArgumentException("too many arguments")
 
-    visitor.context.push_scope()
+    visitor.context.pushScope()
     paramNames.zip(params).foreach(param => visitor.context.setVar(param._1, pack(param._2)))
     val res = visitor.visit(body)
-    visitor.context.pop_scope()
+    visitor.context.popScope()
     unpack(res)
   }
 }

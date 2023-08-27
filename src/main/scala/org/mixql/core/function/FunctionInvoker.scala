@@ -1,6 +1,6 @@
 package org.mixql.core.function
 
-import org.mixql.core.context.{Context, EngineContext}
+import org.mixql.core.context.{EngineContext, Context}
 import org.mixql.core.context.gtype._
 
 import java.lang.reflect.Method
