@@ -150,7 +150,7 @@ class CursorTest extends MainVisitorBaseTest {
               """.stripMargin
     val context = runMainVisitor(
       code,
-      new Context(MutMap[String, Engine]("CursorTestEngine1" -> new CursorTestEngine1), "CursorTestEngine1")
+      Context(MutMap[String, Engine]("CursorTestEngine1" -> new CursorTestEngine1), "CursorTestEngine1")
     )
 
     val res1 = context.getVar("arr")
@@ -192,7 +192,7 @@ class CursorTest extends MainVisitorBaseTest {
               """.stripMargin
     val context = runMainVisitor(
       code,
-      new Context(MutMap[String, Engine]("CursorTestEngine2" -> new CursorTestEngine2), "CursorTestEngine2")
+      Context(MutMap[String, Engine]("CursorTestEngine2" -> new CursorTestEngine2), "CursorTestEngine2")
     )
 
     val res1 = context.getVar("arr")
@@ -231,7 +231,7 @@ class CursorTest extends MainVisitorBaseTest {
               """.stripMargin
     val context = runMainVisitor(
       code,
-      new Context(MutMap[String, Engine]("CursorTestEngine2" -> new CursorTestEngine2), "CursorTestEngine2")
+      Context(MutMap[String, Engine]("CursorTestEngine2" -> new CursorTestEngine2), "CursorTestEngine2")
     )
 
     val res1 = context.getVar("arr")
@@ -266,7 +266,7 @@ class CursorTest extends MainVisitorBaseTest {
               """.stripMargin
     val context = runMainVisitor(
       code,
-      new Context(MutMap[String, Engine]("CursorTestEngine2" -> new CursorTestEngine2), "CursorTestEngine2")
+      Context(MutMap[String, Engine]("CursorTestEngine2" -> new CursorTestEngine2), "CursorTestEngine2")
     )
 
     val res1 = context.getVar("arr")
@@ -303,7 +303,7 @@ class CursorTest extends MainVisitorBaseTest {
               """.stripMargin
     val context = runMainVisitor(
       code,
-      new Context(MutMap[String, Engine]("CursorTestEngine2" -> new CursorTestEngine2), "CursorTestEngine2")
+      Context(MutMap[String, Engine]("CursorTestEngine2" -> new CursorTestEngine2), "CursorTestEngine2")
     )
 
     val res1 = context.getVar("arr")

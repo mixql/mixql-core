@@ -157,7 +157,7 @@ class FunctionInvokerTest extends AnyFunSuite {
 
   test("Invoke anonymous function length_with_mixql_core_context with mixql-core context") {
     import scala.collection.mutable.{Map => MutMap}
-    val context = new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
+    val context = Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
     context.setVar("a", new gInt(12))
     val res = FunctionInvoker.invoke(functions, "length_with_mixql_core_context", context, List("123"))
     assert(res == 15)

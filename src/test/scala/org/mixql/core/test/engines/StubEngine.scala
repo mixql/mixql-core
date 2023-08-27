@@ -17,22 +17,12 @@ class StubEngine extends Engine {
     new Null()
   }
 
-  var changedParams: Map[String, Type] = Map()
-
   override def executeFuncImpl(name: String, ctx: EngineContext, params: Type*): Type = {
     name match {
       case "getnum" => 42
       case "getstr" => "42"
       case _        => throw new NoSuchMethodException(s"unknown func $name")
     }
-  }
-
-  override def paramChangedImpl(name: String, ctx: EngineContext): Unit = {
-    changedParams = changedParams ++ Map(name -> ctx.getVar(name))
-  }
-
-  def getChangedParam(name: String): Type = {
-    changedParams(name)
   }
 
   override def getDefinedFunctions(): List[String] = List("getnum", "getstr")

@@ -447,7 +447,7 @@ class ExpressionTest extends MainVisitorBaseTest {
         |let a = 32;
         |let res = testcontext("gg", 10);
                 """.stripMargin
-    val context = new Context(MutMap[String, Engine]("stub" -> (new StubEngine)), "stub")
+    val context = Context(MutMap[String, Engine]("stub" -> (new StubEngine)), "stub")
     val testContext =
       new ((String, Int, Context) => Int) {
         override def apply(str: String, num: Int, context: Context): Int = {
@@ -468,7 +468,7 @@ class ExpressionTest extends MainVisitorBaseTest {
         |let a = 32;
         |let res = testcontext(num = 10, str="gg");
                 """.stripMargin
-    val context = new Context(MutMap[String, Engine]("stub" -> (new StubEngine)), "stub")
+    val context = Context(MutMap[String, Engine]("stub" -> (new StubEngine)), "stub")
     val testContext =
       new ((String, Int, Context) => Int) {
         override def apply(str: String, num: Int, context: Context): Int = {

@@ -9,6 +9,7 @@ import org.mixql.core.generated.sql
 import org.mixql.core.generated.sql.{Close_cursor_stmtContext, Open_cursor_stmtContext}
 import org.mixql.core.logger.{logDebug, logInfo, logWarn}
 
+import scala.collection.mutable.{Map => MutMap}
 import scala.util.{Failure, Success}
 import scala.collection.JavaConverters._
 import org.mixql.core.exception.UserSqlException
@@ -105,16 +106,18 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
   }
 
   override def visitChange_engine_stmt(ctx: sql.Change_engine_stmtContext): Type = {
-    if (ctx.choose_engine.expr)
-      context.setCurrentEngine(visit(ctx.choose_engine.expr).toString)
-    else
-      context.setCurrentEngine(visit(ctx.choose_engine.ident).toString)
-    if (ctx.choose_engine.engine_params)
-      ctx.choose_engine.engine_params.ident.asScala.map(visit)
-        .zip(ctx.choose_engine.engine_params.expr.asScala.map(visit)).foreach(p => {
-          context.setVar(p._1.toString, p._2)
-          context.currentEngine.paramChanged(p._1.toString, new EngineContext(context))
-        })
+    val engine_name =
+      if (ctx.choose_engine.expr)
+        visit(ctx.choose_engine.expr).toString
+      else
+        visit(ctx.choose_engine.ident).toString
+    if (ctx.choose_engine.engine_params) {
+      val params = ctx.choose_engine.engine_params.ident.asScala.map(x => visit(x).toString)
+        .zip(ctx.choose_engine.engine_params.expr.asScala.map(visit))
+      context.setCurrentEngine(engine_name, MutMap() ++ params.toMap)
+    } else {
+      context.setCurrentEngine(engine_name)
+    }
     new Null()
   }
 

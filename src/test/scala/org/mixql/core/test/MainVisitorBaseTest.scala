@@ -14,7 +14,7 @@ class MainVisitorBaseTest extends AnyFunSuite {
 
   def runMainVisitor(code: String,
                      context: Context = {
-                       new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
+                       Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
                      }): Context = {
     val lexer = new token(CharStreams.fromString(code))
     val tokenStream = new CommonTokenStream(new token(CharStreams.fromString(code)))

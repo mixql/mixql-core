@@ -257,10 +257,8 @@ class ControlStmtsTest extends MainVisitorBaseTest {
 
       override def executeFuncImpl(name: String, ctx: EngineContext, params: Type*): Type = ???
 
-      override def paramChangedImpl(name: String, ctx: EngineContext): Unit = {}
-
     }
-    val context = runMainVisitor(code, new Context(MutMap("stub" -> new StubEngine, "stub1" -> new Other), "stub"))
+    val context = runMainVisitor(code, Context(MutMap("stub" -> new StubEngine, "stub1" -> new Other), "stub"))
 
     assert(context.currentEngine.isInstanceOf[Other])
     assert(context.currentEngine.name == "other")
@@ -285,15 +283,12 @@ class ControlStmtsTest extends MainVisitorBaseTest {
       override def name: String = "other"
     }
 
-    val context = runMainVisitor(code, new Context(MutMap("stub" -> new StubEngine, "stub1" -> new Other), "stub"))
+    val context = runMainVisitor(code, Context(MutMap("stub" -> new StubEngine, "stub1" -> new Other), "stub"))
 
     assert(context.currentEngine.isInstanceOf[StubEngine])
     assert(context.currentEngine.name == "stub")
     assert(context.currentEngineAllias == "stub")
-    // paramChanged was not triggered as engine was not started before
-    assertThrows[java.util.NoSuchElementException](
-      context.currentEngine.asInstanceOf[StubEngine].getChangedParam("spark.execution.memory").toString() == "16G"
-    )
+    assert(context.getParams()("spark.execution.memory").toString == "16G")
   }
 
   test("Test engine context vars") {
@@ -315,7 +310,7 @@ class ControlStmtsTest extends MainVisitorBaseTest {
       }
     }
 
-    val context = runMainVisitor(code, new Context(MutMap("stub" -> new Other), "stub"))
+    val context = runMainVisitor(code, Context(MutMap("stub" -> new Other), "stub"))
 
     assert(context.currentEngine.isInstanceOf[Other])
     assert(context.currentEngine.name == "stub")
@@ -327,13 +322,21 @@ class ControlStmtsTest extends MainVisitorBaseTest {
   }
 
   test("Test run on other engine with params") {
+    class StubEngineWithParam extends StubEngine {
+      var sem = ""
+      override def executeImpl(stmt: String, ctx: EngineContext): Type = {
+        queue += stmt
+        sem = ctx.context.getParams("stub1")("spark.execution.memory").toString
+        new Null()
+      }
+    }
     val code =
       """
         |let spark.execution.memory = "8G";
         |select gg from wp on engine stub1(spark.execution.memory="16G");
                 """.stripMargin
-
-    val context = runMainVisitor(code, new Context(MutMap("stub" -> new StubEngine, "stub1" -> new StubEngine), "stub"))
+    val stub1 = new StubEngineWithParam
+    val context = runMainVisitor(code, Context(MutMap("stub" -> new StubEngine, "stub1" -> stub1), "stub"))
 
     assert(context.currentEngine.isInstanceOf[StubEngine])
     assert(context.currentEngine.name == "stub")
@@ -341,30 +344,7 @@ class ControlStmtsTest extends MainVisitorBaseTest {
     // Was executed on stub1 engine and not on stub
     assert(context.getEngine("stub1").get.asInstanceOf[StubEngine].queue.last == "select gg from wp")
     assertThrows[Exception](context.getEngine("stub").get.asInstanceOf[StubEngine].queue.last)
-    ///////////////////////////////////////////////
-    // Will not trigger paramChanged if not all
-    if ({
-      val config = ConfigFactory.load()
-      Try({
-        val param = config.getString("mixql.engine.variables.update")
-        if (param.trim != "all")
-          false
-        else
-          true
-      }).getOrElse(true)
-    }) {
-      assert(
-        context.getEngine("stub").get.asInstanceOf[StubEngine].getChangedParam("spark.execution.memory")
-          .toString() == "8G"
-      )
-    }
-    ////////////////////////////////////////////////
-    // ParamChanged was not triggered as it was triggered before engine started
-    // -> paramChanged -> not trigger engine did not started -> execute select -> engine started
-    assert(
-      context.getEngine("stub1").get.asInstanceOf[StubEngine].getChangedParam("spark.execution.memory")
-        .toString() == "8G"
-    )
+    assert(stub1.sem == "16G")
   }
 
   test("Test run on engine with params") {
@@ -378,10 +358,7 @@ class ControlStmtsTest extends MainVisitorBaseTest {
         |select gg from wp; -- executes with new parameter if engine decided to use it
                 """.stripMargin
 
-    val context = runMainVisitor(
-      code,
-      new Context(MutMap("stub" -> new StubEngine, "stub1" -> new StubEngine), "stub1")
-    )
+    val context = runMainVisitor(code, Context(MutMap("stub" -> new StubEngine, "stub1" -> new StubEngine), "stub1"))
 
     assert(context.currentEngine.isInstanceOf[StubEngine])
     assert(context.currentEngine.name == "stub")
@@ -389,30 +366,7 @@ class ControlStmtsTest extends MainVisitorBaseTest {
     // Was executed on stub1 engine and not on stub
     assert(context.getEngine("stub1").get.asInstanceOf[StubEngine].queue.last == "select gg from wp")
     assertThrows[Exception](context.getEngine("stub").get.asInstanceOf[StubEngine].queue.last)
-    ///////////////////////////////////////////////
-    // Will not trigger paramChanged if not all
-    if ({
-      val config = ConfigFactory.load()
-      Try({
-        val param = config.getString("mixql.engine.variables.update")
-        if (param.trim != "all")
-          false
-        else
-          true
-      }).getOrElse(true)
-    }) {
-      assert(
-        context.getEngine("stub").get.asInstanceOf[StubEngine].getChangedParam("spark.execution.memory")
-          .toString() == "16G"
-      )
-    }
-    ////////////////////////////////////////////////
-    // ParamChanged was not triggered as it was triggered before engine started
-    // -> paramChanged -> not trigger engine did not started -> execute select -> engine started
-    assert(
-      context.getEngine("stub1").get.asInstanceOf[StubEngine].getChangedParam("spark.execution.memory")
-        .toString() == "16G"
-    )
+    assert(context.getParams()("spark.execution.memory").toString == "16G")
   }
 
   test("Test try/catch") {
@@ -431,7 +385,7 @@ class ControlStmtsTest extends MainVisitorBaseTest {
         throw new NullPointerException("hello")
       }
     }
-    val context = runMainVisitor(code, new Context(MutMap("stub" -> new Other), "stub"))
+    val context = runMainVisitor(code, Context(MutMap("stub" -> new Other), "stub"))
     val res = context.getVar("res")
     assert(res.isInstanceOf[string])
     assert(res.asInstanceOf[string].getValue == "NullPointerException")
@@ -472,7 +426,7 @@ class ControlStmtsTest extends MainVisitorBaseTest {
         |return $y;
         |$x + $y;
                 """.stripMargin
-    val res = core.run(code, new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub"))
+    val res = core.run(code, Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub"))
     assert(res.isInstanceOf[gInt])
     assert(res.asInstanceOf[gInt].getValue == 1)
   }
@@ -602,7 +556,7 @@ class ControlStmtsTest extends MainVisitorBaseTest {
         throw new NullPointerException("hello")
       }
     }
-    val context = runMainVisitor(code, new Context(MutMap("stub" -> new Other), "stub"))
+    val context = runMainVisitor(code, Context(MutMap("stub" -> new Other), "stub"))
     val res = context.getVar("res")
     assert(res.isInstanceOf[gInt])
     assert(res.asInstanceOf[gInt].getValue == 1)
