@@ -12,27 +12,14 @@ object FunctionInvoker {
 
   def invoke(functions: Map[String, Any],
              funcName: String,
-             context: Context, // To support not only mixql-core context
+             _contexts: List[Object], // To support not only mixql-core context
              args: List[Any] = Nil,
              kwargs: Map[String, Object] = Map.empty): Any = {
-    invoke(
-      functions,
-      funcName,
-      if (context == null) {
-        val t: Map[String, Object] = Map()
-        t
-      } else
-        Map("org.mixql.core.context.Context" -> context),
-      args,
-      kwargs
-    )
-  }
-
-  def invoke(functions: Map[String, Any],
-             funcName: String,
-             contexts: Map[String, Object],
-             args: List[Any],
-             kwargs: Map[String, Object]): Any = {
+    val contexts =
+      if (_contexts == null)
+        List[Object]()
+      else
+        _contexts
     try {
       functions.map(t => t._1.toLowerCase -> t._2).get(funcName.toLowerCase()) match {
         case Some(func) =>
@@ -60,9 +47,9 @@ object FunctionInvoker {
               invokeFunc(func.asInstanceOf[Object], contexts, args.map(a => a.asInstanceOf[Object]), kwargs, funcName)
           }
         case None =>
-          val ctxFiltered = contexts.filter(tuple => tuple._2.isInstanceOf[Context])
+          val ctxFiltered = contexts.filter(tuple => tuple.isInstanceOf[Context])
           if (ctxFiltered.nonEmpty) {
-            val ctx = ctxFiltered.values.head.asInstanceOf[Context]
+            val ctx = ctxFiltered.head.asInstanceOf[Context]
             if (ctx.currentEngine.getDefinedFunctions().contains(funcName.toLowerCase))
               unpack(ctx.currentEngine.executeFunc(funcName, new EngineContext(ctx), kwargs, args.map(pack): _*))
             else {
@@ -149,7 +136,7 @@ object FunctionInvoker {
   }
 
   private def invokeFunc(obj: Object,
-                         contexts: Map[String, Object],
+                         contexts: List[Object],
                          args: Seq[Object] = Nil,
                          kwargs: Map[String, Object] = Map.empty,
                          funcName: String): Any = {
@@ -182,9 +169,9 @@ object FunctionInvoker {
 
           if (contexts.nonEmpty && !addedArg) {
             try {
-              contexts.foreach(tuple =>
-                if (ptype.getName == tuple._1 || ptype == tuple._2.getClass) {
-                  lb += tuple._2
+              contexts.foreach(ctx =>
+                if (ptype.getName == ctx.getClass.getName || ptype == ctx.getClass) {
+                  lb += ctx
                   addedArg = true
                   throw new BrakeException
                 }

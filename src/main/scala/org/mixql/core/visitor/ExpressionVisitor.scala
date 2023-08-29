@@ -168,7 +168,7 @@ trait ExpressionVisitor extends BaseVisitor {
         else
           Nil
       }).toMap
-    val res = FunctionInvoker.invoke(context.functions.toMap, funcName, context, args.toList, kwargs)
+    val res = FunctionInvoker.invoke(context.functions.toMap, funcName, List[Object](context), args.toList, kwargs)
     controlState = ControlContext.NONE
     pack(res)
   }

@@ -40,7 +40,7 @@ class EngineContext(val context: Context) {
     */
   def invokeFunction(funcName: String, args: List[Any] = Nil, kwargs: Map[String, Object] = Map.empty): Type = {
     try {
-      val res = FunctionInvoker.invoke(Map(context.functions.toSeq: _*), funcName, context, args, kwargs)
+      val res = FunctionInvoker.invoke(Map(context.functions.toSeq: _*), funcName, List[Object](context), args, kwargs)
       pack(res)
     } catch {
       case e: java.lang.reflect.InvocationTargetException =>
