@@ -17,54 +17,94 @@ object FunctionInvoker {
              kwargs: Map[String, Object] = Map.empty,
              cc: String = "org.mixql.core.context.Context" // To support not only mixql-core context
   ): Any = {
-    functions.get(funcName.toLowerCase()) match {
-      case Some(func) =>
-        func match {
-          case l: List[_] =>
-            for (f <- l) {
-              val applyMethods = f.getClass.getMethods.filter(x =>
-                // x.getParameters.length != 0 &&
-                x.getParameters.exists(y => y.getType.getName != "java.lang.Object") &&
-                  x.getName == "apply"
-              )
+    try {
+      functions.get(funcName.toLowerCase()) match {
+        case Some(func) =>
+          func match {
+            case l: List[_] =>
+              for (f <- l) {
+                val applyMethods = f.getClass.getMethods.filter(x =>
+                  // x.getParameters.length != 0 &&
+                  x.getParameters.exists(y => y.getType.getName != "java.lang.Object") &&
+                    x.getName == "apply"
+                )
 
-              if (compareFunctionTypes(applyMethods(0), args)) {
-                return invokeFunc(
-                  f.asInstanceOf[Object],
-                  context,
-                  args.map(a => a.asInstanceOf[Object]),
-                  kwargs,
-                  funcName,
-                  cc
+                if (compareFunctionTypes(applyMethods(0), args)) {
+                  return invokeFunc(
+                    f.asInstanceOf[Object],
+                    context,
+                    args.map(a => a.asInstanceOf[Object]),
+                    kwargs,
+                    funcName,
+                    cc
+                  )
+                }
+              }
+              throw new RuntimeException(s"Can't find function `$funcName` in $l [${l.length}] params=$args")
+            case _ =>
+              invokeFunc(
+                func.asInstanceOf[Object],
+                context,
+                args.map(a => a.asInstanceOf[Object]),
+                kwargs,
+                funcName,
+                cc
+              )
+          }
+        case None =>
+          if (context.isInstanceOf[Context]) {
+            val ctx = context.asInstanceOf[Context]
+            if (kwargs.nonEmpty)
+              throw new UnsupportedOperationException("named args for engine function not supported")
+            if (ctx.currentEngine.getDefinedFunctions().contains(funcName.toLowerCase))
+              unpack(ctx.currentEngine.executeFunc(funcName, new EngineContext(ctx), args.map(pack): _*))
+            else {
+              val engine = ctx.engines.find(eng => {
+                if (eng._2.name != ctx.currentEngine.name)
+                  eng._2.getDefinedFunctions().contains(funcName)
+                else
+                  false
+              })
+              engine match {
+                case Some(value) => unpack(value._2.executeFunc(funcName, new EngineContext(ctx), args.map(pack): _*))
+                case None        => throw new NoSuchMethodException(s"no function $funcName found for any engine")
+              }
+            }
+          } else {
+            throw new NoSuchMethodException(s"no function $funcName was founded to invoke")
+          }
+      }
+    } catch {
+      case e: java.lang.reflect.InvocationTargetException =>
+        val errorMsg: String =
+          "InvocationTargetException: \n" +
+            e.getClass.getName + " msg : " + e.getMessage + "\n" +
+            "target's exception: " + e.getTargetException.getClass.getName + "\n" +
+            "target's exception msg: " + e.getTargetException.getMessage + "\n" +
+            "target exception stacktrace: " + {
+              import java.io.PrintWriter
+              import java.io.StringWriter
+              var sw: StringWriter = null
+              var pw: PrintWriter = null
+              try {
+                sw = new StringWriter()
+                pw = new PrintWriter(sw)
+                e.getTargetException.printStackTrace(pw)
+                sw.toString
+              } finally {
+                Try(
+                  if (pw != null)
+                    pw.close()
+                )
+                Try(
+                  if (sw != null)
+                    sw.close()
                 )
               }
             }
-            throw new RuntimeException(s"Can't find function `$funcName` in $l [${l.length}] params=$args")
-          case _ =>
-            invokeFunc(func.asInstanceOf[Object], context, args.map(a => a.asInstanceOf[Object]), kwargs, funcName, cc)
-        }
-      case None =>
-        if (context.isInstanceOf[Context]) {
-          val ctx = context.asInstanceOf[Context]
-          if (kwargs.nonEmpty)
-            throw new UnsupportedOperationException("named args for engine function not supported")
-          if (ctx.currentEngine.getDefinedFunctions().contains(funcName.toLowerCase))
-            unpack(ctx.currentEngine.executeFunc(funcName, new EngineContext(ctx), args.map(pack): _*))
-          else {
-            val engine = ctx.engines.find(eng => {
-              if (eng._2.name != ctx.currentEngine.name)
-                eng._2.getDefinedFunctions().contains(funcName)
-              else
-                false
-            })
-            engine match {
-              case Some(value) => unpack(value._2.executeFunc(funcName, new EngineContext(ctx), args.map(pack): _*))
-              case None        => throw new NoSuchMethodException(s"no function $funcName found for any engine")
-            }
-          }
-        } else {
-          throw new NoSuchMethodException(s"no function $funcName was founded to invoke")
-        }
+
+        throw new FunctionInvokerException(errorMsg)
+      case e: Throwable => throw e
     }
   }
 
