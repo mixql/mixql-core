@@ -324,7 +324,7 @@ class Context(val engines: MutMap[String, Engine],
       throw new InstantiationException(s"function $name is already defined")
     else {
       logDebug(
-        "Functions map after adding function: " +
+        "Functions map after before function: " +
           functions.keySet.toList.sorted.toString()
       )
       val map = Map(name.toLowerCase() -> function)
