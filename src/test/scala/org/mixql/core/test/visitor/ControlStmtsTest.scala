@@ -255,7 +255,8 @@ class ControlStmtsTest extends MainVisitorBaseTest {
 
       override def executeImpl(stmt: String, ctx: EngineContext): Type = ???
 
-      override def executeFuncImpl(name: String, ctx: EngineContext, params: Type*): Type = ???
+      override def executeFuncImpl(name: String, ctx: EngineContext, kwargs: Map[String, Object], params: Type*): Type =
+        ???
 
       override def paramChangedImpl(name: String, ctx: EngineContext): Unit = {}
 

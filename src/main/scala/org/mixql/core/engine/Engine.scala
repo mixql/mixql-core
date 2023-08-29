@@ -55,11 +55,11 @@ abstract class Engine {
     *   function params
     * @return
     */
-  final def executeFunc(name: String, ctx: EngineContext, params: Type*): Type = {
+  final def executeFunc(name: String, ctx: EngineContext, kwargs: Map[String, Object], params: Type*): Type = {
     if (!engineStarted)
       logInfo(s"Engine $name was triggered by executeFunc request")
     engineStarted = true
-    executeFuncImpl(name, ctx, params: _*)
+    executeFuncImpl(name, ctx, kwargs, params: _*)
   }
 
   /** set param for engine
@@ -100,7 +100,7 @@ abstract class Engine {
     new gcursor(execute(stmt, ctx))
   }
 
-  def executeFuncImpl(name: String, ctx: EngineContext, params: Type*): Type
+  def executeFuncImpl(name: String, ctx: EngineContext, kwargs: Map[String, Object], params: Type*): Type
 
   def paramChangedImpl(name: String, ctx: EngineContext): Unit
 }

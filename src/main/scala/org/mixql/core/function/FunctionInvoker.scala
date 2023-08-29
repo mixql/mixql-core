@@ -63,10 +63,8 @@ object FunctionInvoker {
           val ctxFiltered = contexts.filter(tuple => tuple._2.isInstanceOf[Context])
           if (ctxFiltered.nonEmpty) {
             val ctx = ctxFiltered.values.head.asInstanceOf[Context]
-            if (kwargs.nonEmpty)
-              throw new UnsupportedOperationException("named args for engine function not supported")
             if (ctx.currentEngine.getDefinedFunctions().contains(funcName.toLowerCase))
-              unpack(ctx.currentEngine.executeFunc(funcName, new EngineContext(ctx), args.map(pack): _*))
+              unpack(ctx.currentEngine.executeFunc(funcName, new EngineContext(ctx), kwargs, args.map(pack): _*))
             else {
               val engine = ctx.engines.find(eng => {
                 if (eng._2.name != ctx.currentEngine.name)
@@ -75,8 +73,9 @@ object FunctionInvoker {
                   false
               })
               engine match {
-                case Some(value) => unpack(value._2.executeFunc(funcName, new EngineContext(ctx), args.map(pack): _*))
-                case None        => throw new NoSuchMethodException(s"no function $funcName found for any engine")
+                case Some(value) =>
+                  unpack(value._2.executeFunc(funcName, new EngineContext(ctx), kwargs, args.map(pack): _*))
+                case None => throw new NoSuchMethodException(s"no function $funcName found for any engine")
               }
             }
           } else {

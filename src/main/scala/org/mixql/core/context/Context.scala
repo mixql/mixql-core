@@ -439,7 +439,7 @@ class Context(val engines: MutMap[String, Engine],
       new Null()
     }
 
-    override def executeFuncImpl(name: String, ctx: EngineContext, params: Type*) =
+    override def executeFuncImpl(name: String, ctx: EngineContext, kwargs: Map[String, Object], params: Type*) =
       throw new UnsupportedOperationException("interpolator dont have specific funcs")
 
     override def paramChangedImpl(name: String, ctx: EngineContext): Unit = {}
