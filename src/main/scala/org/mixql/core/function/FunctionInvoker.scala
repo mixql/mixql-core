@@ -34,7 +34,7 @@ object FunctionInvoker {
              args: List[Any],
              kwargs: Map[String, Object]): Any = {
     try {
-      functions.get(funcName.toLowerCase()) match {
+      functions.map(t => t._1.toLowerCase -> t._2).get(funcName.toLowerCase()) match {
         case Some(func) =>
           func match {
             case l: List[_] =>

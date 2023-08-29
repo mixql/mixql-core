@@ -38,7 +38,7 @@ object Context {
     "toLowerCase" -> StringFunction.toLowerCase,
     "toUpperCase" -> StringFunction.toUpperCase,
     "trim" -> StringFunction.trim
-  ).map(t => t._1.toLowerCase -> t._2)
+  )
 }
 
 /** the entry point to gsql api. Context stores registered engines, variables
