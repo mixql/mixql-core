@@ -145,13 +145,8 @@ class FunctionInvokerTest extends AnyFunSuite {
   }
 
   test("Invoke anonymous function length_of_custom_context with not mixql-core context") {
-    val res = FunctionInvoker.invoke(
-      functions,
-      "length_of_custom_context",
-      new CustomTestContext,
-      List("123"),
-      cc = "org.mixql.core.test.function.CustomTestContext"
-    )
+    val res = FunctionInvoker
+      .invoke(functions, "length_of_custom_context", List[Object](new CustomTestContext), List("123"))
     assert(res == 100503)
   }
 
@@ -159,7 +154,9 @@ class FunctionInvokerTest extends AnyFunSuite {
     import scala.collection.mutable.{Map => MutMap}
     val context = new Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
     context.setVar("a", new gInt(12))
-    val res = FunctionInvoker.invoke(functions, "length_with_mixql_core_context", context, List("123"))
+    val res = {
+      FunctionInvoker.invoke(functions, "length_with_mixql_core_context", List[Object](context), List("123"))
+    }
     assert(res == 15)
   }
 
@@ -179,7 +176,8 @@ class FunctionInvokerTest extends AnyFunSuite {
   }
 
   test("Invoke function with arguments was passed by name") {
-    val res = FunctionInvoker.invoke(functions, "two_def_arg_func", null, Nil, Map("a" -> "qw", "b" -> "erty"))
+    val res = FunctionInvoker
+      .invoke(functions, "two_def_arg_func", List[Object](), Nil, Map("a" -> "qw", "b" -> "erty"))
 
     assert(res == "qwerty")
   }

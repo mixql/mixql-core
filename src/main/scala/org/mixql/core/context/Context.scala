@@ -38,7 +38,7 @@ object Context {
     "toLowerCase" -> StringFunction.toLowerCase,
     "toUpperCase" -> StringFunction.toUpperCase,
     "trim" -> StringFunction.trim
-  ).map(t => t._1.toLowerCase -> t._2)
+  )
 }
 
 /** the entry point to gsql api. Context stores registered engines, variables
@@ -324,7 +324,7 @@ class Context(val engines: MutMap[String, Engine],
       throw new InstantiationException(s"function $name is already defined")
     else {
       logDebug(
-        "Functions map after adding function: " +
+        "Functions map after before function: " +
           functions.keySet.toList.sorted.toString()
       )
       val map = Map(name.toLowerCase() -> function)
@@ -439,7 +439,7 @@ class Context(val engines: MutMap[String, Engine],
       new Null()
     }
 
-    override def executeFuncImpl(name: String, ctx: EngineContext, params: Type*) =
+    override def executeFuncImpl(name: String, ctx: EngineContext, kwargs: Map[String, Object], params: Type*) =
       throw new UnsupportedOperationException("interpolator dont have specific funcs")
 
     override def paramChangedImpl(name: String, ctx: EngineContext): Unit = {}
