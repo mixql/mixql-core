@@ -5,7 +5,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Run tests
-        run: sbt coverage +test
+        run: sbt ++3.2.1 test coverage ++2.13.8 test ++2.12.17 test #disable coverage for scala 3.2.1 as it
+        # does not work correctly with scala 3. Leave coverage for other versions
+        # run: sbt coverage +test
       - name: Coverage Report
         run: sbt coverageReport
       - name: Upload coverage to Codecov
