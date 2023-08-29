@@ -12,11 +12,27 @@ object FunctionInvoker {
 
   def invoke(functions: Map[String, Any],
              funcName: String,
-             context: Object, // To support not only mixql-core context
+             context: Context, // To support not only mixql-core context
              args: List[Any] = Nil,
-             kwargs: Map[String, Object] = Map.empty,
-             cc: String = "org.mixql.core.context.Context" // To support not only mixql-core context
-  ): Any = {
+             kwargs: Map[String, Object] = Map.empty): Any = {
+    invoke(
+      functions,
+      funcName,
+      if (context == null) {
+        val t: Map[String, Object] = Map()
+        t
+      } else
+        Map("org.mixql.core.context.Context" -> context),
+      args,
+      kwargs
+    )
+  }
+
+  def invoke(functions: Map[String, Any],
+             funcName: String,
+             contexts: Map[String, Object],
+             args: List[Any],
+             kwargs: Map[String, Object]): Any = {
     try {
       functions.get(funcName.toLowerCase()) match {
         case Some(func) =>
@@ -32,28 +48,21 @@ object FunctionInvoker {
                 if (compareFunctionTypes(applyMethods(0), args)) {
                   return invokeFunc(
                     f.asInstanceOf[Object],
-                    context,
+                    contexts,
                     args.map(a => a.asInstanceOf[Object]),
                     kwargs,
-                    funcName,
-                    cc
+                    funcName
                   )
                 }
               }
               throw new RuntimeException(s"Can't find function `$funcName` in $l [${l.length}] params=$args")
             case _ =>
-              invokeFunc(
-                func.asInstanceOf[Object],
-                context,
-                args.map(a => a.asInstanceOf[Object]),
-                kwargs,
-                funcName,
-                cc
-              )
+              invokeFunc(func.asInstanceOf[Object], contexts, args.map(a => a.asInstanceOf[Object]), kwargs, funcName)
           }
         case None =>
-          if (context.isInstanceOf[Context]) {
-            val ctx = context.asInstanceOf[Context]
+          val ctxFiltered = contexts.filter(tuple => tuple._2.isInstanceOf[Context])
+          if (ctxFiltered.nonEmpty) {
+            val ctx = ctxFiltered.values.head.asInstanceOf[Context]
             if (kwargs.nonEmpty)
               throw new UnsupportedOperationException("named args for engine function not supported")
             if (ctx.currentEngine.getDefinedFunctions().contains(funcName.toLowerCase))
@@ -141,11 +150,10 @@ object FunctionInvoker {
   }
 
   private def invokeFunc(obj: Object,
-                         context: Object,
+                         contexts: Map[String, Object],
                          args: Seq[Object] = Nil,
                          kwargs: Map[String, Object] = Map.empty,
-                         funcName: String,
-                         cc: String): Any = {
+                         funcName: String): Any = {
     if (obj.isInstanceOf[SqlLambda])
       return obj.asInstanceOf[SqlLambda].apply(args: _*)
     val a = obj.getClass.getMethods.find(p =>
@@ -166,21 +174,45 @@ object FunctionInvoker {
           val seqc = "scala.collection.immutable.Seq"
           val seqcOld = "scala.collection.Seq" // In case of scala 2.12
           // argument is variable number of args like gg: String*
+          var addedArg = false
           if (i == size && (ptype.getName == seqc) ||
-              (ptype.getName == seqcOld)) {
+              (ptype.getName == seqcOld) && !addedArg) {
             lb += args1
-          } else if (context != null &&
-                     (ptype.getName == cc || ptype == context.getClass)) {
-            lb += context
-          } else if (kwargs1.contains(pname)) {
-            lb += kwargs1(pname)
-            kwargs1 = kwargs1 - pname
-          } else if (args1.nonEmpty) {
-            lb += args1.head
-            args1 = args1.tail
-          } else {
-            lb += getDefParamsFor(obj, i)
+            addedArg = true
           }
+
+          if (contexts.nonEmpty && !addedArg) {
+            try {
+              contexts.foreach(tuple =>
+                if (ptype.getName == tuple._1 || ptype == tuple._2.getClass) {
+                  lb += tuple._2
+                  addedArg = true
+                  throw new BrakeException
+                }
+              )
+            } catch {
+              case _: BrakeException =>
+              case e: Exception      => throw e
+            }
+          }
+
+          if (kwargs1.contains(pname) && !addedArg) {
+            lb += kwargs1(pname)
+            addedArg = true
+            kwargs1 = kwargs1 - pname
+          }
+
+          if (args1.nonEmpty && !addedArg) {
+            lb += args1.head
+            addedArg = true
+            args1 = args1.tail
+          }
+
+          if (!addedArg) {
+            lb += getDefParamsFor(obj, i)
+            addedArg = true
+          }
+
           i += 1
         })
         apply.invoke(obj, lb.toArray: _*)

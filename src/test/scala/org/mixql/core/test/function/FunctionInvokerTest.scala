@@ -148,9 +148,11 @@ class FunctionInvokerTest extends AnyFunSuite {
     val res = FunctionInvoker.invoke(
       functions,
       "length_of_custom_context",
-      new CustomTestContext,
-      List("123"),
-      cc = "org.mixql.core.test.function.CustomTestContext"
+      Map("org.mixql.core.test.function.CustomTestContext" -> (new CustomTestContext).asInstanceOf[Object]),
+      List("123").map(a => a.asInstanceOf[Any]), {
+        val t: Map[String, Object] = Map()
+        t
+      }
     )
     assert(res == 100503)
   }
@@ -179,7 +181,8 @@ class FunctionInvokerTest extends AnyFunSuite {
   }
 
   test("Invoke function with arguments was passed by name") {
-    val res = FunctionInvoker.invoke(functions, "two_def_arg_func", null, Nil, Map("a" -> "qw", "b" -> "erty"))
+    val res = FunctionInvoker
+      .invoke(functions, "two_def_arg_func", context = null, Nil, Map("a" -> "qw", "b" -> "erty"))
 
     assert(res == "qwerty")
   }
