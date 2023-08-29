@@ -17,7 +17,7 @@ lazy val mixQLCore = (project in file(".")).enablePlugins(Antlr4Plugin).settings
   homepage := Some(url("https://github.com/mixql/mixql-core")),
   scmInfo := Some(ScmInfo(url("https://github.com/mixql/mixql-core"), "scm:git@github.com:mixql/mixql-core.git")),
   developers := List(
-    Developer("LavrVV", "MixQL team", "lavr3x@rambler.ru", url("https://github.com/LavrVV")),
+    Developer("LavrVV", "MixQL  team", "lavr3x@rambler.ru", url("https://github.com/LavrVV")),
     Developer("wiikviz", "Kostya Kviz", "kviz@outlook.com", url("https://github.com/wiikviz")),
     Developer("mihan1235", "MixQL team", "mihan1235@yandex.ru", url("http://mixql.org/")),
     Developer("ntlegion", "MixQL team", "ntlegion@outlook.com", url("https://github.com/ntlegion"))
