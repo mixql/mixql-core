@@ -2,41 +2,13 @@ package org.mixql.core.context
 
 import scala.collection.mutable.{Map => MutMap}
 import org.mixql.core.context.gtype._
-import org.mixql.core.context.ConfigHelp.parseConfig
-import com.typesafe.config.{Config, ConfigFactory, ConfigObject}
+
 import com.typesafe.config.ConfigValueType._
 
 object VariablesStorage {
 
-  def apply(defaultEngine: String, variablesInit: MutMap[String, Type] = MutMap[String, Type]()): VariablesStorage = {
-    new VariablesStorage(initVariables(defaultEngine, variablesInit))
-  }
-
-  private def initVariables(defaultEngine: String, variablesInit: MutMap[String, Type]): MutMap[String, Type] = {
-    val config = ConfigFactory.load()
-    val mixqlParams = initMixqlParams(config, defaultEngine)
-    if (config.hasPath("mixql.variables.init")) {
-      val confVars = parseConfig(config.getObject("mixql.variables.init"))
-      mixqlParams ++= confVars
-    }
-    mixqlParams ++= variablesInit
-    mixqlParams
-  }
-
-  private def initMixqlParams(config: Config, defaultEngine: String): MutMap[String, Type] = {
-    val result: MutMap[String, Type] = MutMap[String, Type]()
-
-    val errorSkip = config.getBoolean("mixql.error.skip")
-    result += "mixql.error.skip" -> new bool(errorSkip)
-
-    // val currentEngineAllias =
-    //   if (config.hasPath("mixql.execution.engine"))
-    //     config.getString("mixql.execution.engine")
-    //   else
-    //     defaultEngine
-    result += "mixql.execution.engine" -> new string(defaultEngine)
-
-    result
+  def apply(variablesInit: MutMap[String, Type] = MutMap[String, Type]()): VariablesStorage = {
+    new VariablesStorage(variablesInit)
   }
 
   private class Node(p: Node = null, variablesInit: MutMap[String, Type] = MutMap[String, Type]()) {

@@ -6,6 +6,8 @@ import org.mixql.core.function.{ArrayFunction, StringFunction}
 import org.mixql.core.context.gtype._
 import org.mixql.core.logger.logDebug
 import org.mixql.core
+import org.mixql.core.context.ConfigHelp.parseConfig
+import com.typesafe.config.{Config, ConfigFactory, ConfigObject}
 
 import scala.reflect.ClassTag
 import scala.collection.JavaConverters._
@@ -54,7 +56,32 @@ object Context {
             functionsInit: MutMap[String, Any] = MutMap[String, Any](),
             variablesInit: MutMap[String, Type] = MutMap[String, Type]()): Context = {
     val eng = EnginesStorage(engines += "interpolator" -> new Interpolator)
-    new Context(eng, VariablesStorage(defaultEngine, variablesInit), defaultFunctions ++ functionsInit, true)
+    val vars = VariablesStorage(initVariables(variablesInit))
+    vars.setVar("mixql.execution.engine", new string(defaultEngine))
+    new Context(eng, vars, defaultFunctions ++ functionsInit, true)
+  }
+
+  private def initVariables(variablesInit: MutMap[String, Type]): MutMap[String, Type] = {
+    val config = ConfigFactory.load()
+    val mixqlParams = initMixqlParams(config)
+    if (config.hasPath("mixql.variables.init")) {
+      val confVars = parseConfig(config.getObject("mixql.variables.init"))
+      mixqlParams ++= confVars
+    }
+    mixqlParams ++= variablesInit
+    mixqlParams
+  }
+
+  private def initMixqlParams(config: Config): MutMap[String, Type] = {
+    val result: MutMap[String, Type] = MutMap[String, Type]()
+
+    val errorSkip = config.getBoolean("mixql.error.skip")
+    result += "mixql.error.skip" -> new bool(errorSkip)
+
+    val currentEngineAllias = config.getString("mixql.execution.engine")
+    result += "mixql.execution.engine" -> new string(currentEngineAllias)
+
+    result
   }
 
   private sealed class Interpolator extends Engine {
@@ -75,7 +102,11 @@ object Context {
   }
 }
 
-class Context(eng: EnginesStorage, vars: VariablesStorage, func: MutMap[String, Any], private var isMainThread: Boolean = false) extends java.lang.AutoCloseable {
+class Context(eng: EnginesStorage,
+              vars: VariablesStorage,
+              func: MutMap[String, Any],
+              private var isMainThread: Boolean = false)
+    extends java.lang.AutoCloseable {
 
   /** current engine name
     *
@@ -287,7 +318,8 @@ class Context(eng: EnginesStorage, vars: VariablesStorage, func: MutMap[String, 
     variables.getVar(key)
   }
 
-  /** get the param value by name for engine, if no param found var with this name returns
+  /** get the param value by name for engine, if no param found var with this
+    * name returns
     *
     * @param key
     *   param name
@@ -299,7 +331,7 @@ class Context(eng: EnginesStorage, vars: VariablesStorage, func: MutMap[String, 
   def getParam(key: String, engineName: String): Type = {
     engines.getEngineParam(engineName, key) match {
       case _: none => getVar(key)
-      case other => other
+      case other   => other
     }
   }
 

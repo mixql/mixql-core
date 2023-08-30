@@ -22,8 +22,7 @@ object FunctionInvoker {
         _contexts
     try {
       functions.map(t => t._1.toLowerCase -> t._2).get(funcName.toLowerCase()) match {
-        case Some(func) =>
-          invokeRegisteredFunc(func, funcName, contexts, args, kwargs)
+        case Some(func) => invokeRegisteredFunc(func, funcName, contexts, args, kwargs)
         case None =>
           val ctxFiltered = contexts.filter(tuple => tuple.isInstanceOf[Context])
           if (ctxFiltered.nonEmpty) {
@@ -32,9 +31,12 @@ object FunctionInvoker {
             if (func.isInstanceOf[SqlLambda])
               invokeRegisteredFunc(func, funcName, contexts, args, kwargs)
             else if (ctx.currentEngine.getDefinedFunctions().contains(funcName.toLowerCase))
-              unpack(ctx.currentEngine.executeFunc(funcName, new EngineContext(ctx, ctx.currentEngineAllias), kwargs, args.map(pack): _*))
+              unpack(
+                ctx.currentEngine
+                  .executeFunc(funcName, new EngineContext(ctx, ctx.currentEngineAllias), kwargs, args.map(pack): _*)
+              )
             else
-              throw new NoSuchMethodException(s"no function $funcName was founded to invoke")  
+              throw new NoSuchMethodException(s"no function $funcName was founded to invoke")
           } else {
             throw new NoSuchMethodException(s"no function $funcName was founded to invoke")
           }
@@ -73,35 +75,27 @@ object FunctionInvoker {
     }
   }
 
-  private def invokeRegisteredFunc(
-    func: Any,
-    funcName: String,
-             contexts: List[Object],
-    args: List[Any] = Nil,
-             kwargs: Map[String, Object] = Map.empty): Any = {
+  private def invokeRegisteredFunc(func: Any,
+                                   funcName: String,
+                                   contexts: List[Object],
+                                   args: List[Any] = Nil,
+                                   kwargs: Map[String, Object] = Map.empty): Any = {
     func match {
-            case l: List[_] =>
-              for (f <- l) {
-                val applyMethods = f.getClass.getMethods.filter(x =>
-                  // x.getParameters.length != 0 &&
-                  x.getParameters.exists(y => y.getType.getName != "java.lang.Object") &&
-                    x.getName == "apply"
-                )
+      case l: List[_] =>
+        for (f <- l) {
+          val applyMethods = f.getClass.getMethods.filter(x =>
+            // x.getParameters.length != 0 &&
+            x.getParameters.exists(y => y.getType.getName != "java.lang.Object") &&
+              x.getName == "apply"
+          )
 
-                if (compareFunctionTypes(applyMethods(0), args)) {
-                  return invokeFunc(
-                    f.asInstanceOf[Object],
-                    contexts,
-                    args.map(a => a.asInstanceOf[Object]),
-                    kwargs,
-                    funcName
-                  )
-                }
-              }
-              throw new RuntimeException(s"Can't find function `$funcName` in $l [${l.length}] params=$args")
-            case _ =>
-              invokeFunc(func.asInstanceOf[Object], contexts, args.map(a => a.asInstanceOf[Object]), kwargs, funcName)
+          if (compareFunctionTypes(applyMethods(0), args)) {
+            return invokeFunc(f.asInstanceOf[Object], contexts, args.map(a => a.asInstanceOf[Object]), kwargs, funcName)
           }
+        }
+        throw new RuntimeException(s"Can't find function `$funcName` in $l [${l.length}] params=$args")
+      case _ => invokeFunc(func.asInstanceOf[Object], contexts, args.map(a => a.asInstanceOf[Object]), kwargs, funcName)
+    }
   }
 
   private def compareFunctionTypes(a: Method, paramsSeq: Seq[_]): Boolean = {
