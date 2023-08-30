@@ -54,7 +54,7 @@ object Context {
             functionsInit: MutMap[String, Any] = MutMap[String, Any](),
             variablesInit: MutMap[String, Type] = MutMap[String, Type]()): Context = {
     val eng = EnginesStorage(engines += "interpolator" -> new Interpolator)
-    new Context(eng, VariablesStorage(defaultEngine, variablesInit), defaultFunctions ++ functionsInit)
+    new Context(eng, VariablesStorage(defaultEngine, variablesInit), defaultFunctions ++ functionsInit, true)
   }
 
   private sealed class Interpolator extends Engine {
@@ -70,12 +70,12 @@ object Context {
       new string(interpolated)
     }
 
-    override def executeFuncImpl(name: String, ctx: EngineContext, params: Type*) =
+    override def executeFuncImpl(name: String, ctx: EngineContext, kwargs: Map[String, Object], params: Type*) =
       throw new UnsupportedOperationException("interpolator dont have specific funcs")
   }
 }
 
-class Context(eng: EnginesStorage, vars: VariablesStorage, func: MutMap[String, Any]) extends java.lang.AutoCloseable {
+class Context(eng: EnginesStorage, vars: VariablesStorage, func: MutMap[String, Any], private var isMainThread: Boolean = false) extends java.lang.AutoCloseable {
 
   /** current engine name
     *
@@ -209,9 +209,9 @@ class Context(eng: EnginesStorage, vars: VariablesStorage, func: MutMap[String, 
     */
   def execute(stmt: String, expect_cursor: Boolean): Type = {
     if (!expect_cursor)
-      currentEngine.execute(stmt, new EngineContext(this))
+      currentEngine.execute(stmt, new EngineContext(this, currentEngineAllias))
     else
-      currentEngine.getCursor(stmt, new EngineContext(this))
+      currentEngine.getCursor(stmt, new EngineContext(this, currentEngineAllias))
   }
 
   /** execute statement on engine
@@ -227,9 +227,9 @@ class Context(eng: EnginesStorage, vars: VariablesStorage, func: MutMap[String, 
     getEngine(engine) match {
       case Some(value) =>
         if (!expect_cursor)
-          value.execute(stmt, new EngineContext(this))
+          value.execute(stmt, new EngineContext(this, engine))
         else
-          value.getCursor(stmt, new EngineContext(this))
+          value.getCursor(stmt, new EngineContext(this, engine))
       case None => throw new NoSuchElementException(s"unknown engine $engine")
     }
   }
@@ -254,9 +254,9 @@ class Context(eng: EnginesStorage, vars: VariablesStorage, func: MutMap[String, 
         params.foreach(p => engines.setEngineParam(engine, p._1, p._2))
         val res =
           if (!expect_cursor)
-            eng.execute(stmt, new EngineContext(this))
+            eng.execute(stmt, new EngineContext(this, engine))
           else
-            eng.getCursor(stmt, new EngineContext(this))
+            eng.getCursor(stmt, new EngineContext(this, engine))
         // restore old params
         old.foreach(p => engines.setEngineParam(engine, p._1, p._2))
         res
@@ -285,6 +285,22 @@ class Context(eng: EnginesStorage, vars: VariablesStorage, func: MutMap[String, 
     */
   def getVar(key: String): Type = {
     variables.getVar(key)
+  }
+
+  /** get the param value by name for engine, if no param found var with this name returns
+    *
+    * @param key
+    *   param name
+    * @param engineName
+    *   engine name
+    * @return
+    *   param value
+    */
+  def getParam(key: String, engineName: String): Type = {
+    engines.getEngineParam(engineName, key) match {
+      case _: none => getVar(key)
+      case other => other
+    }
   }
 
   /** get all vars for this scope + all params for current engine
@@ -334,7 +350,7 @@ class Context(eng: EnginesStorage, vars: VariablesStorage, func: MutMap[String, 
   }
 
   override def close(): Unit = {
-    // TODO
+    engines.close()
   }
 
   def getVars(): MutMap[String, Type] = {

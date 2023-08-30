@@ -5,10 +5,10 @@ import org.mixql.core.function.FunctionInvoker
 
 import scala.collection.mutable
 
-class EngineContext(val context: Context) {
+class EngineContext(val context: Context, val engineName: String) {
   def setVar(key: String, value: Type): Unit = context.setVar(key, value)
 
-  def getVar(key: String): Type = context.getVar(key)
+  def getVar(key: String): Type = context.getParam(key, engineName)
 
   def getVars(keys: List[String]): mutable.Map[String, Type] = {
     val res: mutable.Map[String, Type] = mutable.Map()

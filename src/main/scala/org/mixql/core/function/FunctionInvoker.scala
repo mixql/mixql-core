@@ -23,48 +23,18 @@ object FunctionInvoker {
     try {
       functions.map(t => t._1.toLowerCase -> t._2).get(funcName.toLowerCase()) match {
         case Some(func) =>
-          func match {
-            case l: List[_] =>
-              for (f <- l) {
-                val applyMethods = f.getClass.getMethods.filter(x =>
-                  // x.getParameters.length != 0 &&
-                  x.getParameters.exists(y => y.getType.getName != "java.lang.Object") &&
-                    x.getName == "apply"
-                )
-
-                if (compareFunctionTypes(applyMethods(0), args)) {
-                  return invokeFunc(
-                    f.asInstanceOf[Object],
-                    contexts,
-                    args.map(a => a.asInstanceOf[Object]),
-                    kwargs,
-                    funcName
-                  )
-                }
-              }
-              throw new RuntimeException(s"Can't find function `$funcName` in $l [${l.length}] params=$args")
-            case _ =>
-              invokeFunc(func.asInstanceOf[Object], contexts, args.map(a => a.asInstanceOf[Object]), kwargs, funcName)
-          }
+          invokeRegisteredFunc(func, funcName, contexts, args, kwargs)
         case None =>
           val ctxFiltered = contexts.filter(tuple => tuple.isInstanceOf[Context])
           if (ctxFiltered.nonEmpty) {
             val ctx = ctxFiltered.head.asInstanceOf[Context]
-            if (ctx.currentEngine.getDefinedFunctions().contains(funcName.toLowerCase))
-              unpack(ctx.currentEngine.executeFunc(funcName, new EngineContext(ctx), kwargs, args.map(pack): _*))
-            else {
-              val engine = ctx.engines.find(eng => {
-                if (eng._2.name != ctx.currentEngine.name)
-                  eng._2.getDefinedFunctions().contains(funcName)
-                else
-                  false
-              })
-              engine match {
-                case Some(value) =>
-                  unpack(value._2.executeFunc(funcName, new EngineContext(ctx), kwargs, args.map(pack): _*))
-                case None => throw new NoSuchMethodException(s"no function $funcName found for any engine")
-              }
-            }
+            val func = ctx.getVar(funcName)
+            if (func.isInstanceOf[SqlLambda])
+              invokeRegisteredFunc(func, funcName, contexts, args, kwargs)
+            else if (ctx.currentEngine.getDefinedFunctions().contains(funcName.toLowerCase))
+              unpack(ctx.currentEngine.executeFunc(funcName, new EngineContext(ctx, ctx.currentEngineAllias), kwargs, args.map(pack): _*))
+            else
+              throw new NoSuchMethodException(s"no function $funcName was founded to invoke")  
           } else {
             throw new NoSuchMethodException(s"no function $funcName was founded to invoke")
           }
@@ -101,6 +71,37 @@ object FunctionInvoker {
         throw new FunctionInvokerException(errorMsg)
       case e: Throwable => throw e
     }
+  }
+
+  private def invokeRegisteredFunc(
+    func: Any,
+    funcName: String,
+             contexts: List[Object],
+    args: List[Any] = Nil,
+             kwargs: Map[String, Object] = Map.empty): Any = {
+    func match {
+            case l: List[_] =>
+              for (f <- l) {
+                val applyMethods = f.getClass.getMethods.filter(x =>
+                  // x.getParameters.length != 0 &&
+                  x.getParameters.exists(y => y.getType.getName != "java.lang.Object") &&
+                    x.getName == "apply"
+                )
+
+                if (compareFunctionTypes(applyMethods(0), args)) {
+                  return invokeFunc(
+                    f.asInstanceOf[Object],
+                    contexts,
+                    args.map(a => a.asInstanceOf[Object]),
+                    kwargs,
+                    funcName
+                  )
+                }
+              }
+              throw new RuntimeException(s"Can't find function `$funcName` in $l [${l.length}] params=$args")
+            case _ =>
+              invokeFunc(func.asInstanceOf[Object], contexts, args.map(a => a.asInstanceOf[Object]), kwargs, funcName)
+          }
   }
 
   private def compareFunctionTypes(a: Method, paramsSeq: Seq[_]): Boolean = {

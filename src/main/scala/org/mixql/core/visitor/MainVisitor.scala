@@ -128,14 +128,7 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
     } else {
       val value = visit(ctx.expr)
       logDebug("visitAssigment_default: value: " + value)
-      value match {
-        case v: SqlLambda =>
-          val lambdaFuncName = visit(ctx.ident).toString;
-          logDebug("Adding lambda function " + lambdaFuncName + " to context")
-          context.addFunction(lambdaFuncName, v)
-
-        case _ => context.setVar(visit(ctx.ident).toString, value)
-      }
+      context.setVar(visit(ctx.ident).toString, value)
     }
     new Null()
   }

@@ -81,6 +81,16 @@ final class EnginesStorage(e: MutMap[String, Engine] = MutMap[String, Engine](),
     enginesParams(engineName).collect()
   }
 
+  def close() = {
+    engines.values.foreach(engine => {
+      import java.lang.AutoCloseable
+      if (engine.isInstanceOf[AutoCloseable]) {
+        val engineCloseable: AutoCloseable = engine.asInstanceOf[AutoCloseable]
+        engineCloseable.close()
+      }
+    })
+  }
+
   private def prepareNewStorage() = {
     var d = depth
     val paramStorage = new VariablesStorage()
