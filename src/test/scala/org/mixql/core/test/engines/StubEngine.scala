@@ -17,8 +17,6 @@ class StubEngine extends Engine {
     new Null()
   }
 
-  var changedParams: Map[String, Type] = Map()
-
   override def executeFuncImpl(name: String, ctx: EngineContext, kwargs: Map[String, Object], params: Type*): Type = {
     if (kwargs.nonEmpty)
       throw new UnsupportedOperationException("named arguments are not supported in functions in engine " + name)
@@ -28,14 +26,6 @@ class StubEngine extends Engine {
       case "getstr" => "42"
       case _        => throw new NoSuchMethodException(s"unknown func $name")
     }
-  }
-
-  override def paramChangedImpl(name: String, ctx: EngineContext): Unit = {
-    changedParams = changedParams ++ Map(name -> ctx.getVar(name))
-  }
-
-  def getChangedParam(name: String): Type = {
-    changedParams(name)
   }
 
   override def getDefinedFunctions(): List[String] = List("getnum", "getstr")

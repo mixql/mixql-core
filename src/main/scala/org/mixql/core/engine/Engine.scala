@@ -62,18 +62,6 @@ abstract class Engine {
     executeFuncImpl(name, ctx, kwargs, params: _*)
   }
 
-  /** set param for engine
-    *
-    * @param name
-    *   of the param
-    * @param value
-    *   of the param
-    */
-  final def paramChanged(name: String, ctx: EngineContext): Unit = {
-    if (engineStarted)
-      paramChangedImpl(name, ctx)
-  }
-
   /** get list of defined functions names in lower case
     *
     * @return
@@ -102,5 +90,4 @@ abstract class Engine {
 
   def executeFuncImpl(name: String, ctx: EngineContext, kwargs: Map[String, Object], params: Type*): Type
 
-  def paramChangedImpl(name: String, ctx: EngineContext): Unit
 }
