@@ -266,15 +266,84 @@ class StringInterpolationTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
 
     assert(context.getVar("v1").isInstanceOf[string])
-    assert(
-      context.getVar("v1").asInstanceOf[string].getValue ==
-        """dfdgg
-        |dddd
-        |""".stripMargin
-    )
+    assert(context.getVar("v1").asInstanceOf[string].getValue == "dfdgg\ndddd")
 
     assert(context.getVar("v2").isInstanceOf[string])
-    assert(context.getVar("v2").asInstanceOf[string].getValue == "fgfhfh      ")
+    assert(context.getVar("v2").asInstanceOf[string].getValue == "fgfhfh\t")
+
+    assert(context.getVar("v3").isInstanceOf[string])
+    assert(context.getVar("v3").asInstanceOf[string].getValue == "fghfhhgfhg\\n")
+
+    assert(context.getVar("v5").isInstanceOf[string])
+    assert(context.getVar("v5").asInstanceOf[string].getValue == "gfhfhfhghfhh\\t")
+
+    assert(context.getVar("v6").isInstanceOf[string])
+    assert(context.getVar("v6").asInstanceOf[string].getValue == "gfhfhfhghfhhnone")
+
+    assert(context.getVar("v7").isInstanceOf[string])
+    assert(context.getVar("v7").asInstanceOf[string].getValue == "gfhfhfhghfhh$t")
+
+    assert(context.getVar("v8").isInstanceOf[string])
+    assert(context.getVar("v8").asInstanceOf[string].getValue == "gfhfhfhghfhh\\")
+  }
+
+  test("Test escaped symbols `") {
+    val code =
+      """
+        |let v1=`dfdgg\ndddd`;
+        |let v2=`fgfhfh\t`;
+        |let v3=`fghfhhgfhg\\n`;
+        |let v5=`gfhfhfhghfhh\\t`;
+        |let v6=`gfhfhfhghfhh$t`;
+        |let v7=`gfhfhfhghfhh\$t`;
+        |let v8=`gfhfhfhghfhh\\`;
+        |
+        |
+                """.stripMargin
+    val context = runMainVisitor(code)
+
+    assert(context.getVar("v1").isInstanceOf[string])
+    assert(context.getVar("v1").asInstanceOf[string].getValue == "dfdgg\ndddd")
+
+    assert(context.getVar("v2").isInstanceOf[string])
+    assert(context.getVar("v2").asInstanceOf[string].getValue == "fgfhfh\t")
+
+    assert(context.getVar("v3").isInstanceOf[string])
+    assert(context.getVar("v3").asInstanceOf[string].getValue == "fghfhhgfhg\\n")
+
+    assert(context.getVar("v5").isInstanceOf[string])
+    assert(context.getVar("v5").asInstanceOf[string].getValue == "gfhfhfhghfhh\\t")
+
+    assert(context.getVar("v6").isInstanceOf[string])
+    assert(context.getVar("v6").asInstanceOf[string].getValue == "gfhfhfhghfhhnone")
+
+    assert(context.getVar("v7").isInstanceOf[string])
+    assert(context.getVar("v7").asInstanceOf[string].getValue == "gfhfhfhghfhh$t")
+
+    assert(context.getVar("v8").isInstanceOf[string])
+    assert(context.getVar("v8").asInstanceOf[string].getValue == "gfhfhfhghfhh\\")
+  }
+
+  test("Test escaped symbols '") {
+    val code =
+      """
+        |let v1='dfdgg\ndddd';
+        |let v2='fgfhfh\t';
+        |let v3='fghfhhgfhg\\n';
+        |let v5='gfhfhfhghfhh\\t';
+        |let v6='gfhfhfhghfhh$t';
+        |let v7='gfhfhfhghfhh\$t';
+        |let v8='gfhfhfhghfhh\\';
+        |
+        |
+                """.stripMargin
+    val context = runMainVisitor(code)
+
+    assert(context.getVar("v1").isInstanceOf[string])
+    assert(context.getVar("v1").asInstanceOf[string].getValue == "dfdgg\ndddd")
+
+    assert(context.getVar("v2").isInstanceOf[string])
+    assert(context.getVar("v2").asInstanceOf[string].getValue == "fgfhfh\t")
 
     assert(context.getVar("v3").isInstanceOf[string])
     assert(context.getVar("v3").asInstanceOf[string].getValue == "fghfhhgfhg\\n")

@@ -380,6 +380,7 @@ T_SYSDATE              : S Y S D A T E ;
 T_VARIANCE             : V A R I A N C E ;
 T_USER                 : U S E R;
 
+//in visitTerminal in BaseVisitor is substring(1)!!!
 T_ESCAPED_SYMBOLS: '\\$' | '\\\\';
 
 T_ADD          : '+' ;
@@ -500,23 +501,29 @@ fragment Z : ('z'|'Z') ;
 mode S_STRING;
 
 T_S_CLOSE_QUOTE: '\'' -> popMode;
-T_SS_ESC: '\\\\' | '\\$' | '\\\'';
+//is overrided in visitTerminal in BaseVisitor!!!
+T_SS_ESC: '\\\\n'| '\\\\r'| '\\\\t' | '\\\\' | '\\$' | '\\\'' | '\n' | '\\n' | '\\r' | '\r' | '\\t' | '\t';
 T_SS_EXP_INTERPOLATION: '${' -> pushMode(DEFAULT_MODE);
+//in visitTerminal in BaseVisitor is substring(1)!!!
 T_SS_VAR_INTERPOLATION: '$' L_NAME_PART ('.' L_NAME_PART)*;
 T_SS_OTHER: ~('\'' | '$' | '\\')+;
 
 mode B_STRING;
 
 T_B_CLOSE_QUOTE: '`' -> popMode;
-T_BS_ESC: '\\\\' | '\\$' | '\\`';
+//is overrided in visitTerminal in BaseVisitor!!!
+T_BS_ESC: '\\\\n'| '\\\\r'| '\\\\t' | '\\\\' | '\\$' | '\\`' | '\n' | '\\n' | '\\r' | '\r' | '\\t' | '\t';
 T_BS_EXP_INTERPOLATION: '${' -> pushMode(DEFAULT_MODE);
+//in visitTerminal in BaseVisitor is substring(1)!!!
 T_BS_VAR_INTERPOLATION: '$' L_NAME_PART ('.' L_NAME_PART)*;
 T_BS_OTHER: ~('`' | '$' | '\\')+;
 
 mode D_STRING;
 
 T_D_CLOSE_QUOTE: '"' -> popMode;
-T_DS_ESC: '\\\\' | '\\$' | '\\"';
+//is overrided in visitTerminal in BaseVisitor!!!
+T_DS_ESC: '\\\\n'| '\\\\r'| '\\\\t'  | '\\\\' | '\\$' | '\\"' | '\n' | '\\n' | '\\r' | '\r' | '\\t' | '\t';
 T_DS_EXP_INTERPOLATION: '${' -> pushMode(DEFAULT_MODE);
+//in visitTerminal in BaseVisitor is substring(1)!!!
 T_DS_VAR_INTERPOLATION: '$' L_NAME_PART ('.' L_NAME_PART)*;
 T_DS_OTHER: ~('"' | '$' | '\\')+;

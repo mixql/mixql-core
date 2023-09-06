@@ -27,10 +27,52 @@ trait BaseVisitor extends sqlBaseVisitor[Type] {
 
   override def visitTerminal(node: TerminalNode): Type = {
     node.getSymbol().getType() match {
-      case token.T_ESCAPED_SYMBOLS      => new string(node.getText().substring(1))
-      case token.T_SS_ESC               => new string(node.getText().substring(1))
-      case token.T_DS_ESC               => new string(node.getText().substring(1))
-      case token.T_BS_ESC               => new string(node.getText().substring(1))
+      case token.T_ESCAPED_SYMBOLS => new string(node.getText().substring(1))
+      case token.T_SS_ESC =>
+        new string(node.getText() match {
+          case "\\\\n"  => """\n"""
+          case "\\\\r"  => """\r"""
+          case "\\\\t"  => """\t"""
+          case "\\\\"   => """\"""
+          case "\\$"    => "$"
+          case "\n"     => "\n"
+          case """\n""" => "\n"
+          case """\r""" => "\r"
+          case "\r"     => "\r"
+          case """\t""" => "\t"
+          case "\t"     => "\t"
+          case """\'""" => """'"""
+        })
+      case token.T_DS_ESC =>
+        new string(node.getText() match {
+          case "\\\\n"  => """\n"""
+          case "\\\\r"  => """\r"""
+          case "\\\\t"  => """\t"""
+          case "\\\\"   => """\"""
+          case "\\$"    => "$"
+          case "\n"     => "\n"
+          case """\n""" => "\n"
+          case """\r""" => "\r"
+          case "\r"     => "\r"
+          case """\t""" => "\t"
+          case "\t"     => "\t"
+          case """\"""" => """""""
+        })
+      case token.T_BS_ESC =>
+        new string(node.getText() match {
+          case "\\\\n"  => """\n"""
+          case "\\\\r"  => """\r"""
+          case "\\\\t"  => """\t"""
+          case "\\\\"   => """\"""
+          case "\\$"    => "$"
+          case "\n"     => "\n"
+          case """\n""" => "\n"
+          case """\r""" => "\r"
+          case "\r"     => "\r"
+          case """\t""" => "\t"
+          case "\t"     => "\t"
+          case """\`""" => """`"""
+        })
       case token.T_SS_VAR_INTERPOLATION => context.getVar(node.getText().substring(1))
       case token.T_DS_VAR_INTERPOLATION => context.getVar(node.getText().substring(1))
       case token.T_BS_VAR_INTERPOLATION => context.getVar(node.getText().substring(1))
