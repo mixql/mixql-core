@@ -102,6 +102,7 @@ final class EnginesStorage(e: MutMap[String, Engine] = MutMap[String, Engine](),
   }
 
   private val engines: MutMap[String, Engine] = e
+  def engineNames = engines.keys.toList
 
   private val enginesParams: MutMap[String, VariablesStorage] = p
 

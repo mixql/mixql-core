@@ -393,5 +393,7 @@ class Context(eng: EnginesStorage,
 
   private val engines: EnginesStorage = eng
 
+  def engineNames = engines.engineNames
+
   val functions: MutMap[String, Any] = func
 }
