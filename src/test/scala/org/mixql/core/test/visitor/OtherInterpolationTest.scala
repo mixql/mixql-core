@@ -53,4 +53,45 @@ class OtherInterpolationTest extends MainVisitorBaseTest {
     val query = context.currentEngine.asInstanceOf[StubEngine].queue
     assert(query.dequeue() == "select $ { dfsg } { 15 * 10 } {\\} where > 10")
   }
+
+  test("Test any statement with SEMICOLON") {
+    val code =
+      """
+        |select \; { dfsg } { 15 * 10 } {\\} where > 10;
+                """.stripMargin
+    val context = runMainVisitor(code)
+    val query = context.currentEngine.asInstanceOf[StubEngine].queue
+    assert(query.dequeue() == "select ; { dfsg } { 15 * 10 } {\\} where > 10")
+  }
+
+  test("Test any statement with \\n") {
+    val code =
+      """
+        |select \n { dfsg } { 15 * 10 } {\\} where > 10;
+                """.stripMargin
+    val context = runMainVisitor(code)
+    val query = context.currentEngine.asInstanceOf[StubEngine].queue
+    assert(query.dequeue() == "select \\n { dfsg } { 15 * 10 } {\\} where > 10")
+  }
+
+  test("Test any statement with trigger") {
+    val code =
+      """
+        |CREATE TRIGGER actor_trigger_ai AFTER INSERT ON actor
+        | BEGIN
+        |  UPDATE actor SET last_update = DATETIME('NOW')  WHERE rowid = new.rowid\;
+        | END
+        |;
+                """.stripMargin
+    val context = runMainVisitor(code)
+    val query = context.currentEngine.asInstanceOf[StubEngine].queue
+    assert(
+      query.dequeue() ==
+        """|CREATE TRIGGER actor_trigger_ai AFTER INSERT ON actor
+        | BEGIN
+        |  UPDATE actor SET last_update = DATETIME('NOW')  WHERE rowid = new.rowid;
+        | END""".stripMargin
+    )
+  }
+
 }

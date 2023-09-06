@@ -27,7 +27,15 @@ trait BaseVisitor extends sqlBaseVisitor[Type] {
 
   override def visitTerminal(node: TerminalNode): Type = {
     node.getSymbol().getType() match {
-      case token.T_ESCAPED_SYMBOLS => new string(node.getText().substring(1))
+      case token.T_ESCAPED_SYMBOLS =>
+        new string(node.getText() match {
+          case "\\$"    => "$"
+          case "\\\\"   => """\"""
+          case "\\;"    => ";"
+          case """\n""" => """\n"""
+          case """\r""" => """\r"""
+          case """\t""" => """\t"""
+        })
       case token.T_SS_ESC =>
         new string(node.getText() match {
           case "\\\\n"  => """\n"""

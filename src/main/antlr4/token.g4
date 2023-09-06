@@ -380,8 +380,8 @@ T_SYSDATE              : S Y S D A T E ;
 T_VARIANCE             : V A R I A N C E ;
 T_USER                 : U S E R;
 
-//in visitTerminal in BaseVisitor is substring(1)!!!
-T_ESCAPED_SYMBOLS: '\\$' | '\\\\';
+//is overrided in visitTerminal in BaseVisitor!!!
+T_ESCAPED_SYMBOLS: '\\$' | '\\\\' | '\\;' | '\\n' | '\\r' | '\\t' ;
 
 T_ADD          : '+' ;
 T_COLON        : ':' ;
@@ -439,8 +439,8 @@ L_M_COMMENT : '/*' .*? '*/' -> channel(HIDDEN) ;                       // Multil
 L_S_COMMENT : ('--' | '//')  .*? '\r'? (EOF | '\n') -> channel(HIDDEN) ;       // Single line comment
 
 
-L_FILE      : ([a-zA-Z] ':' '\\'?)? L_NAME  ('\\' L_NAME )*                  // File path (a/b/c Linux path causes conflicts with division operator and handled at parser level)
-            ;
+//L_FILE      : ([a-zA-Z] ':' '\\'?)? L_NAME  ('\\' L_NAME )*                  // File path (a/b/c Linux path causes conflicts with division operator and handled at parser level)
+//            ;
 
 
 //L_LABEL     : ([a-zA-Z] | L_DIGIT | '_')* ':'
