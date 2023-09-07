@@ -204,9 +204,8 @@ object FunctionInvoker {
 
           i += 1
         })
-        var res: Any = null
         try {
-          res = apply.invoke(obj, lb.toArray: _*)
+          apply.invoke(obj, lb.toArray: _*)
         } catch {
           case e: java.lang.reflect.InvocationTargetException =>
             if (e.getTargetException != null && e.getTargetException.getMessage
@@ -214,11 +213,9 @@ object FunctionInvoker {
               val longs = lb.last
               lb = lb.dropRight(1)
               lb += longs.asInstanceOf[Seq[Long]].map(_.toInt)
-              res = apply.invoke(obj, lb.toArray: _*)
+              apply.invoke(obj, lb.toArray: _*)
             }
         }
-        println(s"res=$res")
-        res
     }
   }
 
