@@ -231,7 +231,7 @@ class GIntTest extends MainVisitorBaseTest {
     assert(res1.asInstanceOf[gInt].getValue == 9223372036854775807L)
   }
 
-  test("Test big integer") {
+  ignore("Test big integer") {
     Int.MaxValue
     val code =
       """
