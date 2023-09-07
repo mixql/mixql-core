@@ -146,7 +146,7 @@ object FunctionInvoker {
       case None => throw new RuntimeException(s"Can't find method `apply` in function $funcName")
       case Some(apply) =>
         val applyParams = apply.getParameters
-        var lb: ListBuffer[Object] = ListBuffer()
+        val lb: ListBuffer[Object] = ListBuffer()
         var args1 = args
         var kwargs1 = kwargs
         var i = 1
@@ -204,18 +204,20 @@ object FunctionInvoker {
 
           i += 1
         })
+        var res: Any = null
         try {
-          apply.invoke(obj, lb.toArray: _*)
+          res = apply.invoke(obj, lb.toArray: _*)
         } catch {
           case e: java.lang.reflect.InvocationTargetException =>
             if (e.getTargetException != null && e.getTargetException.getMessage
                   .contains("class java.lang.Long cannot be cast")) {
               val longs = lb.last
-              lb = lb.dropRight(1)
+              lb.remove(lb.length - 1)
               lb += longs.asInstanceOf[Seq[Long]].map(_.toInt)
-              apply.invoke(obj, lb.toArray: _*)
+              res = apply.invoke(obj, lb.toArray: _*)
             }
         }
+        res
     }
   }
 
