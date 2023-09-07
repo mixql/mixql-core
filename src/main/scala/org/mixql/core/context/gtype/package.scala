@@ -10,8 +10,9 @@ package object gtype {
     */
   object implicitGtypeConversions {
     implicit def from_int(a: Int): gInt = new gInt(a)
+    implicit def from_int(a: Long): gInt = new gInt(a)
 
-    implicit def to_int(a: gInt): Int = a.getValue
+    implicit def to_int(a: gInt): Long = a.getValue
 
     implicit def from_double(a: Double): gDouble = new gDouble(a)
 
@@ -107,6 +108,7 @@ package object gtype {
       case null          => new Null()
       case p: String     => new string(p)
       case p: Int        => new gInt(p)
+      case p: Long       => new gInt(p)
       case p: Double     => new gDouble(p)
       case p: Boolean    => new bool(p)
       case p: Array[Any] => new array(p.map(pack))

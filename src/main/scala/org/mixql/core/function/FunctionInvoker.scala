@@ -124,6 +124,7 @@ object FunctionInvoker {
     if (left.isPrimitive) {
       left.getName match {
         case "int"    => return right.getName == "java.lang.Integer"
+        case "long"   => return right.getName == "java.lang.Long"
         case "double" => return right.getName == "java.lang.Double"
       }
     }
@@ -144,7 +145,7 @@ object FunctionInvoker {
     a match {
       case Some(apply) =>
         val applyParams = apply.getParameters
-        var lb: ListBuffer[Object] = ListBuffer()
+        val lb: ListBuffer[Object] = ListBuffer()
         var args1 = args
         var kwargs1 = kwargs
         var i = 1
@@ -184,7 +185,13 @@ object FunctionInvoker {
           }
 
           if (args1.nonEmpty && !addedArg) {
-            lb += args1.head
+            // cast long to int if necessary
+            val funcParamName = applyParams(i - 1).getType.getName
+            if ((funcParamName == "int" || funcParamName == "java.lang.Integer") && args1.head.isInstanceOf[Long])
+              lb += args1.head.asInstanceOf[Long].toInt.asInstanceOf[Object]
+            else
+              lb += args1.head
+
             addedArg = true
             args1 = args1.tail
           }
@@ -196,7 +203,18 @@ object FunctionInvoker {
 
           i += 1
         })
-        apply.invoke(obj, lb.toArray: _*)
+        try {
+          apply.invoke(obj, lb.toArray: _*)
+        } catch {
+          case e: java.lang.reflect.InvocationTargetException =>
+            if (e.getTargetException != null && e.getTargetException.getMessage
+                  .contains("class java.lang.Long cannot be cast")) {
+              val longs = lb.last
+              lb.remove(lb.length - 1, 1)
+              lb += longs.asInstanceOf[Seq[Long]].map(_.toInt)
+              apply.invoke(obj, lb.toArray: _*)
+            }
+        }
       case None => throw new RuntimeException(s"Can't find method `apply` in function $funcName")
     }
   }

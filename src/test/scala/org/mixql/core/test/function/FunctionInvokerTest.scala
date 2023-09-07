@@ -28,7 +28,7 @@ class FunctionInvokerTest extends AnyFunSuite {
 
   val lengthMixQlCoreContext: Any =
     new ((Context, String) => Int) {
-      def apply(ctx: Context, str: String): Int = str.length + ctx.getVar("a").asInstanceOf[gInt].getValue
+      def apply(ctx: Context, str: String): Int = str.length + ctx.getVar("a").asInstanceOf[gInt].getValue.toInt
     }
 
   val defArgFunc =

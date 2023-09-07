@@ -78,7 +78,7 @@ public class array extends collection {
     @Override
     public Type apply(Type index) {
         if (index instanceof gInt)
-            return arr.get(((gInt) index).value);
+            return arr.get((int) ((gInt) index).value);
         else
             throw new IllegalArgumentException("array index must be int");
     }
@@ -86,7 +86,7 @@ public class array extends collection {
     @Override
     public void update(Type index, Type value) {
         if (index instanceof gInt)
-            arr.set(((gInt) index).value, value);
+            arr.set((int) ((gInt) index).value, value);
         else
             throw new IllegalArgumentException("array index must be int");
     }
