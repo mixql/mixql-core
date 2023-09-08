@@ -156,7 +156,7 @@ class CursorTest extends MainVisitorBaseTest {
     val res1 = context.getVar("arr")
     assert(res1.isInstanceOf[array])
     val arr1 = res1.asInstanceOf[array]
-    val arr1Size = arr1.size().getValue
+    val arr1Size = arr1.size().getValue.asInstanceOf[Int]
     assert(arr1Size == 20)
 
     for (i <- 0 to arr1Size - 1) {
@@ -198,7 +198,7 @@ class CursorTest extends MainVisitorBaseTest {
     val res1 = context.getVar("arr")
     assert(res1.isInstanceOf[array])
     val arr1 = res1.asInstanceOf[array]
-    val arr1Size = arr1.size().getValue
+    val arr1Size = arr1.size().getValue.asInstanceOf[Int]
     assert(arr1Size == 10)
 
     for (i <- 0 until arr1Size) {
@@ -237,7 +237,7 @@ class CursorTest extends MainVisitorBaseTest {
     val res1 = context.getVar("arr")
     assert(res1.isInstanceOf[array])
     val arr1 = res1.asInstanceOf[array]
-    val arr1Size = arr1.size().getValue
+    val arr1Size = arr1.size().getValue.asInstanceOf[Int]
     assert(arr1Size == 10)
 
     for (i <- 0 until arr1Size) {
@@ -309,7 +309,7 @@ class CursorTest extends MainVisitorBaseTest {
     val res1 = context.getVar("arr")
     assert(res1.isInstanceOf[array])
     val arr1 = res1.asInstanceOf[array]
-    val arr1Size = arr1.size().getValue
+    val arr1Size = arr1.size().getValue.asInstanceOf[Int]
     assert(arr1Size == 10)
 
     for (i <- 0 until arr1Size) {

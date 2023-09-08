@@ -30,6 +30,8 @@ object ConfigHelp {
       new string(value.asInstanceOf[String])
     else if (value.isInstanceOf[Integer])
       new gInt(value.asInstanceOf[Integer])
+    else if (value.isInstanceOf[Long])
+      new gInt(value.asInstanceOf[Long])
     else if (value.isInstanceOf[Double])
       new gDouble(value.asInstanceOf[Double])
     else if (value.isInstanceOf[ju.List[Object]])

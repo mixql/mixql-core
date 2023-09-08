@@ -46,9 +46,9 @@ trait LiteralVisitor extends BaseVisitor {
 
   override def visitLiteral_int(ctx: sql.Literal_intContext): Type =
     if (ctx.int_number.T_SUB)
-      new gInt(-ctx.int_number.L_INT.getText.toInt)
+      new gInt(-ctx.int_number.L_INT.getText.toLong)
     else
-      new gInt(ctx.int_number.L_INT.getText.toInt)
+      new gInt(ctx.int_number.L_INT.getText.toLong)
 
   override def visitLiteral_double(ctx: sql.Literal_doubleContext): Type =
     if (ctx.dec_number.T_SUB)

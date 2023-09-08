@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class gInt extends Type {
-    int value;
+    long value;
 
-    public int getValue(){
+    public long getValue() {
         return value;
     }
 
@@ -14,14 +14,18 @@ public class gInt extends Type {
         this.value = value;
     }
 
+    public gInt(long value) {
+        this.value = value;
+    }
+
     public gInt(String value) {
-        this.value = Integer.parseInt(value);
+        this.value = Long.parseLong(value);
     }
 
 
     @Override
     public String toString() {
-        return Integer.toString(value);
+        return Long.toString(value);
     }
 
     @Override

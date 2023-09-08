@@ -72,7 +72,7 @@ public class gcursor extends cursor {
 
         if (source instanceof map) {
             map m = (map) source;
-            int mSize = m.size().value;
+            int mSize = (int) m.size().value;
             if (keySet == null) {
 
                 keySet = new Type[mSize];
