@@ -105,6 +105,7 @@ package object gtype {
 
   def pack(a: Any): Type = {
     a match {
+      case p: Type       => p
       case null          => new Null()
       case p: String     => new string(p)
       case p: Int        => new gInt(p)
