@@ -34,6 +34,7 @@ hs_err_pid*
 metals.sbt
 .bloop
 .antlr
+null
 
 /src/main/java/org/mixql/core/generated
 /src/main/antlr4/gen

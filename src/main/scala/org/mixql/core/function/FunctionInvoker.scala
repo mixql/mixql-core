@@ -7,8 +7,26 @@ import java.lang.reflect.Method
 import scala.annotation.meta.param
 import scala.collection.mutable.ListBuffer
 import scala.util.Try
+import scala.concurrent.{Future, ExecutionContext}
+import ExecutionContext.Implicits.global
 
 object FunctionInvoker {
+
+  def invokeAsync(functions: Map[String, Any],
+                  funcName: String,
+                  _contexts: List[Object], // To support not only mixql-core context
+                  args: List[Any] = Nil,
+                  kwargs: Map[String, Object] = Map.empty): Future[Type] = {
+    val contexts = _contexts.map(c => {
+      if (c.isInstanceOf[Context])
+        c.asInstanceOf[Context].fork()
+      else
+        c
+    })
+    Future[Type] {
+      pack(invoke(functions, funcName, contexts, args, kwargs))
+    }
+  }
 
   def invoke(functions: Map[String, Any],
              funcName: String,
@@ -69,7 +87,7 @@ object FunctionInvoker {
                 )
               }
             }
-
+        throw e
         throw new FunctionInvokerException(errorMsg)
       case e: Throwable => throw e
     }
@@ -137,7 +155,7 @@ object FunctionInvoker {
                          kwargs: Map[String, Object] = Map.empty,
                          funcName: String): Any = {
     if (obj.isInstanceOf[SqlLambda])
-      return obj.asInstanceOf[SqlLambda].apply(args: _*)
+      return obj.asInstanceOf[SqlLambda].apply(contexts.head.asInstanceOf[Context], args: _*)
     val a = obj.getClass.getMethods.find(p =>
       p.getName == "apply" &&
         (p.getParameters.length == 0 || p.getParameters()(0).getName.toLowerCase != "v1")
@@ -215,7 +233,8 @@ object FunctionInvoker {
               lb.remove(lb.length - 1)
               lb += longs.asInstanceOf[Seq[Long]].map(_.toInt)
               res = apply.invoke(obj, lb.toArray: _*)
-            }
+            } else
+              throw e
         }
         res
     }
