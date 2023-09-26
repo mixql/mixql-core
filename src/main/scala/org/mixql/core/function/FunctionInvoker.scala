@@ -87,7 +87,7 @@ object FunctionInvoker {
                 )
               }
             }
-        throw e
+        throw e.getCause
         throw new FunctionInvokerException(errorMsg)
       case e: Throwable => throw e
     }

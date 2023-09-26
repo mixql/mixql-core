@@ -196,6 +196,55 @@ class LambdaTest extends MainVisitorBaseTest {
     assert(res1.asInstanceOf[gInt].getValue == 1)
   }
 
+  test("Test throw exception from lambda") {
+    val code =
+      """
+        |let lambda = () -> begin
+        |  RAISE "async", "await";
+        |  return 1;
+        |end;
+        |try
+        |  let async_call = lambda();
+        |catch exc then
+        |  let exc_t = $exc["type"];
+        |  let exc_m = $exc["message"];
+        |end
+                """.stripMargin
+    val context = runMainVisitor(code)
+    val exc_t = context.getVar("exc_t")
+    assert(exc_t.isInstanceOf[string])
+    assert(exc_t.asInstanceOf[string].getValue == "async")
+    val exc_m = context.getVar("exc_m")
+    assert(exc_m.isInstanceOf[string])
+    assert(exc_m.asInstanceOf[string].getValue == "await")
+  }
+
+  test("Test throw exception from scala func") {
+    val code =
+      """
+        |try
+        |  let exc = await lambda();
+        |catch exc then
+        |  let exc_t = $exc["type"];
+        |  let exc_m = $exc["message"];
+        |end
+                """.stripMargin
+    val lambda: Any =
+      new (() => Int) {
+        def apply(): Int = throw new Exception("await")
+      }
+    val context = runMainVisitor(
+      code,
+      Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub", MutMap[String, Any]("lambda" -> lambda))
+    )
+    val exc_t = context.getVar("exc_t")
+    assert(exc_t.isInstanceOf[string])
+    assert(exc_t.asInstanceOf[string].getValue == "Exception")
+    val exc_m = context.getVar("exc_m")
+    assert(exc_m.isInstanceOf[string])
+    assert(exc_m.asInstanceOf[string].getValue == "await")
+  }
+
   test("Test call async lambda") {
     val code =
       """
@@ -227,7 +276,7 @@ class LambdaTest extends MainVisitorBaseTest {
     assert(res.asInstanceOf[gInt].getValue == 1)
   }
 
-  test("Test throw async exception") {
+  test("Test throw async exception from lambda") {
     val code =
       """
         |let lambda = () -> begin
