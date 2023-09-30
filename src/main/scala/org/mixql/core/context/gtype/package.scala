@@ -135,7 +135,7 @@ package object gtype {
       case t: array            => t.getArr.map(unpack)
       case t: map              => t.getMap.asScala.map(kv => unpack(kv._1) -> unpack(kv._2)).toMap
       case v: SqlLambda        => v
-      case a: SqlAsync          => a.fut
+      case a: SqlAsync         => a.fut
     }
   }
 }
