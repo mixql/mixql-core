@@ -157,8 +157,8 @@ trait ExpressionVisitor extends BaseVisitor {
         visit(ctx.await.func)
       else
         visit(ctx.await.`var`)
-    if (res.isInstanceOf[MixqlAync])
-      res.asInstanceOf[MixqlAync].await()
+    if (res.isInstanceOf[SqlAync])
+      res.asInstanceOf[SqlAync].await()
     else
       throw new IllegalCallerException("can await only async call")
   }
@@ -185,7 +185,7 @@ trait ExpressionVisitor extends BaseVisitor {
           Nil
       }).toMap
     if (ctx.T_ASYNC) {
-      new MixqlAync(
+      new SqlAync(
         FunctionInvoker.invokeAsync(context.functions.toMap, funcName, List[Object](context), args.toList, kwargs)
       )
     } else {

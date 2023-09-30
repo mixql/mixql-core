@@ -236,6 +236,7 @@ non_reserved_words :                      // Tokens that are not reserved words 
      | T_AT
      | T_AUTO_INCREMENT
      | T_AVG
+     | T_AWAIT
      | T_BATCHSIZE
      | T_BEGIN
      | T_BETWEEN

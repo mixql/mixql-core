@@ -156,4 +156,28 @@ class ContextTest extends AnyFunSuite {
     val engine_name1 = context.getVar("mixql.execution.engine")
     assert(engine_name1.toString == "stub")
   }
+
+  test("Test fork context") {
+    val context = Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
+    context.setVar("a", new gInt(25))
+    val fork = context.fork()
+    assert(fork.getVar("a").asInstanceOf[gInt].getValue == 25)
+    context.pushScope()
+
+    context.setVar("a", new gInt(15))
+    assert(fork.getVar("a").asInstanceOf[gInt].getValue == 25)
+    assert(context.getVar("a").asInstanceOf[gInt].getValue == 15)
+
+    fork.setVar("a", new gInt(35))
+    assert(fork.getVar("a").asInstanceOf[gInt].getValue == 35)
+    assert(context.getVar("a").asInstanceOf[gInt].getValue == 15)
+
+    context.setVar("a", new gInt(45))
+    assert(fork.getVar("a").asInstanceOf[gInt].getValue == 35)
+    assert(context.getVar("a").asInstanceOf[gInt].getValue == 45)
+
+    fork.setVar("a", new gInt(55))
+    assert(fork.getVar("a").asInstanceOf[gInt].getValue == 55)
+    assert(context.getVar("a").asInstanceOf[gInt].getValue == 45)
+  }
 }

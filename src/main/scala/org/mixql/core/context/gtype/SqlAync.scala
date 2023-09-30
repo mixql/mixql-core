@@ -7,11 +7,11 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.Await
 import java.lang.reflect.InvocationTargetException
 
-final class MixqlAync(fut: Future[Type]) extends Type {
+final class SqlAync(val fut: Future[Any]) extends Type {
 
   def await(): Type = {
     try {
-      Await.result(fut, Duration.Inf)
+      pack(Await.result(fut, Duration.Inf))
     } catch {
       case e: UserSqlException => e
       case e: InvocationTargetException =>

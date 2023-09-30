@@ -3,7 +3,7 @@ package org.mixql.core.function
 import org.mixql.core.context.{EngineContext, Context}
 import org.mixql.core.context.gtype._
 
-import java.lang.reflect.Method
+import java.lang.reflect.{Method, InvocationTargetException}
 import scala.annotation.meta.param
 import scala.collection.mutable.ListBuffer
 import scala.util.Try
@@ -16,15 +16,15 @@ object FunctionInvoker {
                   funcName: String,
                   _contexts: List[Object], // To support not only mixql-core context
                   args: List[Any] = Nil,
-                  kwargs: Map[String, Object] = Map.empty): Future[Type] = {
+                  kwargs: Map[String, Object] = Map.empty): Future[Any] = {
     val contexts = _contexts.map(c => {
       if (c.isInstanceOf[Context])
         c.asInstanceOf[Context].fork()
       else
         c
     })
-    Future[Type] {
-      pack(invoke(functions, funcName, contexts, args, kwargs))
+    Future[Any] {
+      invoke(functions, funcName, contexts, args, kwargs)
     }
   }
 
@@ -60,36 +60,8 @@ object FunctionInvoker {
           }
       }
     } catch {
-      case e: java.lang.reflect.InvocationTargetException =>
-        val errorMsg: String =
-          "InvocationTargetException: \n" +
-            e.getClass.getName + " msg : " + e.getMessage + "\n" +
-            "target's exception: " + e.getTargetException.getClass.getName + "\n" +
-            "target's exception msg: " + e.getTargetException.getMessage + "\n" +
-            "target exception stacktrace: " + {
-              import java.io.PrintWriter
-              import java.io.StringWriter
-              var sw: StringWriter = null
-              var pw: PrintWriter = null
-              try {
-                sw = new StringWriter()
-                pw = new PrintWriter(sw)
-                e.getTargetException.printStackTrace(pw)
-                sw.toString
-              } finally {
-                Try(
-                  if (pw != null)
-                    pw.close()
-                )
-                Try(
-                  if (sw != null)
-                    sw.close()
-                )
-              }
-            }
-        throw e.getCause
-        throw new FunctionInvokerException(errorMsg)
-      case e: Throwable => throw e
+      case e: InvocationTargetException => throw e.getCause
+      case e: Throwable                 => throw e
     }
   }
 
