@@ -16,4 +16,4 @@ mixql.variables.init {
     intVariable = 42
 }
 ```
-when you start context you will have `int` variable with name intVariable and value 42. If `mixql.engine.variables.update` is `"all"` all engines will have this param too.
+when you start context you will have `int` variable with name intVariable and value 42.
