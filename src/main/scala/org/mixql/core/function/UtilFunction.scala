@@ -6,14 +6,17 @@ import org.mixql.core.exception.UserSqlException
 import scala.concurrent.Future
 
 object UtilFunction {
-    val is_error =
-        new (Any => Boolean) {
-            override def apply(value: Any): Boolean = value.isInstanceOf[UserSqlException]
-        }
 
-    val await = new (Future[Any] => Any) {
-            override def apply(value: Future[Any]): Any = {
-                new SqlAync(value).await()
-            }
-        }
+  val is_error =
+    new (Any => Boolean) {
+      override def apply(value: Any): Boolean = value.isInstanceOf[UserSqlException]
+    }
+
+  val await =
+    new (Future[Any] => Any) {
+
+      override def apply(value: Future[Any]): Any = {
+        new SqlAync(value).await()
+      }
+    }
 }

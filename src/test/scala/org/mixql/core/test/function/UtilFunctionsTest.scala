@@ -9,6 +9,7 @@ import org.mixql.core.test.engines.StubEngine
 import scala.collection.mutable.{Map => MutMap}
 
 class UtilFunctionsTest extends MainVisitorBaseTest {
+
   test("Test is_error") {
     val code =
       """
