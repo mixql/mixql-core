@@ -270,7 +270,7 @@ class LambdaTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val async_call = context.getVar("async_call")
-    assert(async_call.isInstanceOf[SqlAync])
+    assert(async_call.isInstanceOf[SqlAsync])
     val res = context.getVar("res")
     assert(res.isInstanceOf[gInt])
     assert(res.asInstanceOf[gInt].getValue == 1)
@@ -353,7 +353,7 @@ class LambdaTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[SqlAync])
+    assert(res.isInstanceOf[SqlAsync])
     val res1 = context.getVar("res1")
     assert(res1.isInstanceOf[gInt])
     assert(res1.asInstanceOf[gInt].getValue == 1)

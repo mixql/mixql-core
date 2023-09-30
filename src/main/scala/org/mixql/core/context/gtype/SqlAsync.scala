@@ -7,7 +7,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.Await
 import java.lang.reflect.InvocationTargetException
 
-final class SqlAync(val fut: Future[Any]) extends Type {
+final class SqlAsync(val fut: Future[Any]) extends Type {
 
   def await(): Type = {
     try {

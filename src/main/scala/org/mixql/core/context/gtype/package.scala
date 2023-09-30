@@ -118,7 +118,7 @@ package object gtype {
       case p: Map[Any, Any] =>
         import scala.collection.JavaConverters._
         new map(scala.collection.mutable.Map(p.map(kv => pack(kv._1) -> pack(kv._2)).toSeq: _*).asJava)
-      case p: Future[Any] => new SqlAync(p)
+      case p: Future[Any] => new SqlAsync(p)
       case other          => new string(other.toString)
     }
   }
@@ -135,7 +135,7 @@ package object gtype {
       case t: array            => t.getArr.map(unpack)
       case t: map              => t.getMap.asScala.map(kv => unpack(kv._1) -> unpack(kv._2)).toMap
       case v: SqlLambda        => v
-      case a: SqlAync          => a.fut
+      case a: SqlAsync          => a.fut
     }
   }
 }

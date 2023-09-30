@@ -16,7 +16,7 @@ object UtilFunction {
     new (Future[Any] => Any) {
 
       override def apply(value: Future[Any]): Any = {
-        new SqlAync(value).await()
+        new SqlAsync(value).await()
       }
     }
 }
