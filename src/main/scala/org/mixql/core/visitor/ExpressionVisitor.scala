@@ -148,29 +148,51 @@ trait ExpressionVisitor extends BaseVisitor {
 
   override def visitExpr_lambda(ctx: sql.Expr_lambdaContext): Type = {
     val pNames = ctx.lambda.ident.asScala.map(n => visit(n).toString).toList
-    new SqlLambda(pNames, ctx.lambda.block, this)
+    new SqlLambda(pNames, ctx.lambda.block, this.tokenStream)
+  }
+
+  override def visitExpr_await(ctx: sql.Expr_awaitContext): Type = {
+    val res =
+      if (ctx.await.func)
+        visit(ctx.await.func)
+      else
+        visit(ctx.await.`var`)
+    if (res.isInstanceOf[SqlAsync])
+      res.asInstanceOf[SqlAsync].await()
+    else
+      throw new IllegalCallerException("can await only async call")
   }
 
   override def visitExpr_func(ctx: sql.Expr_funcContext): Type = {
-    val funcName = visit(ctx.func.ident).toString
+    visit(ctx.func)
+  }
+
+  override def visitFunc(ctx: sql.FuncContext): Type = {
+    val funcName = visit(ctx.ident).toString
     // TODO: add the implicit cast
     val args: Seq[Object] =
-      ctx.func.arg.asScala.flatMap(arg => {
+      ctx.arg.asScala.flatMap(arg => {
         if (arg.ident == null)
           Seq(unpack(visit(arg.expr)).asInstanceOf[Object])
         else
           Nil
       }).toSeq
     val kwargs: Map[String, Object] =
-      ctx.func.arg.asScala.flatMap(arg => {
+      ctx.arg.asScala.flatMap(arg => {
         if (arg.ident != null)
           Seq(visit(arg.ident).toString -> unpack(visit(arg.expr)).asInstanceOf[Object])
         else
           Nil
       }).toMap
-    val res = FunctionInvoker.invoke(context.functions.toMap, funcName, List[Object](context), args.toList, kwargs)
-    controlState = ControlContext.NONE
-    pack(res)
+    if (ctx.T_ASYNC) {
+      new SqlAsync(
+        FunctionInvoker.invokeAsync(context.functions.toMap, funcName, List[Object](context), args.toList, kwargs)
+      )
+    } else {
+      val res = FunctionInvoker.invoke(context.functions.toMap, funcName, List[Object](context), args.toList, kwargs)
+      controlState = ControlContext.NONE
+      pack(res)
+    }
   }
 
   override def visitExprSpecFuncCast(ctx: sql.ExprSpecFuncCastContext): Type = {

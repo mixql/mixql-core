@@ -2,7 +2,7 @@ package org.mixql.core.context
 
 import scala.collection.mutable.{Map => MutMap}
 import org.mixql.core.engine.Engine
-import org.mixql.core.function.{ArrayFunction, StringFunction}
+import org.mixql.core.function.{ArrayFunction, StringFunction, UtilFunction}
 import org.mixql.core.context.gtype._
 import org.mixql.core.logger.logDebug
 import org.mixql.core
@@ -36,7 +36,9 @@ object Context {
     "split" -> StringFunction.split,
     "toLowerCase" -> StringFunction.toLowerCase,
     "toUpperCase" -> StringFunction.toUpperCase,
-    "trim" -> StringFunction.trim
+    "trim" -> StringFunction.trim,
+    "is_error" -> UtilFunction.is_error,
+    "await" -> UtilFunction.await
   ).map(t => t._1.toLowerCase -> t._2)
 
   /** the entry point to gsql api. Context stores registered engines, variables

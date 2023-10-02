@@ -2,6 +2,8 @@ package org.mixql.core.context
 
 import org.mixql.core.function.SqlLambda
 import scala.collection.mutable.{Map => MutMap}
+import org.mixql.core.exception.UserSqlException
+import scala.concurrent.Future
 
 package object gtype {
   import scala.language.implicitConversions
@@ -116,22 +118,24 @@ package object gtype {
       case p: Map[Any, Any] =>
         import scala.collection.JavaConverters._
         new map(scala.collection.mutable.Map(p.map(kv => pack(kv._1) -> pack(kv._2)).toSeq: _*).asJava)
-      case p: SqlLambda => p
-      case other        => new string(other.toString)
+      case p: Future[Any] => new SqlAsync(p)
+      case other          => new string(other.toString)
     }
   }
 
   def unpack(a: Type): Any = {
     import scala.collection.JavaConverters._
     a match {
-      case _: Null      => null
-      case t: string    => t.getValue
-      case t: gInt      => t.getValue
-      case t: gDouble   => t.getValue
-      case t: bool      => t.getValue
-      case t: array     => t.getArr.map(unpack)
-      case t: map       => t.getMap.asScala.map(kv => unpack(kv._1) -> unpack(kv._2)).toMap
-      case v: SqlLambda => v
+      case e: UserSqlException => e
+      case _: Null             => null
+      case t: string           => t.getValue
+      case t: gInt             => t.getValue
+      case t: gDouble          => t.getValue
+      case t: bool             => t.getValue
+      case t: array            => t.getArr.map(unpack)
+      case t: map              => t.getMap.asScala.map(kv => unpack(kv._1) -> unpack(kv._2)).toMap
+      case v: SqlLambda        => v
+      case a: SqlAsync         => a.fut
     }
   }
 }

@@ -3,12 +3,30 @@ package org.mixql.core.function
 import org.mixql.core.context.{EngineContext, Context}
 import org.mixql.core.context.gtype._
 
-import java.lang.reflect.Method
+import java.lang.reflect.{Method, InvocationTargetException}
 import scala.annotation.meta.param
 import scala.collection.mutable.ListBuffer
 import scala.util.Try
+import scala.concurrent.{Future, ExecutionContext}
+import ExecutionContext.Implicits.global
 
 object FunctionInvoker {
+
+  def invokeAsync(functions: Map[String, Any],
+                  funcName: String,
+                  _contexts: List[Object], // To support not only mixql-core context
+                  args: List[Any] = Nil,
+                  kwargs: Map[String, Object] = Map.empty): Future[Any] = {
+    val contexts = _contexts.map(c => {
+      if (c.isInstanceOf[Context])
+        c.asInstanceOf[Context].fork()
+      else
+        c
+    })
+    Future[Any] {
+      invoke(functions, funcName, contexts, args, kwargs)
+    }
+  }
 
   def invoke(functions: Map[String, Any],
              funcName: String,
@@ -42,36 +60,8 @@ object FunctionInvoker {
           }
       }
     } catch {
-      case e: java.lang.reflect.InvocationTargetException =>
-        val errorMsg: String =
-          "InvocationTargetException: \n" +
-            e.getClass.getName + " msg : " + e.getMessage + "\n" +
-            "target's exception: " + e.getTargetException.getClass.getName + "\n" +
-            "target's exception msg: " + e.getTargetException.getMessage + "\n" +
-            "target exception stacktrace: " + {
-              import java.io.PrintWriter
-              import java.io.StringWriter
-              var sw: StringWriter = null
-              var pw: PrintWriter = null
-              try {
-                sw = new StringWriter()
-                pw = new PrintWriter(sw)
-                e.getTargetException.printStackTrace(pw)
-                sw.toString
-              } finally {
-                Try(
-                  if (pw != null)
-                    pw.close()
-                )
-                Try(
-                  if (sw != null)
-                    sw.close()
-                )
-              }
-            }
-
-        throw new FunctionInvokerException(errorMsg)
-      case e: Throwable => throw e
+      case e: InvocationTargetException => throw e.getCause
+      case e: Throwable                 => throw e
     }
   }
 
@@ -137,7 +127,7 @@ object FunctionInvoker {
                          kwargs: Map[String, Object] = Map.empty,
                          funcName: String): Any = {
     if (obj.isInstanceOf[SqlLambda])
-      return obj.asInstanceOf[SqlLambda].apply(args: _*)
+      return obj.asInstanceOf[SqlLambda].apply(contexts.head.asInstanceOf[Context], args: _*)
     val a = obj.getClass.getMethods.find(p =>
       p.getName == "apply" &&
         (p.getParameters.length == 0 || p.getParameters()(0).getName.toLowerCase != "v1")
@@ -215,7 +205,8 @@ object FunctionInvoker {
               lb.remove(lb.length - 1)
               lb += longs.asInstanceOf[Seq[Long]].map(_.toInt)
               res = apply.invoke(obj, lb.toArray: _*)
-            }
+            } else
+              throw e
         }
         res
     }

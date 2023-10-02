@@ -18,6 +18,7 @@ T_ASYNC           : A S Y N C;
 T_AT              : A T ;
 T_AUTO_INCREMENT  : A U T O '_' I N C R E M E N T ;
 T_AVG             : A V G ;
+T_AWAIT           : A W A I T;
 T_BATCHSIZE       : B A T C H S I Z E ;
 T_BUCKETS         : B U C K E T S ;
 T_BEGIN           : B E G I N ;

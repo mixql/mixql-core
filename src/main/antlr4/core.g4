@@ -83,13 +83,19 @@ expr: // TODO other expressions if needed
      | expr logical_operator expr                                #expr_logical
      | T_NOT expr                                                #expr_not
      | expr T_PIPE expr                                          #expr_concat
-     | T_INTERVAL expr interval_item                             #expr_interval // TODO do we need it? if need its literal
+//     | T_INTERVAL expr interval_item                             #expr_interval // TODO do we need it? if need its literal
      | case_r                                                    #expr_case 
-     | ident T_PERCENT (T_ISOPEN | T_FOUND | T_NOTFOUND)         #expr_found // TODO do we need it?
+//     | ident T_PERCENT (T_ISOPEN | T_FOUND | T_NOTFOUND)         #expr_found // TODO do we need it?
+     | await                                                     #expr_await
      | spec_func                                                 #expr_spec_func // TODO what functions to add?
      | func                                                      #expr_func
      | var                                                       #expr_var
      | literal                                                   #expr_literal
+     ;
+
+await:
+       T_AWAIT func
+     | T_AWAIT var
      ;
 
 logical_operator:
@@ -111,8 +117,7 @@ compare_operator:
 
 /** functions with special syntax */
 spec_func :
-//       T_CAST T_OPEN_P expr T_AS  dtype dtype_len? T_CLOSE_P  #exprSpecFuncCast
-       T_CAST T_OPEN_P expr T_AS  dtype T_CLOSE_P  #exprSpecFuncCast
+       T_CAST T_OPEN_P expr T_AS dtype T_CLOSE_P  #exprSpecFuncCast
 //     | T_COUNT T_OPEN_P (expr | T_MUL) T_CLOSE_P              #exprSpecFuncCount
      ;
 
@@ -130,7 +135,7 @@ interval_item :
      ;
 
 func:
-     ident T_OPEN_P (arg (T_COMMA arg)*)? T_CLOSE_P
+     T_ASYNC? ident T_OPEN_P (arg (T_COMMA arg)*)? T_CLOSE_P
      ;
 
 arg: 
@@ -231,6 +236,7 @@ non_reserved_words :                      // Tokens that are not reserved words 
      | T_AT
      | T_AUTO_INCREMENT
      | T_AVG
+     | T_AWAIT
      | T_BATCHSIZE
      | T_BEGIN
      | T_BETWEEN

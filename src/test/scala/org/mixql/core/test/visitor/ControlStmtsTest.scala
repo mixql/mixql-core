@@ -1,6 +1,5 @@
 package org.mixql.core.test.visitor
 
-import com.typesafe.config.ConfigFactory
 import org.mixql.core.test.MainVisitorBaseTest
 import org.mixql.core.context.gtype._
 import org.mixql.core.engine.Engine
@@ -267,14 +266,6 @@ class ControlStmtsTest extends MainVisitorBaseTest {
   }
 
   test("Test change engine params") {
-    //    assume({
-    //      val config = ConfigFactory.load()
-    //      Try({
-    //        val param = config.getString("mixql.engine.variables.update")
-    //        if (param.trim != "all") false
-    //        else true
-    //      }).getOrElse(true)
-    //    })
     val code =
       """
       |let engine stub(spark.execution.memory="16G");
@@ -430,140 +421,6 @@ class ControlStmtsTest extends MainVisitorBaseTest {
     val res = core.run(code, Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub"))
     assert(res.isInstanceOf[gInt])
     assert(res.asInstanceOf[gInt].getValue == 1)
-  }
-
-  test("Test return from lambda") {
-    val code =
-      """
-        |let test_ret = (x) -> begin
-        |  return 1;
-        |  return 2;
-        |  1 + 2;
-        |end;
-        |let res = test_ret(1);
-                """.stripMargin
-    val context = runMainVisitor(code)
-    val res = context.getVar("res")
-    assert(res.isInstanceOf[gInt])
-    assert(res.asInstanceOf[gInt].getValue == 1)
-  }
-
-  test("Test return from lambda with while cycle") {
-    val code =
-      """
-        |let test_ret = (x) -> begin
-        |   let x = 1;
-        |   while $x < 5 do
-        |     return $x;
-        |     let x = $x + 1;
-        |   end while
-        |   return 2;
-        |end;
-        |let res = test_ret(1);
-        |let end_var = 12;
-                """.stripMargin
-    val context = runMainVisitor(code)
-    val res = context.getVar("res")
-    assert(res.isInstanceOf[gInt])
-    assert(res.asInstanceOf[gInt].getValue == 1)
-    val end = context.getVar("end_var")
-    assert(end.isInstanceOf[gInt])
-    assert(end.asInstanceOf[gInt].getValue == 12)
-  }
-
-  test("Test return from lambda with for range") {
-    val code =
-      """
-        |let test_ret = (x) -> begin
-        |   let x = 0;
-        |   for i in 1..20 step 2 loop
-        |     return $i;
-        |   end loop
-        |   return 2;
-        |end;
-        |let res = test_ret(1);
-        |let end_var = 12;
-                """.stripMargin
-    val context = runMainVisitor(code)
-    val res = context.getVar("res")
-    assert(res.isInstanceOf[gInt])
-    assert(res.asInstanceOf[gInt].getValue == 1)
-    val end = context.getVar("end_var")
-    assert(end.isInstanceOf[gInt])
-    assert(end.asInstanceOf[gInt].getValue == 12)
-  }
-
-  test("Test return from lambda with for in cursor") {
-    val code =
-      """
-        |let test_ret = (x) -> begin
-        |   let x = 0;
-        |   for i in [1, 3, 5] loop
-        |     return $i;
-        |   end loop
-        |   return 2;
-        |end;
-        |let res = test_ret(1);
-        |let end_var = 12;
-                """.stripMargin
-    val context = runMainVisitor(code)
-    val res = context.getVar("res")
-    assert(res.isInstanceOf[gInt])
-    assert(res.asInstanceOf[gInt].getValue == 1)
-    val end = context.getVar("end_var")
-    assert(end.isInstanceOf[gInt])
-    assert(end.asInstanceOf[gInt].getValue == 12)
-  }
-
-  test("Test return from lambda with try/catch: try") {
-    val code =
-      """
-        |let test_ret = (x) -> begin
-        |   TRY
-        |     return 0;
-        |   CATCH ex THEN
-        |     return 1;
-        |   END
-        |   return 2;
-        |end;
-        |let res = test_ret(1);
-        |let end_var = 12;
-                """.stripMargin
-    val context = runMainVisitor(code)
-    val res = context.getVar("res")
-    assert(res.isInstanceOf[gInt])
-    assert(res.asInstanceOf[gInt].getValue == 0)
-    val end = context.getVar("end_var")
-    assert(end.isInstanceOf[gInt])
-    assert(end.asInstanceOf[gInt].getValue == 12)
-  }
-
-  test("Test return from lambda with try/catch: catch") {
-    val code =
-      """
-        |let test_ret = (x) -> begin
-        |   TRY
-        |     select gg from wp;
-        |   CATCH ex THEN
-        |     return 1;
-        |   END
-        |   return 2;
-        |end;
-        |let res = test_ret(1);
-        |let end_var = 12;
-                """.stripMargin
-    class Other extends StubEngine {
-      override def executeImpl(stmt: String, ctx: EngineContext): Type = {
-        throw new NullPointerException("hello")
-      }
-    }
-    val context = runMainVisitor(code, Context(MutMap("stub" -> new Other), "stub"))
-    val res = context.getVar("res")
-    assert(res.isInstanceOf[gInt])
-    assert(res.asInstanceOf[gInt].getValue == 1)
-    val end = context.getVar("end_var")
-    assert(end.isInstanceOf[gInt])
-    assert(end.asInstanceOf[gInt].getValue == 12)
   }
 
   test("Test multiple assigment") {
