@@ -1,6 +1,6 @@
 package org.mixql.core.test.function
 
-import org.mixql.core.context.gtype._
+import org.mixql.core.context.mtype._
 import org.mixql.core.test.MainVisitorBaseTest
 
 class AsciFunctionsTest extends MainVisitorBaseTest {
@@ -13,7 +13,7 @@ class AsciFunctionsTest extends MainVisitorBaseTest {
 
     val context = runMainVisitor(code)
 
-    val foo = context.getVar("foo").asInstanceOf[gInt]
+    val foo = context.getVar("foo").asInstanceOf[MInt]
     assert(foo.getValue == 0)
   }
 
@@ -25,7 +25,7 @@ class AsciFunctionsTest extends MainVisitorBaseTest {
 
     val context = runMainVisitor(code)
 
-    val foo = context.getVar("foo").asInstanceOf[gInt]
+    val foo = context.getVar("foo").asInstanceOf[MInt]
     assert(foo.getValue == 50)
   }
 }

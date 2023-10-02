@@ -3,7 +3,7 @@ package org.mixql.core.context
 import scala.collection.mutable.{Map => MutMap}
 import org.mixql.core.engine.Engine
 import org.mixql.core.function.{ArrayFunction, StringFunction, UtilFunction}
-import org.mixql.core.context.gtype._
+import org.mixql.core.context.mtype._
 import org.mixql.core.logger.logDebug
 import org.mixql.core
 import org.mixql.core.context.ConfigHelp.parseConfig
@@ -56,14 +56,14 @@ object Context {
   def apply(engines: MutMap[String, Engine],
             defaultEngine: String,
             functionsInit: MutMap[String, Any] = MutMap[String, Any](),
-            variablesInit: MutMap[String, Type] = MutMap[String, Type]()): Context = {
+            variablesInit: MutMap[String, MType] = MutMap[String, MType]()): Context = {
     val eng = EnginesStorage(engines += "interpolator" -> new Interpolator)
     val vars = VariablesStorage(initVariables(variablesInit))
-    vars.setVar("mixql.execution.engine", new string(defaultEngine))
+    vars.setVar("mixql.execution.engine", new MString(defaultEngine))
     new Context(eng, vars, defaultFunctions ++ functionsInit, true)
   }
 
-  private def initVariables(variablesInit: MutMap[String, Type]): MutMap[String, Type] = {
+  private def initVariables(variablesInit: MutMap[String, MType]): MutMap[String, MType] = {
     val config = ConfigFactory.load()
     val mixqlParams = initMixqlParams(config)
     if (config.hasPath("mixql.variables.init")) {
@@ -74,14 +74,14 @@ object Context {
     mixqlParams
   }
 
-  private def initMixqlParams(config: Config): MutMap[String, Type] = {
-    val result: MutMap[String, Type] = MutMap[String, Type]()
+  private def initMixqlParams(config: Config): MutMap[String, MType] = {
+    val result: MutMap[String, MType] = MutMap[String, MType]()
 
     val errorSkip = config.getBoolean("mixql.error.skip")
-    result += "mixql.error.skip" -> new bool(errorSkip)
+    result += "mixql.error.skip" -> new MBool(errorSkip)
 
     val currentEngineAllias = config.getString("mixql.execution.engine")
-    result += "mixql.execution.engine" -> new string(currentEngineAllias)
+    result += "mixql.execution.engine" -> new MString(currentEngineAllias)
 
     result
   }
@@ -94,12 +94,12 @@ object Context {
 
     var currentEngine: Engine = null
 
-    override def executeImpl(stmt: String, ctx: EngineContext): Type = {
+    override def executeImpl(stmt: String, ctx: EngineContext): MType = {
       interpolated = stmt
-      new string(interpolated)
+      new MString(interpolated)
     }
 
-    override def executeFuncImpl(name: String, ctx: EngineContext, kwargs: Map[String, Object], params: Type*) =
+    override def executeFuncImpl(name: String, ctx: EngineContext, kwargs: Map[String, Object], params: MType*) =
       throw new UnsupportedOperationException("interpolator dont have specific funcs")
   }
 }
@@ -133,8 +133,8 @@ class Context(eng: EnginesStorage,
     */
   def errorSkip: Boolean =
     getVar("mixql.error.skip") match {
-      case t: bool => t.getValue
-      case _: Type => throw new Exception("something wrong mixql.error.skip must be bool")
+      case t: MBool => t.getValue
+      case _: MType => throw new Exception("something wrong mixql.error.skip must be bool")
     }
 
   /** add variable scope
@@ -170,7 +170,7 @@ class Context(eng: EnginesStorage,
       case None        => throw new NoSuchElementException(s"no engine with name: $name")
       case Some(value) =>
     }
-    variables.setVar("mixql.execution.engine", new string(name))
+    variables.setVar("mixql.execution.engine", new MString(name))
   }
 
   /** Set current engine by name that registered in this context. Throws
@@ -181,14 +181,14 @@ class Context(eng: EnginesStorage,
     * @param params
     *   params to add to new current engine
     */
-  def setCurrentEngine(name: String, params: MutMap[String, Type]): Unit = {
+  def setCurrentEngine(name: String, params: MutMap[String, MType]): Unit = {
     // check if engine with name exist
     getEngine(name) match {
       case None        => throw new NoSuchElementException(s"no engine with name: $name")
       case Some(value) =>
     }
     params.foreach(p => engines.setEngineParam(name, p._1, p._2))
-    variables.setVar("mixql.execution.engine", new string(name))
+    variables.setVar("mixql.execution.engine", new MString(name))
   }
 
   /** register engine by this name. If there was other engine with this name it
@@ -240,7 +240,7 @@ class Context(eng: EnginesStorage,
     * @return
     *   the result of execution
     */
-  def execute(stmt: String, expect_cursor: Boolean): Type = {
+  def execute(stmt: String, expect_cursor: Boolean): MType = {
     if (!expect_cursor)
       currentEngine.execute(stmt, new EngineContext(this, currentEngineAllias))
     else
@@ -256,7 +256,7 @@ class Context(eng: EnginesStorage,
     * @return
     *   the result of execution
     */
-  def execute(stmt: String, engine: String, expect_cursor: Boolean): Type = {
+  def execute(stmt: String, engine: String, expect_cursor: Boolean): MType = {
     getEngine(engine) match {
       case Some(value) =>
         if (!expect_cursor)
@@ -278,7 +278,7 @@ class Context(eng: EnginesStorage,
     * @return
     *   the result of execution
     */
-  def execute(stmt: String, engine: String, params: Map[String, Type], expect_cursor: Boolean): Type = {
+  def execute(stmt: String, engine: String, params: Map[String, MType], expect_cursor: Boolean): MType = {
     getEngine(engine) match {
       case Some(eng) =>
         // cache old params
@@ -305,7 +305,7 @@ class Context(eng: EnginesStorage,
     * @param value
     *   the value of variable or param
     */
-  def setVar(key: String, value: Type): Unit = {
+  def setVar(key: String, value: MType): Unit = {
     variables.setVar(key, value)
   }
 
@@ -316,7 +316,7 @@ class Context(eng: EnginesStorage,
     * @return
     *   variable value
     */
-  def getVar(key: String): Type = {
+  def getVar(key: String): MType = {
     variables.getVar(key)
   }
 
@@ -330,10 +330,10 @@ class Context(eng: EnginesStorage,
     * @return
     *   param value
     */
-  def getParam(key: String, engineName: String): Type = {
+  def getParam(key: String, engineName: String): MType = {
     engines.getEngineParam(engineName, key) match {
-      case _: none => getVar(key)
-      case other   => other
+      case _: MNone => getVar(key)
+      case other    => other
     }
   }
 
@@ -342,7 +342,7 @@ class Context(eng: EnginesStorage,
     * @return
     *   map: param name -> param value
     */
-  def getParams(): MutMap[String, Type] = {
+  def getParams(): MutMap[String, MType] = {
     variables.collect() ++ engines.getEngineParams(currentEngineAllias)
   }
 
@@ -353,7 +353,7 @@ class Context(eng: EnginesStorage,
     * @return
     *   map: param name -> param value
     */
-  def getParams(engineName: String): MutMap[String, Type] = {
+  def getParams(engineName: String): MutMap[String, MType] = {
     variables.collect() ++ engines.getEngineParams(engineName)
   }
 
@@ -387,7 +387,7 @@ class Context(eng: EnginesStorage,
     engines.close()
   }
 
-  def getVars(): MutMap[String, Type] = {
+  def getVars(): MutMap[String, MType] = {
     variables.collect()
   }
 

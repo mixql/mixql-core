@@ -1,7 +1,7 @@
 package org.mixql.core.test.visitor
 
 import org.mixql.core.context.Context
-import org.mixql.core.context.gtype._
+import org.mixql.core.context.mtype._
 import org.mixql.core.engine.Engine
 import org.mixql.core.test.MainVisitorBaseTest
 import org.mixql.core.test.engines.{CursorTestEngine1, CursorTestEngine2}
@@ -37,21 +37,21 @@ class CursorTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
 
     val res1 = context.getVar("res1")
-    assert(res1.isInstanceOf[bool])
-    assert(res1.asInstanceOf[bool].getValue)
+    assert(res1.isInstanceOf[MBool])
+    assert(res1.asInstanceOf[MBool].getValue)
 
     val res2 = context.getVar("res2")
-    assert(res2.isInstanceOf[array])
-    assert(res2.asInstanceOf[array].toString == "[true, \"gg\", 12]")
+    assert(res2.isInstanceOf[MArray])
+    assert(res2.asInstanceOf[MArray].toString == "[true, \"gg\", 12]")
 
     val res3 = context.getVar("res3")
-    assert(res3.isInstanceOf[gInt])
-    assert(res3.asInstanceOf[gInt].getValue == 12)
+    assert(res3.isInstanceOf[MInt])
+    assert(res3.asInstanceOf[MInt].getValue == 12)
 
     val res4 = context.getVar("res4")
-    assert(res4.isInstanceOf[none])
+    assert(res4.isInstanceOf[MNone])
     val res5 = context.getVar("res5")
-    assert(res5.isInstanceOf[none])
+    assert(res5.isInstanceOf[MNone])
   }
 
   test("Test cursor is map, fetch, open, close") {
@@ -84,33 +84,33 @@ class CursorTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
 
     val res1 = context.getVar("res1")
-    assert(res1.isInstanceOf[array])
+    assert(res1.isInstanceOf[MArray])
     assert(
-      res1.asInstanceOf[array].toString == "[\"fb\", true]" ||
-        res1.asInstanceOf[array].toString == "[\"sarr\", [true, \"gg\", 12]]" ||
-        res1.asInstanceOf[array].toString == "[\"sgint\", 12]"
+      res1.asInstanceOf[MArray].toString == "[\"fb\", true]" ||
+        res1.asInstanceOf[MArray].toString == "[\"sarr\", [true, \"gg\", 12]]" ||
+        res1.asInstanceOf[MArray].toString == "[\"sgint\", 12]"
     )
 
     val res2 = context.getVar("res2")
-    assert(res2.isInstanceOf[array])
+    assert(res2.isInstanceOf[MArray])
     assert(
-      res2.asInstanceOf[array].toString == "[\"fb\", true]" ||
-        res2.asInstanceOf[array].toString == "[\"sarr\", [true, \"gg\", 12]]" ||
-        res2.asInstanceOf[array].toString == "[\"sgint\", 12]"
+      res2.asInstanceOf[MArray].toString == "[\"fb\", true]" ||
+        res2.asInstanceOf[MArray].toString == "[\"sarr\", [true, \"gg\", 12]]" ||
+        res2.asInstanceOf[MArray].toString == "[\"sgint\", 12]"
     )
 
     val res3 = context.getVar("res3")
-    assert(res3.isInstanceOf[array])
+    assert(res3.isInstanceOf[MArray])
     assert(
-      res3.asInstanceOf[array].toString == "[\"fb\", true]" ||
-        res3.asInstanceOf[array].toString == "[\"sarr\", [true, \"gg\", 12]]" ||
-        res3.asInstanceOf[array].toString == "[\"sgint\", 12]"
+      res3.asInstanceOf[MArray].toString == "[\"fb\", true]" ||
+        res3.asInstanceOf[MArray].toString == "[\"sarr\", [true, \"gg\", 12]]" ||
+        res3.asInstanceOf[MArray].toString == "[\"sgint\", 12]"
     )
 
     val res4 = context.getVar("res4")
-    assert(res4.isInstanceOf[none])
+    assert(res4.isInstanceOf[MNone])
     val res5 = context.getVar("res5")
-    assert(res5.isInstanceOf[none])
+    assert(res5.isInstanceOf[MNone])
   }
 
   test("Test cursor will not fetch without open") {
@@ -154,16 +154,16 @@ class CursorTest extends MainVisitorBaseTest {
     )
 
     val res1 = context.getVar("arr")
-    assert(res1.isInstanceOf[array])
-    val arr1 = res1.asInstanceOf[array]
+    assert(res1.isInstanceOf[MArray])
+    val arr1 = res1.asInstanceOf[MArray]
     val arr1Size = arr1.size().getValue.asInstanceOf[Int]
     assert(arr1Size == 20)
 
     for (i <- 0 to arr1Size - 1) {
       if (i < 7)
-        assert(arr1.apply(new gInt(i)).isInstanceOf[gInt])
+        assert(arr1.apply(new MInt(i)).isInstanceOf[MInt])
       else
-        assert(arr1.apply(new gInt(i)).isInstanceOf[none])
+        assert(arr1.apply(new MInt(i)).isInstanceOf[MNone])
     }
   }
 
@@ -196,13 +196,13 @@ class CursorTest extends MainVisitorBaseTest {
     )
 
     val res1 = context.getVar("arr")
-    assert(res1.isInstanceOf[array])
-    val arr1 = res1.asInstanceOf[array]
+    assert(res1.isInstanceOf[MArray])
+    val arr1 = res1.asInstanceOf[MArray]
     val arr1Size = arr1.size().getValue.asInstanceOf[Int]
     assert(arr1Size == 10)
 
     for (i <- 0 until arr1Size) {
-      assert(arr1.apply(new gInt(i)).isInstanceOf[gInt])
+      assert(arr1.apply(new MInt(i)).isInstanceOf[MInt])
     }
   }
 
@@ -235,13 +235,13 @@ class CursorTest extends MainVisitorBaseTest {
     )
 
     val res1 = context.getVar("arr")
-    assert(res1.isInstanceOf[array])
-    val arr1 = res1.asInstanceOf[array]
+    assert(res1.isInstanceOf[MArray])
+    val arr1 = res1.asInstanceOf[MArray]
     val arr1Size = arr1.size().getValue.asInstanceOf[Int]
     assert(arr1Size == 10)
 
     for (i <- 0 until arr1Size) {
-      assert(arr1.apply(new gInt(i)).isInstanceOf[gInt])
+      assert(arr1.apply(new MInt(i)).isInstanceOf[MInt])
     }
   }
 
@@ -270,17 +270,17 @@ class CursorTest extends MainVisitorBaseTest {
     )
 
     val res1 = context.getVar("arr")
-    assert(res1.isInstanceOf[array])
-    val arr1 = res1.asInstanceOf[array]
+    assert(res1.isInstanceOf[MArray])
+    val arr1 = res1.asInstanceOf[MArray]
     val arr1Size = arr1.size().getValue
     assert(arr1Size == 3)
 
-    assert(arr1.apply(new gInt(0)).isInstanceOf[string])
-    assert(arr1.apply(new gInt(0)).asInstanceOf[string].toString == "a")
-    assert(arr1.apply(new gInt(1)).isInstanceOf[string])
-    assert(arr1.apply(new gInt(1)).asInstanceOf[string].toString == "b")
-    assert(arr1.apply(new gInt(2)).isInstanceOf[string])
-    assert(arr1.apply(new gInt(2)).asInstanceOf[string].toString == "c")
+    assert(arr1.apply(new MInt(0)).isInstanceOf[MString])
+    assert(arr1.apply(new MInt(0)).asInstanceOf[MString].toString == "a")
+    assert(arr1.apply(new MInt(1)).isInstanceOf[MString])
+    assert(arr1.apply(new MInt(1)).asInstanceOf[MString].toString == "b")
+    assert(arr1.apply(new MInt(2)).isInstanceOf[MString])
+    assert(arr1.apply(new MInt(2)).asInstanceOf[MString].toString == "c")
   }
 
   test("Test cursor with for in cursor select from *") {
@@ -307,13 +307,13 @@ class CursorTest extends MainVisitorBaseTest {
     )
 
     val res1 = context.getVar("arr")
-    assert(res1.isInstanceOf[array])
-    val arr1 = res1.asInstanceOf[array]
+    assert(res1.isInstanceOf[MArray])
+    val arr1 = res1.asInstanceOf[MArray]
     val arr1Size = arr1.size().getValue.asInstanceOf[Int]
     assert(arr1Size == 10)
 
     for (i <- 0 until arr1Size) {
-      assert(arr1.apply(new gInt(i)).isInstanceOf[gInt])
+      assert(arr1.apply(new MInt(i)).isInstanceOf[MInt])
     }
   }
 }

@@ -1,13 +1,15 @@
 package org.mixql.core.test.visitor
 
 import org.mixql.core.test.MainVisitorBaseTest
-import org.mixql.core.context.gtype._
+import org.mixql.core.context.mtype._
 import org.mixql.core.engine.Engine
 import org.mixql.core.context.{Context, EngineContext}
 import org.mixql.core
 import org.mixql.core.test.engines.StubEngine
 
 import scala.collection.mutable.{Map => MutMap}
+import org.mixql.core.context.mtype.MAsync
+import org.mixql.core.function.MLambda
 
 class LambdaTest extends MainVisitorBaseTest {
 
@@ -22,7 +24,7 @@ class LambdaTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[core.function.SqlLambda])
+    assert(res.isInstanceOf[MLambda])
   }
 
   test("Test return from lambda") {
@@ -37,8 +39,8 @@ class LambdaTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[gInt])
-    assert(res.asInstanceOf[gInt].getValue == 1)
+    assert(res.isInstanceOf[MInt])
+    assert(res.asInstanceOf[MInt].getValue == 1)
   }
 
   test("Test return from lambda with while cycle") {
@@ -57,11 +59,11 @@ class LambdaTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[gInt])
-    assert(res.asInstanceOf[gInt].getValue == 1)
+    assert(res.isInstanceOf[MInt])
+    assert(res.asInstanceOf[MInt].getValue == 1)
     val end = context.getVar("end_var")
-    assert(end.isInstanceOf[gInt])
-    assert(end.asInstanceOf[gInt].getValue == 12)
+    assert(end.isInstanceOf[MInt])
+    assert(end.asInstanceOf[MInt].getValue == 12)
   }
 
   test("Test return from lambda with for range") {
@@ -79,11 +81,11 @@ class LambdaTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[gInt])
-    assert(res.asInstanceOf[gInt].getValue == 1)
+    assert(res.isInstanceOf[MInt])
+    assert(res.asInstanceOf[MInt].getValue == 1)
     val end = context.getVar("end_var")
-    assert(end.isInstanceOf[gInt])
-    assert(end.asInstanceOf[gInt].getValue == 12)
+    assert(end.isInstanceOf[MInt])
+    assert(end.asInstanceOf[MInt].getValue == 12)
   }
 
   test("Test return from lambda with for in cursor") {
@@ -101,11 +103,11 @@ class LambdaTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[gInt])
-    assert(res.asInstanceOf[gInt].getValue == 1)
+    assert(res.isInstanceOf[MInt])
+    assert(res.asInstanceOf[MInt].getValue == 1)
     val end = context.getVar("end_var")
-    assert(end.isInstanceOf[gInt])
-    assert(end.asInstanceOf[gInt].getValue == 12)
+    assert(end.isInstanceOf[MInt])
+    assert(end.asInstanceOf[MInt].getValue == 12)
   }
 
   test("Test return from lambda with try/catch: try") {
@@ -124,11 +126,11 @@ class LambdaTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[gInt])
-    assert(res.asInstanceOf[gInt].getValue == 0)
+    assert(res.isInstanceOf[MInt])
+    assert(res.asInstanceOf[MInt].getValue == 0)
     val end = context.getVar("end_var")
-    assert(end.isInstanceOf[gInt])
-    assert(end.asInstanceOf[gInt].getValue == 12)
+    assert(end.isInstanceOf[MInt])
+    assert(end.asInstanceOf[MInt].getValue == 12)
   }
 
   test("Test return from lambda with try/catch: catch") {
@@ -146,17 +148,17 @@ class LambdaTest extends MainVisitorBaseTest {
         |let end_var = 12;
                 """.stripMargin
     class Other extends StubEngine {
-      override def executeImpl(stmt: String, ctx: EngineContext): Type = {
+      override def executeImpl(stmt: String, ctx: EngineContext): MType = {
         throw new NullPointerException("hello")
       }
     }
     val context = runMainVisitor(code, Context(MutMap("stub" -> new Other), "stub"))
     val res = context.getVar("res")
-    assert(res.isInstanceOf[gInt])
-    assert(res.asInstanceOf[gInt].getValue == 1)
+    assert(res.isInstanceOf[MInt])
+    assert(res.asInstanceOf[MInt].getValue == 1)
     val end = context.getVar("end_var")
-    assert(end.isInstanceOf[gInt])
-    assert(end.asInstanceOf[gInt].getValue == 12)
+    assert(end.isInstanceOf[MInt])
+    assert(end.asInstanceOf[MInt].getValue == 12)
   }
 
   test("Test lambda as param of lambda") {
@@ -172,8 +174,8 @@ class LambdaTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[gInt])
-    assert(res.asInstanceOf[gInt].getValue == 1)
+    assert(res.isInstanceOf[MInt])
+    assert(res.asInstanceOf[MInt].getValue == 1)
   }
 
   test("Test return lambda from lambda") {
@@ -190,10 +192,10 @@ class LambdaTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[core.function.SqlLambda])
+    assert(res.isInstanceOf[MLambda])
     val res1 = context.getVar("res1")
-    assert(res1.isInstanceOf[gInt])
-    assert(res1.asInstanceOf[gInt].getValue == 1)
+    assert(res1.isInstanceOf[MInt])
+    assert(res1.asInstanceOf[MInt].getValue == 1)
   }
 
   test("Test throw exception from lambda") {
@@ -212,11 +214,11 @@ class LambdaTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val exc_t = context.getVar("exc_t")
-    assert(exc_t.isInstanceOf[string])
-    assert(exc_t.asInstanceOf[string].getValue == "async")
+    assert(exc_t.isInstanceOf[MString])
+    assert(exc_t.asInstanceOf[MString].getValue == "async")
     val exc_m = context.getVar("exc_m")
-    assert(exc_m.isInstanceOf[string])
-    assert(exc_m.asInstanceOf[string].getValue == "await")
+    assert(exc_m.isInstanceOf[MString])
+    assert(exc_m.asInstanceOf[MString].getValue == "await")
   }
 
   test("Test throw exception from scala func") {
@@ -238,11 +240,11 @@ class LambdaTest extends MainVisitorBaseTest {
       Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub", MutMap[String, Any]("lambda" -> lambda))
     )
     val exc_t = context.getVar("exc_t")
-    assert(exc_t.isInstanceOf[string])
-    assert(exc_t.asInstanceOf[string].getValue == "Exception")
+    assert(exc_t.isInstanceOf[MString])
+    assert(exc_t.asInstanceOf[MString].getValue == "Exception")
     val exc_m = context.getVar("exc_m")
-    assert(exc_m.isInstanceOf[string])
-    assert(exc_m.asInstanceOf[string].getValue == "await")
+    assert(exc_m.isInstanceOf[MString])
+    assert(exc_m.asInstanceOf[MString].getValue == "await")
   }
 
   test("Test call async lambda") {
@@ -255,8 +257,8 @@ class LambdaTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[gInt])
-    assert(res.asInstanceOf[gInt].getValue == 1)
+    assert(res.isInstanceOf[MInt])
+    assert(res.asInstanceOf[MInt].getValue == 1)
   }
 
   test("Test await from var") {
@@ -270,10 +272,10 @@ class LambdaTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val async_call = context.getVar("async_call")
-    assert(async_call.isInstanceOf[SqlAsync])
+    assert(async_call.isInstanceOf[MAsync])
     val res = context.getVar("res")
-    assert(res.isInstanceOf[gInt])
-    assert(res.asInstanceOf[gInt].getValue == 1)
+    assert(res.isInstanceOf[MInt])
+    assert(res.asInstanceOf[MInt].getValue == 1)
   }
 
   test("Test throw async exception from lambda") {
@@ -290,11 +292,11 @@ class LambdaTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val exc_t = context.getVar("exc_t")
-    assert(exc_t.isInstanceOf[string])
-    assert(exc_t.asInstanceOf[string].getValue == "async")
+    assert(exc_t.isInstanceOf[MString])
+    assert(exc_t.asInstanceOf[MString].getValue == "async")
     val exc_m = context.getVar("exc_m")
-    assert(exc_m.isInstanceOf[string])
-    assert(exc_m.asInstanceOf[string].getValue == "await")
+    assert(exc_m.isInstanceOf[MString])
+    assert(exc_m.asInstanceOf[MString].getValue == "await")
   }
 
   test("Test throw async exception from scala func") {
@@ -314,11 +316,11 @@ class LambdaTest extends MainVisitorBaseTest {
       Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub", MutMap[String, Any]("lambda" -> lambda))
     )
     val exc_t = context.getVar("exc_t")
-    assert(exc_t.isInstanceOf[string])
-    assert(exc_t.asInstanceOf[string].getValue == "Exception")
+    assert(exc_t.isInstanceOf[MString])
+    assert(exc_t.asInstanceOf[MString].getValue == "Exception")
     val exc_m = context.getVar("exc_m")
-    assert(exc_m.isInstanceOf[string])
-    assert(exc_m.asInstanceOf[string].getValue == "await")
+    assert(exc_m.isInstanceOf[MString])
+    assert(exc_m.asInstanceOf[MString].getValue == "await")
   }
 
   test("Test aync as param of lambda") {
@@ -335,8 +337,8 @@ class LambdaTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[gInt])
-    assert(res.asInstanceOf[gInt].getValue == 1)
+    assert(res.isInstanceOf[MInt])
+    assert(res.asInstanceOf[MInt].getValue == 1)
   }
 
   test("Test return async from lambda") {
@@ -353,9 +355,9 @@ class LambdaTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[SqlAsync])
+    assert(res.isInstanceOf[MAsync])
     val res1 = context.getVar("res1")
-    assert(res1.isInstanceOf[gInt])
-    assert(res1.asInstanceOf[gInt].getValue == 1)
+    assert(res1.isInstanceOf[MInt])
+    assert(res1.asInstanceOf[MInt].getValue == 1)
   }
 }

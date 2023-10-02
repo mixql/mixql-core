@@ -1,6 +1,6 @@
 package org.mixql.core.test.context
 
-import org.mixql.core.context.gtype._
+import org.mixql.core.context.mtype._
 import org.mixql.core.context.{EngineContext, Context}
 
 import org.mixql.core.engine.Engine
@@ -15,55 +15,55 @@ class ContextTest extends AnyFunSuite {
     var query: String = ""
     override def name: String = "MyEngine"
 
-    override def executeImpl(stmt: String, ctx: EngineContext): Type = {
+    override def executeImpl(stmt: String, ctx: EngineContext): MType = {
       query = stmt
-      new Null()
+      new MNull()
     }
 
-    override def executeFuncImpl(name: String, ctx: EngineContext, kwargs: Map[String, Object], params: Type*): Type =
+    override def executeFuncImpl(name: String, ctx: EngineContext, kwargs: Map[String, Object], params: MType*): MType =
       ???
   }
 
   test("Test get vars from config") {
     val context = Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
     assert(isNull(context.getVar("nullVariable")))
-    assert(context.getVar("boolVariable").isInstanceOf[bool])
-    assert(context.getVar("boolVariable").asInstanceOf[bool].getValue == true)
-    assert(context.getVar("intVariable").isInstanceOf[gInt])
-    assert(context.getVar("intVariable").asInstanceOf[gInt].getValue == 42)
-    assert(context.getVar("doubleVariable").isInstanceOf[gDouble])
-    assert(context.getVar("doubleVariable").asInstanceOf[gDouble].getValue == 42.42)
-    assert(context.getVar("strVariable").isInstanceOf[string])
-    assert(context.getVar("strVariable").asInstanceOf[string].getValue == "str")
-    assert(context.getVar("variable.with.points").isInstanceOf[string])
+    assert(context.getVar("boolVariable").isInstanceOf[MBool])
+    assert(context.getVar("boolVariable").asInstanceOf[MBool].getValue == true)
+    assert(context.getVar("intVariable").isInstanceOf[MInt])
+    assert(context.getVar("intVariable").asInstanceOf[MInt].getValue == 42)
+    assert(context.getVar("doubleVariable").isInstanceOf[MDouble])
+    assert(context.getVar("doubleVariable").asInstanceOf[MDouble].getValue == 42.42)
+    assert(context.getVar("strVariable").isInstanceOf[MString])
+    assert(context.getVar("strVariable").asInstanceOf[MString].getValue == "str")
+    assert(context.getVar("variable.with.points").isInstanceOf[MString])
     assert(
-      context.getVar("variable.with.points").asInstanceOf[string].getValue ==
+      context.getVar("variable.with.points").asInstanceOf[MString].getValue ==
         "var with pt"
     )
-    assert(context.getVar("variable.with.points2").isInstanceOf[gInt])
+    assert(context.getVar("variable.with.points2").isInstanceOf[MInt])
     assert(
-      context.getVar("variable.with.points2").asInstanceOf[gInt].getValue ==
+      context.getVar("variable.with.points2").asInstanceOf[MInt].getValue ==
         1725
     )
-    assert(context.getVar("listVariable").isInstanceOf[array])
-    val arr = context.getVar("listVariable").asInstanceOf[array]
-    assert(arr.size == new gInt(4))
-    assert(arr(new gInt(0)).isInstanceOf[bool])
-    assert(arr(new gInt(1)).isInstanceOf[gInt])
-    assert(arr(new gInt(2)).isInstanceOf[gDouble])
-    assert(arr(new gInt(3)).isInstanceOf[string])
+    assert(context.getVar("listVariable").isInstanceOf[MArray])
+    val arr = context.getVar("listVariable").asInstanceOf[MArray]
+    assert(arr.size == new MInt(4))
+    assert(arr(new MInt(0)).isInstanceOf[MBool])
+    assert(arr(new MInt(1)).isInstanceOf[MInt])
+    assert(arr(new MInt(2)).isInstanceOf[MDouble])
+    assert(arr(new MInt(3)).isInstanceOf[MString])
   }
 
   test("Test add var value to context") {
     val context = Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
-    context.setVar("a", new gInt(12))
-    assert(context.getVar("a").isInstanceOf[gInt])
-    assert(context.getVar("a").asInstanceOf[gInt].getValue == 12)
+    context.setVar("a", new MInt(12))
+    assert(context.getVar("a").isInstanceOf[MInt])
+    assert(context.getVar("a").asInstanceOf[MInt].getValue == 12)
   }
 
   test("Test add null var to context") {
     val context = Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
-    context.setVar("a", new Null)
+    context.setVar("a", new MNull)
     assert(isNull(context.getVar("a")))
   }
 
@@ -74,11 +74,11 @@ class ContextTest extends AnyFunSuite {
 
   test("Test change var value in context") {
     val context = Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
-    context.setVar("a", new gInt(12))
-    context.setVar("a", new string("value"))
-    assert(context.getVar("a").isInstanceOf[string])
-    assert(context.getVar("a").asInstanceOf[string].getValue == "value")
-    context.setVar("a", new Null)
+    context.setVar("a", new MInt(12))
+    context.setVar("a", new MString("value"))
+    assert(context.getVar("a").isInstanceOf[MString])
+    assert(context.getVar("a").asInstanceOf[MString].getValue == "value")
+    context.setVar("a", new MNull)
     assert(isNull(context.getVar("a")))
   }
 
@@ -133,8 +133,8 @@ class ContextTest extends AnyFunSuite {
 
   test("Test interpolator") {
     val context = Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
-    context.setVar("stub.a", new gInt(12))
-    context.setVar("a", new gInt(25))
+    context.setVar("stub.a", new MInt(12))
+    context.setVar("a", new MInt(25))
     val res = context.interpolate("select ${$a + $stub.a}")
     assert(res == "select 37")
   }
@@ -159,25 +159,25 @@ class ContextTest extends AnyFunSuite {
 
   test("Test fork context") {
     val context = Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
-    context.setVar("a", new gInt(25))
+    context.setVar("a", new MInt(25))
     val fork = context.fork()
-    assert(fork.getVar("a").asInstanceOf[gInt].getValue == 25)
+    assert(fork.getVar("a").asInstanceOf[MInt].getValue == 25)
     context.pushScope()
 
-    context.setVar("a", new gInt(15))
-    assert(fork.getVar("a").asInstanceOf[gInt].getValue == 25)
-    assert(context.getVar("a").asInstanceOf[gInt].getValue == 15)
+    context.setVar("a", new MInt(15))
+    assert(fork.getVar("a").asInstanceOf[MInt].getValue == 25)
+    assert(context.getVar("a").asInstanceOf[MInt].getValue == 15)
 
-    fork.setVar("a", new gInt(35))
-    assert(fork.getVar("a").asInstanceOf[gInt].getValue == 35)
-    assert(context.getVar("a").asInstanceOf[gInt].getValue == 15)
+    fork.setVar("a", new MInt(35))
+    assert(fork.getVar("a").asInstanceOf[MInt].getValue == 35)
+    assert(context.getVar("a").asInstanceOf[MInt].getValue == 15)
 
-    context.setVar("a", new gInt(45))
-    assert(fork.getVar("a").asInstanceOf[gInt].getValue == 35)
-    assert(context.getVar("a").asInstanceOf[gInt].getValue == 45)
+    context.setVar("a", new MInt(45))
+    assert(fork.getVar("a").asInstanceOf[MInt].getValue == 35)
+    assert(context.getVar("a").asInstanceOf[MInt].getValue == 45)
 
-    fork.setVar("a", new gInt(55))
-    assert(fork.getVar("a").asInstanceOf[gInt].getValue == 55)
-    assert(context.getVar("a").asInstanceOf[gInt].getValue == 45)
+    fork.setVar("a", new MInt(55))
+    assert(fork.getVar("a").asInstanceOf[MInt].getValue == 55)
+    assert(context.getVar("a").asInstanceOf[MInt].getValue == 45)
   }
 }

@@ -1,6 +1,6 @@
 package org.mixql.core.test.function
 
-import org.mixql.core.context.gtype._
+import org.mixql.core.context.mtype._
 import org.mixql.core.test.MainVisitorBaseTest
 
 class ArrayFunctionsTest extends MainVisitorBaseTest {
@@ -14,8 +14,8 @@ class ArrayFunctionsTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
 
     val res = context.getVar("res")
-    assert(res.isInstanceOf[gInt])
-    assert(res.asInstanceOf[gInt].getValue == 3)
+    assert(res.isInstanceOf[MInt])
+    assert(res.asInstanceOf[MInt].getValue == 3)
   }
 
   test("Test sort") {
@@ -27,10 +27,10 @@ class ArrayFunctionsTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
 
     val res = context.getVar("res")
-    assert(res.isInstanceOf[array])
-    assert(res.asInstanceOf[array].getArr.size == 3)
-    assert(res.asInstanceOf[array](new gInt(0)).asInstanceOf[gInt].getValue == 1)
-    assert(res.asInstanceOf[array](new gInt(1)).asInstanceOf[gInt].getValue == 2)
-    assert(res.asInstanceOf[array](new gInt(2)).asInstanceOf[gInt].getValue == 3)
+    assert(res.isInstanceOf[MArray])
+    assert(res.asInstanceOf[MArray].getArr.size == 3)
+    assert(res.asInstanceOf[MArray](new MInt(0)).asInstanceOf[MInt].getValue == 1)
+    assert(res.asInstanceOf[MArray](new MInt(1)).asInstanceOf[MInt].getValue == 2)
+    assert(res.asInstanceOf[MArray](new MInt(2)).asInstanceOf[MInt].getValue == 3)
   }
 }

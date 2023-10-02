@@ -1,8 +1,8 @@
-package org.mixql.core.context.gtype;
+package org.mixql.core.context.mtype;
 
-public abstract class Type extends Exception {
+public abstract class MType extends Exception {
     // +
-    public Type Add(Type other) {
+    public MType Add(MType other) {
         throw new UnsupportedOperationException(
                 String.format(
                         "type error: %s + %s is unsupported",
@@ -13,7 +13,7 @@ public abstract class Type extends Exception {
     }
 
     // -
-    public Type Subtract(Type other) {
+    public MType Subtract(MType other) {
         throw new UnsupportedOperationException(
                 String.format(
                         "type error: %s + %s is unsupported",
@@ -23,7 +23,7 @@ public abstract class Type extends Exception {
     }
 
     // *
-    public Type Multiply(Type other) {
+    public MType Multiply(MType other) {
         throw new UnsupportedOperationException(
                 String.format(
                         "type error: %s + %s is unsupported",
@@ -33,7 +33,7 @@ public abstract class Type extends Exception {
     }
 
     // /
-    public Type Divide(Type other) {
+    public MType Divide(MType other) {
         throw new UnsupportedOperationException(
                 String.format(
                         "type error: %s + %s is unsupported",
@@ -43,7 +43,7 @@ public abstract class Type extends Exception {
     }
 
     // ||
-    public Type Or(Type other) {
+    public MType Or(MType other) {
         throw new UnsupportedOperationException(
                 String.format(
                         "type error: %s + %s is unsupported",
@@ -53,7 +53,7 @@ public abstract class Type extends Exception {
     }
 
     // &&
-    public Type And(Type other) {
+    public MType And(MType other) {
         throw new UnsupportedOperationException(
                 String.format(
                         "type error: %s + %s is unsupported",
@@ -63,7 +63,7 @@ public abstract class Type extends Exception {
     }
 
     // <
-    public Type LessThen(Type other) {
+    public MType LessThen(MType other) {
         throw new UnsupportedOperationException(
                 String.format(
                         "type error: %s + %s is unsupported",
@@ -73,7 +73,7 @@ public abstract class Type extends Exception {
     }
 
     // <=
-    public Type LessEqualThen(Type other) {
+    public MType LessEqualThen(MType other) {
         throw new UnsupportedOperationException(
                 String.format(
                         "type error: %s + %s is unsupported",
@@ -83,7 +83,7 @@ public abstract class Type extends Exception {
     }
 
     // >
-    public Type MoreThen(Type other) {
+    public MType MoreThen(MType other) {
         throw new UnsupportedOperationException(
                 String.format(
                         "type error: %s + %s is unsupported",
@@ -93,7 +93,7 @@ public abstract class Type extends Exception {
     }
 
     // >=
-    public Type MoreEqualThen(Type other) {
+    public MType MoreEqualThen(MType other) {
         throw new UnsupportedOperationException(
                 String.format(
                         "type error: %s + %s is unsupported",
@@ -103,7 +103,7 @@ public abstract class Type extends Exception {
     }
 
     // ==
-    public Type Equal(Type other) {
+    public MType Equal(MType other) {
         throw new UnsupportedOperationException(
                 String.format(
                         "type error: %s + %s is unsupported",
@@ -113,7 +113,7 @@ public abstract class Type extends Exception {
     }
 
     // !=
-    public Type NotEqual(Type other) {
+    public MType NotEqual(MType other) {
         throw new UnsupportedOperationException(
                 String.format(
                         "type error: %s + %s is unsupported",
@@ -123,7 +123,7 @@ public abstract class Type extends Exception {
     }
 
     // !=
-    public Type Not() {
+    public MType Not() {
         throw new UnsupportedOperationException(
                 String.format(
                         "type error: operation `not` for %s is unsupported",

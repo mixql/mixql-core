@@ -1,6 +1,6 @@
 package org.mixql.core.test.engines
 
-import org.mixql.core.context.gtype.{Type, bool, cursor, gInt, none}
+import org.mixql.core.context.mtype._
 import org.mixql.core.logger.logInfo
 
 import scala.util.Random
@@ -12,25 +12,25 @@ class CursorTest3() extends cursor {
 
   var stream: Random = null
 
-  override def close(): bool = {
+  override def close(): MBool = {
     logInfo("close was triggered in CursorTest3")
-    new bool(true)
+    new MBool(true)
   }
 
-  override def open(): bool = {
+  override def open(): MBool = {
     logInfo("open was triggered in CursorTest3")
     if (stream == null)
       stream = new scala.util.Random
 
-    new bool(true)
+    new MBool(true)
   }
 
-  override def fetch(): Type = {
+  override def fetch(): MType = {
     logInfo("fetch was triggered in CursorTest3")
     if (currentCount < countToFetch) {
       currentCount = currentCount + 1;
-      new gInt(stream.nextInt())
+      new MInt(stream.nextInt())
     } else
-      new none()
+      new MNone()
   }
 }

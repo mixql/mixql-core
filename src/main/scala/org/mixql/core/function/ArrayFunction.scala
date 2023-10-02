@@ -1,6 +1,6 @@
 package org.mixql.core.function
 
-import org.mixql.core.context.gtype._
+import org.mixql.core.context.mtype._
 import org.mixql.core.context.Context
 
 object ArrayFunction {
@@ -11,9 +11,9 @@ object ArrayFunction {
     }
 
   val sort =
-    new ((Array[Any], SqlLambda, Context) => Array[Any]) {
+    new ((Array[Any], MLambda, Context) => Array[Any]) {
 
-      override def apply(arr: Array[Any], less: SqlLambda, context: Context): Array[Any] = {
+      override def apply(arr: Array[Any], less: MLambda, context: Context): Array[Any] = {
         arr.sortWith((x, y) => { less(context, x, y).asInstanceOf[Boolean] })
       }
     }

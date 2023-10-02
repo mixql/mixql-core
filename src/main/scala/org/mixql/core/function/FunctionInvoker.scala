@@ -1,7 +1,7 @@
 package org.mixql.core.function
 
 import org.mixql.core.context.{EngineContext, Context}
-import org.mixql.core.context.gtype._
+import org.mixql.core.context.mtype._
 
 import java.lang.reflect.{Method, InvocationTargetException}
 import scala.annotation.meta.param
@@ -46,7 +46,7 @@ object FunctionInvoker {
           if (ctxFiltered.nonEmpty) {
             val ctx = ctxFiltered.head.asInstanceOf[Context]
             val func = ctx.getVar(funcName)
-            if (func.isInstanceOf[SqlLambda])
+            if (func.isInstanceOf[MLambda])
               invokeRegisteredFunc(func, funcName, contexts, args, kwargs)
             else if (ctx.currentEngine.getDefinedFunctions().contains(funcName.toLowerCase))
               unpack(
@@ -126,8 +126,8 @@ object FunctionInvoker {
                          args: Seq[Object] = Nil,
                          kwargs: Map[String, Object] = Map.empty,
                          funcName: String): Any = {
-    if (obj.isInstanceOf[SqlLambda])
-      return obj.asInstanceOf[SqlLambda].apply(contexts.head.asInstanceOf[Context], args: _*)
+    if (obj.isInstanceOf[MLambda])
+      return obj.asInstanceOf[MLambda].apply(contexts.head.asInstanceOf[Context], args: _*)
     val a = obj.getClass.getMethods.find(p =>
       p.getName == "apply" &&
         (p.getParameters.length == 0 || p.getParameters()(0).getName.toLowerCase != "v1")

@@ -1,13 +1,13 @@
 package org.mixql.core.function
 
-import org.mixql.core.context.gtype._
+import org.mixql.core.context.mtype._
 import org.mixql.core.generated.sql.BlockContext
 import org.mixql.core.visitor.BaseVisitor
 import org.mixql.core.context.Context
 import org.mixql.core.visitor.MainVisitor
 import org.antlr.v4.runtime.TokenStream
 
-final class SqlLambda(paramNames: List[String], body: BlockContext, tokens: TokenStream) extends Type {
+final class MLambda(paramNames: List[String], body: BlockContext, tokens: TokenStream) extends MType {
 
   def apply(context: Context, params: Any*): Any = {
     if (paramNames.size > params.size)

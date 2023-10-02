@@ -1,6 +1,6 @@
 package org.mixql.core.test.function
 
-import org.mixql.core.context.gtype._
+import org.mixql.core.context.mtype._
 import org.mixql.core.test.MainVisitorBaseTest
 
 class Base64FunctionsTest extends MainVisitorBaseTest {
@@ -13,7 +13,7 @@ class Base64FunctionsTest extends MainVisitorBaseTest {
 
     val context = runMainVisitor(code)
 
-    val foo = context.getVar("foo").asInstanceOf[string]
+    val foo = context.getVar("foo").asInstanceOf[MString]
     assert(foo.getValue == "U3BhcmsgU1FM")
   }
 }

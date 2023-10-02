@@ -1,9 +1,9 @@
-package org.mixql.core.test.gtype
+package org.mixql.core.test.mtype
 
-import org.mixql.core.context.gtype.{gDouble, gInt, string}
+import org.mixql.core.context.mtype._
 import org.mixql.core.test.MainVisitorBaseTest
 
-class GIntCastTest extends MainVisitorBaseTest {
+class MIntCastTest extends MainVisitorBaseTest {
 
   test("Test cast double to int") {
     Int.MaxValue
@@ -14,8 +14,8 @@ class GIntCastTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
 
     val res1 = context.getVar("res")
-    assert(res1.isInstanceOf[gInt])
-    assert(res1.asInstanceOf[gInt].getValue == 12)
+    assert(res1.isInstanceOf[MInt])
+    assert(res1.asInstanceOf[MInt].getValue == 12)
   }
 
   test("Test cast int to double") {
@@ -27,8 +27,8 @@ class GIntCastTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
 
     val res1 = context.getVar("res")
-    assert(res1.isInstanceOf[gDouble])
-    assert(res1.asInstanceOf[gDouble].getValue == 12.0)
+    assert(res1.isInstanceOf[MDouble])
+    assert(res1.asInstanceOf[MDouble].getValue == 12.0)
   }
 
   test("Test cast string to int") {
@@ -41,8 +41,8 @@ class GIntCastTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
 
     val res1 = context.getVar("res")
-    assert(res1.isInstanceOf[gInt])
-    assert(res1.asInstanceOf[gInt].getValue == 12)
+    assert(res1.isInstanceOf[MInt])
+    assert(res1.asInstanceOf[MInt].getValue == 12)
   }
 
   test("Test int to string") {
@@ -55,8 +55,8 @@ class GIntCastTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
 
     val res1 = context.getVar("res")
-    assert(res1.isInstanceOf[string])
-    assert(res1.asInstanceOf[string].getValue == "100")
+    assert(res1.isInstanceOf[MString])
+    assert(res1.asInstanceOf[MString].getValue == "100")
   }
 
   test("Test double int to string") {
@@ -68,8 +68,8 @@ class GIntCastTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
 
     val res1 = context.getVar("res")
-    assert(res1.isInstanceOf[string])
-    assert(res1.asInstanceOf[string].getValue == "12.5")
+    assert(res1.isInstanceOf[MString])
+    assert(res1.asInstanceOf[MString].getValue == "12.5")
   }
 
   test("Test cast int to string") {
@@ -81,7 +81,7 @@ class GIntCastTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
 
     val res1 = context.getVar("res")
-    assert(res1.isInstanceOf[string])
-    assert(res1.asInstanceOf[string].getValue == "123")
+    assert(res1.isInstanceOf[MString])
+    assert(res1.asInstanceOf[MString].getValue == "123")
   }
 }
