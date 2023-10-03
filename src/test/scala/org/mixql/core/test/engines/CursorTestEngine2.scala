@@ -1,7 +1,7 @@
 package org.mixql.core.test.engines
 
-import org.mixql.core.context.{EngineContext, gtype}
-import org.mixql.core.context.gtype._
+import org.mixql.core.context.EngineContext
+import org.mixql.core.context.mtype._
 import org.mixql.core.engine.Engine
 import org.mixql.core.logger.logInfo
 
@@ -12,45 +12,46 @@ class CursorTestEngine2 extends Engine {
 
   override def name: String = "CursorTestEngine2"
 
-  override def executeImpl(stmt: String, ctx: EngineContext): Type = {
+  override def executeImpl(stmt: String, ctx: EngineContext): MType = {
     query = stmt
     throw new Exception("execute was triggered instead of executeCursor")
   }
 
-  override def getCursorImpl(stmt: String, ctx: EngineContext): cursor = {
+  override def getCursorImpl(stmt: String, ctx: EngineContext): MCursorBase = {
     query = stmt
     new CursorTest2(this, stmt: String)
   }
 
-  override def executeFuncImpl(name: String, ctx: EngineContext, kwargs: Map[String, Object], params: Type*): Type = ???
+  override def executeFuncImpl(name: String, ctx: EngineContext, kwargs: Map[String, Object], params: MType*): MType =
+    ???
 }
 
-class CursorTest2(engine: CursorTestEngine2, stmt: String) extends cursor {
+class CursorTest2(engine: CursorTestEngine2, stmt: String) extends MCursorBase {
 
   val countToFetch = 10;
   var currentCount = 0;
 
   var stream: Random = null
 
-  override def close(): bool = {
+  override def close(): MBool = {
     logInfo("close was triggered in CursorTest2 of engine " + engine.name)
-    new bool(true)
+    new MBool(true)
   }
 
-  override def open(): bool = {
+  override def open(): MBool = {
     logInfo("open was triggered in CursorTest2 of engine " + engine.name)
     if (stream == null)
       stream = new scala.util.Random
 
-    new bool(true)
+    new MBool(true)
   }
 
-  override def fetch(): Type = {
+  override def fetch(): MType = {
     logInfo("fetch was triggered in CursorTest2 of engine " + engine.name)
     if (currentCount < countToFetch) {
       currentCount = currentCount + 1;
-      new gInt(stream.nextInt())
+      new MInt(stream.nextInt())
     } else
-      new none()
+      MNone.get()
   }
 }

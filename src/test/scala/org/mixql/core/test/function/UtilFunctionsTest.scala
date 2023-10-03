@@ -1,6 +1,6 @@
 package org.mixql.core.test.function
 
-import org.mixql.core.context.gtype._
+import org.mixql.core.context.mtype._
 import org.mixql.core.test.MainVisitorBaseTest
 import org.mixql.core.engine.Engine
 import org.mixql.core.context.{Context, EngineContext}
@@ -26,12 +26,12 @@ class UtilFunctionsTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
 
     val res1 = context.getVar("res1")
-    assert(res1.isInstanceOf[bool])
-    assert(res1.asInstanceOf[bool].getValue)
+    assert(res1.isInstanceOf[MBool])
+    assert(res1.asInstanceOf[MBool].getValue)
 
     val res2 = context.getVar("res2")
-    assert(res2.isInstanceOf[bool])
-    assert(!res2.asInstanceOf[bool].getValue)
+    assert(res2.isInstanceOf[MBool])
+    assert(!res2.asInstanceOf[MBool].getValue)
   }
 
   test("Test is_error scala exception") {
@@ -50,8 +50,8 @@ class UtilFunctionsTest extends MainVisitorBaseTest {
     )
 
     val res = context.getVar("res")
-    assert(res.isInstanceOf[bool])
-    assert(res.asInstanceOf[bool].getValue)
+    assert(res.isInstanceOf[MBool])
+    assert(res.asInstanceOf[MBool].getValue)
   }
 
   test("Test await") {
@@ -67,7 +67,7 @@ class UtilFunctionsTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
 
     val res = context.getVar("res")
-    assert(res.isInstanceOf[gInt])
-    assert(res.asInstanceOf[gInt].getValue == 1)
+    assert(res.isInstanceOf[MInt])
+    assert(res.asInstanceOf[MInt].getValue == 1)
   }
 }

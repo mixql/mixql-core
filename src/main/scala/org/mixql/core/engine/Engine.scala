@@ -1,7 +1,7 @@
 package org.mixql.core.engine
 
 import org.mixql.core.context.EngineContext
-import org.mixql.core.context.gtype._
+import org.mixql.core.context.mtype._
 import org.mixql.core.logger.logInfo
 
 /** abstract class for execution engine
@@ -23,7 +23,7 @@ abstract class Engine {
     * @return
     *   the result of exection
     */
-  final def execute(stmt: String, ctx: EngineContext): Type = {
+  final def execute(stmt: String, ctx: EngineContext): MType = {
     if (!engineStarted)
       logInfo(s"Engine $name was triggered by execute request")
 
@@ -39,7 +39,7 @@ abstract class Engine {
     * @return
     *   the result of execution as cursor
     */
-  final def getCursor(stmt: String, ctx: EngineContext): cursor = {
+  final def getCursor(stmt: String, ctx: EngineContext): MCursorBase = {
     if (!engineStarted)
       logInfo(s"Engine $name was triggered by execute request expecting cursor")
 
@@ -55,7 +55,7 @@ abstract class Engine {
     *   function params
     * @return
     */
-  final def executeFunc(name: String, ctx: EngineContext, kwargs: Map[String, Object], params: Type*): Type = {
+  final def executeFunc(name: String, ctx: EngineContext, kwargs: Map[String, Object], params: MType*): MType = {
     if (!engineStarted)
       logInfo(s"Engine $name was triggered by executeFunc request")
     engineStarted = true
@@ -77,17 +77,17 @@ abstract class Engine {
     Nil
   }
 
-  def executeImpl(stmt: String, ctx: EngineContext): Type
+  def executeImpl(stmt: String, ctx: EngineContext): MType
 
-  def getCursorImpl(stmt: String, ctx: EngineContext): cursor = {
+  def getCursorImpl(stmt: String, ctx: EngineContext): MCursorBase = {
     import org.mixql.core.logger
     logger.logWarn(
       s"getCursor was not defined in engine $name" +
         name + ". Use execute method instead"
     )
-    new gcursor(execute(stmt, ctx))
+    new MCursor(execute(stmt, ctx))
   }
 
-  def executeFuncImpl(name: String, ctx: EngineContext, kwargs: Map[String, Object], params: Type*): Type
+  def executeFuncImpl(name: String, ctx: EngineContext, kwargs: Map[String, Object], params: MType*): MType
 
 }

@@ -1,26 +1,26 @@
 package org.mixql.core.context
 
-import org.mixql.core.context.gtype.{Type, pack}
+import org.mixql.core.context.mtype._
 import org.mixql.core.function.FunctionInvoker
 
 import scala.collection.mutable
 
 class EngineContext(val context: Context, val engineName: String) {
-  def setVar(key: String, value: Type): Unit = context.setVar(key, value)
+  def setVar(key: String, value: MType): Unit = context.setVar(key, value)
 
-  def getVar(key: String): Type = context.getParam(key, engineName)
+  def getVar(key: String): MType = context.getParam(key, engineName)
 
-  def getVars(keys: List[String]): mutable.Map[String, Type] = {
-    val res: mutable.Map[String, Type] = mutable.Map()
+  def getVars(keys: List[String]): mutable.Map[String, MType] = {
+    val res: mutable.Map[String, MType] = mutable.Map()
     keys.foreach(key => res.put(key, context.getVar(key)))
     res
   }
 
-  def setVars(vars: mutable.Map[String, Type]): Unit = {
+  def setVars(vars: mutable.Map[String, MType]): Unit = {
     vars.foreach(variable => context.setVar(variable._1, variable._2))
   }
 
-  def setVars(vars: Map[String, Type]): Unit = {
+  def setVars(vars: Map[String, MType]): Unit = {
     vars.foreach(variable => context.setVar(variable._1, variable._2))
   }
 
@@ -38,7 +38,7 @@ class EngineContext(val context: Context, val engineName: String) {
     * @param kwargs
     *   named arguments for function
     */
-  def invokeFunction(funcName: String, args: List[Any] = Nil, kwargs: Map[String, Object] = Map.empty): Type = {
+  def invokeFunction(funcName: String, args: List[Any] = Nil, kwargs: Map[String, Object] = Map.empty): MType = {
     try {
       val res = FunctionInvoker.invoke(Map(context.functions.toSeq: _*), funcName, List[Object](context), args, kwargs)
       pack(res)

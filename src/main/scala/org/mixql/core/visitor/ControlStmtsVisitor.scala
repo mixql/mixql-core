@@ -2,24 +2,24 @@ package org.mixql.core.visitor
 
 import org.antlr.v4.runtime.TokenStream
 import org.mixql.core.context.{Context, ControlContext}
-import org.mixql.core.context.gtype._
+import org.mixql.core.context.mtype._
 import org.mixql.core.generated.sql
 
 import scala.language.implicitConversions
 import scala.collection.JavaConverters._
 import scala.collection.convert.ImplicitConversions.`map AsScala`
 import scala.util.control.Breaks.{break, _}
-import org.mixql.core.exception.UserSqlException
+import org.mixql.core.exception.MException
 
 trait ControlStmtsVisitor extends BaseVisitor {
 
-  def toUserSqlException(e: Throwable): UserSqlException = {
-    if (e.isInstanceOf[UserSqlException])
-      return e.asInstanceOf[UserSqlException]
-    return new UserSqlException(e.getClass.getSimpleName, e.getMessage)
+  def toUserSqlException(e: Throwable): MException = {
+    if (e.isInstanceOf[MException])
+      return e.asInstanceOf[MException]
+    return new MException(e)
   }
 
-  override def visitTry_catch_stmt(ctx: sql.Try_catch_stmtContext): Type = {
+  override def visitTry_catch_stmt(ctx: sql.Try_catch_stmtContext): MType = {
     try {
       val block = visit(ctx.try_bock)
       if (controlState == ControlContext.RETURN)
@@ -41,10 +41,10 @@ trait ControlStmtsVisitor extends BaseVisitor {
         if (controlState == ControlContext.RETURN)
           return block
     }
-    new Null()
+    MNull.get()
   }
 
-  override def visitIf_stmt(ctx: sql.If_stmtContext): Type = {
+  override def visitIf_stmt(ctx: sql.If_stmtContext): MType = {
     val condition: Boolean = visit(ctx.expr)
     if (condition) {
       visit(ctx.block)
@@ -57,14 +57,14 @@ trait ControlStmtsVisitor extends BaseVisitor {
       if (ctx.else_block)
         visit(ctx.else_block.block)
       else
-        new Null()
+        MNull.get()
     }
   }
 
   // TODO maybe better realisation using for?
-  override def visitFor_range_stmt(ctx: sql.For_range_stmtContext): Type = {
+  override def visitFor_range_stmt(ctx: sql.For_range_stmtContext): MType = {
     // super.visitFor_range_stmt(ctx)
-    var result: Type = new Null
+    var result: MType = MNull.get
     val i_name = visit(ctx.ident).toString
     val old = context.getVar(i_name)
     var i =
@@ -79,13 +79,13 @@ trait ControlStmtsVisitor extends BaseVisitor {
         visit(ctx.from)
     val step =
       (if (ctx.T_REVERSE)
-         new gInt(-1)
+         new MInt(-1)
        else
-         new gInt(1)).Multiply(
+         new MInt(1)).Multiply(
         if (ctx.step)
           visit(ctx.step)
         else
-          new gInt(1)
+          new MInt(1)
       )
     context.setVar(i_name, i)
     breakable {
@@ -113,11 +113,11 @@ trait ControlStmtsVisitor extends BaseVisitor {
     result
   }
 
-  def execForInGcursor(cursor: gcursor, ctx: sql.For_cursor_stmtContext): Type = {
+  def execForInGcursor(cursor: MCursor, ctx: sql.For_cursor_stmtContext): MType = {
     cursor.open()
 
     var fetchRes = cursor.fetch()
-    while (!fetchRes.isInstanceOf[none]) {
+    while (!fetchRes.isInstanceOf[MNone]) {
 //      fetchRes match {
 //        case collection1: collection => execBlockInFor(collection1, ctx)
 //        case _ => execFetchBlockInFor(fetchRes, ctx)
@@ -125,11 +125,11 @@ trait ControlStmtsVisitor extends BaseVisitor {
       execFetchBlockInFor(fetchRes, ctx)
       fetchRes = cursor.fetch()
     }
-    new Null
+    MNull.get()
   }
 
-  def execFetchBlockInFor(inRes: Type, ctx: sql.For_cursor_stmtContext): Type = {
-    var result: Type = new Null
+  def execFetchBlockInFor(inRes: MType, ctx: sql.For_cursor_stmtContext): MType = {
+    var result: MType = MNull.get()
     ctx.ident.size match {
       case 1 =>
         val cursorName = visit(ctx.ident(0)).toString
@@ -155,10 +155,10 @@ trait ControlStmtsVisitor extends BaseVisitor {
     result
   }
 
-  def execBlockInFor(inRes: collection, ctx: sql.For_cursor_stmtContext): Type = {
-    var result: Type = new Null
+  def execBlockInFor(inRes: MCollection, ctx: sql.For_cursor_stmtContext): MType = {
+    var result: MType = MNull.get()
     inRes match {
-      case c: array =>
+      case c: MArray =>
         ctx.ident.size match {
           case 1 =>
             val cursorName = visit(ctx.ident(0)).toString
@@ -183,8 +183,8 @@ trait ControlStmtsVisitor extends BaseVisitor {
             val old = cursors.map(context.getVar(_))
             breakable {
               c.getArr.foreach(el => {
-                if (el.isInstanceOf[array]) {
-                  val a = el.asInstanceOf[array]
+                if (el.isInstanceOf[MArray]) {
+                  val a = el.asInstanceOf[MArray]
                   if (a.getArr.size < cursors.size)
                     throw new IllegalStateException("not enough arguments to unpack")
                   cursors.zip(a.getArr).foreach(kv => {
@@ -206,7 +206,7 @@ trait ControlStmtsVisitor extends BaseVisitor {
             }
             cursors.zip(old).foreach(x => context.setVar(x._1, x._2))
         }
-      case c: map =>
+      case c: MMap =>
         ctx.ident.size match {
           case 2 =>
             val cursorKeyName = visit(ctx.ident(0)).toString
@@ -255,7 +255,7 @@ trait ControlStmtsVisitor extends BaseVisitor {
     result
   }
 
-  override def visitWhile_stmt(ctx: sql.While_stmtContext): Type = {
+  override def visitWhile_stmt(ctx: sql.While_stmtContext): MType = {
     var condition: Boolean = visit(ctx.expr)
     breakable {
       while (condition) {
@@ -269,6 +269,6 @@ trait ControlStmtsVisitor extends BaseVisitor {
         condition = visit(ctx.expr)
       }
     }
-    new Null()
+    MNull.get()
   }
 }

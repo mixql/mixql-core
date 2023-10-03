@@ -1,6 +1,6 @@
 package org.mixql.core.test.function
 
-import org.mixql.core.context.gtype._
+import org.mixql.core.context.mtype._
 import org.mixql.core.test.MainVisitorBaseTest
 
 class StringFunctionsTest extends MainVisitorBaseTest {
@@ -13,7 +13,7 @@ class StringFunctionsTest extends MainVisitorBaseTest {
 
     val context = runMainVisitor(code)
 
-    val foo = context.getVar("foo").asInstanceOf[gInt]
+    val foo = context.getVar("foo").asInstanceOf[MInt]
     assert(foo.getValue == 10)
   }
 
@@ -25,7 +25,7 @@ class StringFunctionsTest extends MainVisitorBaseTest {
 
     val context = runMainVisitor(code)
 
-    val foo = context.getVar("foo").asInstanceOf[string]
+    val foo = context.getVar("foo").asInstanceOf[MString]
     assert(foo.getValue == "k SQL")
   }
 
@@ -37,7 +37,7 @@ class StringFunctionsTest extends MainVisitorBaseTest {
 
     val context = runMainVisitor(code)
 
-    val foo = context.getVar("foo").asInstanceOf[string]
+    val foo = context.getVar("foo").asInstanceOf[MString]
     assert(foo.getValue == "SQL")
   }
 
@@ -49,7 +49,7 @@ class StringFunctionsTest extends MainVisitorBaseTest {
 
     val context = runMainVisitor(code)
 
-    val foo = context.getVar("foo").asInstanceOf[string]
+    val foo = context.getVar("foo").asInstanceOf[MString]
     assert(foo.getValue == "k")
   }
 
@@ -61,7 +61,7 @@ class StringFunctionsTest extends MainVisitorBaseTest {
 
     val context = runMainVisitor(code)
 
-    val foo = context.getVar("foo").asInstanceOf[string]
+    val foo = context.getVar("foo").asInstanceOf[MString]
     assert(foo.getValue == "Spar")
   }
 
@@ -73,7 +73,7 @@ class StringFunctionsTest extends MainVisitorBaseTest {
 
     val context = runMainVisitor(code)
 
-    val foo = context.getVar("foo").asInstanceOf[string]
+    val foo = context.getVar("foo").asInstanceOf[MString]
     assert(foo.getValue == "")
   }
 }

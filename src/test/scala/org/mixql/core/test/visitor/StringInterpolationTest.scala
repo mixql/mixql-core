@@ -1,6 +1,6 @@
 package org.mixql.core.test.visitor
 
-import org.mixql.core.context.gtype._
+import org.mixql.core.context.mtype._
 import org.mixql.core.test.MainVisitorBaseTest
 import org.mixql.core.test.tag.Interpolation
 
@@ -14,8 +14,8 @@ class StringInterpolationTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
-    assert(foo.isInstanceOf[string])
-    assert(foo.asInstanceOf[string].getValue == "abc;123")
+    assert(foo.isInstanceOf[MString])
+    assert(foo.asInstanceOf[MString].getValue == "abc;123")
   }
 
   test("Test set with space") {
@@ -25,8 +25,8 @@ class StringInterpolationTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
-    assert(foo.isInstanceOf[string])
-    assert(foo.asInstanceOf[string].getValue == "    abc    ")
+    assert(foo.isInstanceOf[MString])
+    assert(foo.asInstanceOf[MString].getValue == "    abc    ")
   }
 
   test("Test set with double space") {
@@ -36,19 +36,19 @@ class StringInterpolationTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
-    assert(foo.isInstanceOf[string])
-    assert(foo.asInstanceOf[string].getValue == "    abc   abc  ")
+    assert(foo.isInstanceOf[MString])
+    assert(foo.asInstanceOf[MString].getValue == "    abc   abc  ")
   }
 
-  test("Test set with string surrounded spaces") {
+  test("Test set with MString surrounded spaces") {
     val code =
       """
         |let foo = '    123 abc  ';
                 """.stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
-    assert(foo.isInstanceOf[string])
-    assert(foo.asInstanceOf[string].getValue == "    123 abc  ")
+    assert(foo.isInstanceOf[MString])
+    assert(foo.asInstanceOf[MString].getValue == "    123 abc  ")
   }
 
   test("Test set with space and new line") {
@@ -58,8 +58,8 @@ class StringInterpolationTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
-    assert(foo.isInstanceOf[string])
-    assert(foo.asInstanceOf[string].getValue == "    123 \n   abc  ")
+    assert(foo.isInstanceOf[MString])
+    assert(foo.asInstanceOf[MString].getValue == "    123 \n   abc  ")
   }
 
   test("Test set with space and new lines") {
@@ -69,8 +69,8 @@ class StringInterpolationTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
-    assert(foo.isInstanceOf[string])
-    assert(foo.asInstanceOf[string].getValue == "\n    123 \n   abc  ")
+    assert(foo.isInstanceOf[MString])
+    assert(foo.asInstanceOf[MString].getValue == "\n    123 \n   abc  ")
   }
 
   test("Test set with space new lines and tabulation") {
@@ -80,8 +80,8 @@ class StringInterpolationTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
-    assert(foo.isInstanceOf[string])
-    assert(foo.asInstanceOf[string].getValue == "\n    123 \n \t   abc  \n\t")
+    assert(foo.isInstanceOf[MString])
+    assert(foo.asInstanceOf[MString].getValue == "\n    123 \n \t   abc  \n\t")
   }
 
   test("Test set with space new lines and tabulation 2") {
@@ -91,8 +91,8 @@ class StringInterpolationTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
-    assert(foo.isInstanceOf[string])
-    assert(foo.asInstanceOf[string].getValue == "\t\n    123 \n \t   abc  \n\t")
+    assert(foo.isInstanceOf[MString])
+    assert(foo.asInstanceOf[MString].getValue == "\t\n    123 \n \t   abc  \n\t")
   }
 
   test("Test set with space new lines and tabulation 3") {
@@ -102,56 +102,56 @@ class StringInterpolationTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
-    assert(foo.isInstanceOf[string])
-    assert(foo.asInstanceOf[string].getValue == "\t\n    123 \n \t   abc  \n\t")
+    assert(foo.isInstanceOf[MString])
+    assert(foo.asInstanceOf[MString].getValue == "\t\n    123 \n \t   abc  \n\t")
   }
 
   test("Test set with space 2") {
     val code = "let foo = 'abc cde';".stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
-    assert(foo.isInstanceOf[string])
-    assert(foo.asInstanceOf[string].getValue == "abc cde")
+    assert(foo.isInstanceOf[MString])
+    assert(foo.asInstanceOf[MString].getValue == "abc cde")
   }
 
   test("Test set with space started with new line") {
     val code = "let foo = '\nabc cde';".stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
-    assert(foo.isInstanceOf[string])
-    assert(foo.asInstanceOf[string].getValue == "\nabc cde")
+    assert(foo.isInstanceOf[MString])
+    assert(foo.asInstanceOf[MString].getValue == "\nabc cde")
   }
 
   test("Test set with new lines") {
     val code = "let foo = '\n\n abc\n cde\n\n\n';".stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
-    assert(foo.isInstanceOf[string])
-    assert(foo.asInstanceOf[string].getValue == "\n\n abc\n cde\n\n\n")
+    assert(foo.isInstanceOf[MString])
+    assert(foo.asInstanceOf[MString].getValue == "\n\n abc\n cde\n\n\n")
   }
 
   test("Test set with new lines and double quotes") {
     val code = "let foo = \"\n\n abc\n cde\n\n\n\";".stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
-    assert(foo.isInstanceOf[string])
-    assert(foo.asInstanceOf[string].getValue == "\n\n abc\n cde\n\n\n")
+    assert(foo.isInstanceOf[MString])
+    assert(foo.asInstanceOf[MString].getValue == "\n\n abc\n cde\n\n\n")
   }
 
   test("Test set with new lines and slash quotes") {
     val code = "let foo = `\n\n abc\n cde\n\n\n`;".stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
-    assert(foo.isInstanceOf[string])
-    assert(foo.asInstanceOf[string].getValue == "\n\n abc\n cde\n\n\n")
+    assert(foo.isInstanceOf[MString])
+    assert(foo.asInstanceOf[MString].getValue == "\n\n abc\n cde\n\n\n")
   }
 
   test("Test set with new lines and single quote") {
     val code = "let foo = '\t\n\n abc\n \tcde\n\n\n';".stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
-    assert(foo.isInstanceOf[string])
-    assert(foo.asInstanceOf[string].getValue == "\t\n\n abc\n \tcde\n\n\n")
+    assert(foo.isInstanceOf[MString])
+    assert(foo.asInstanceOf[MString].getValue == "\t\n\n abc\n \tcde\n\n\n")
   }
 
   //  test("Test when single quotes contains escaped single quotes") {
@@ -159,56 +159,56 @@ class StringInterpolationTest extends MainVisitorBaseTest {
   //      "set foo = '\\'';".stripMargin
   //    val context = runMainVisitor(code)
   //    val foo = context.getVar("foo")
-  //    assert(foo.isInstanceOf[string])
-  //    assert(foo.asInstanceOf[string].getValue == "'")
+  //    assert(foo.isInstanceOf[MString])
+  //    assert(foo.asInstanceOf[MString].getValue == "'")
   //  }
 
   test("Test when single quotes contains double quotes") {
     val code = "let foo = '\"';".stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
-    assert(foo.isInstanceOf[string])
-    assert(foo.asInstanceOf[string].getValue == "\"")
+    assert(foo.isInstanceOf[MString])
+    assert(foo.asInstanceOf[MString].getValue == "\"")
   }
 
   test("Test when double quotes contains two double quotes") {
     val code = "let foo = '\"\"';".stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
-    assert(foo.isInstanceOf[string])
-    assert(foo.asInstanceOf[string].getValue == "\"\"")
+    assert(foo.isInstanceOf[MString])
+    assert(foo.asInstanceOf[MString].getValue == "\"\"")
   }
 
   test("Test when double quotes contains single quote") {
     val code = "let foo = \"'\";".stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
-    assert(foo.isInstanceOf[string])
-    assert(foo.asInstanceOf[string].getValue == "'")
+    assert(foo.isInstanceOf[MString])
+    assert(foo.asInstanceOf[MString].getValue == "'")
   }
 
   test("Test when double quotes contains two single quotes") {
     val code = "let foo = \"''\";".stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
-    assert(foo.isInstanceOf[string])
-    assert(foo.asInstanceOf[string].getValue == "''")
+    assert(foo.isInstanceOf[MString])
+    assert(foo.asInstanceOf[MString].getValue == "''")
   }
 
   test("Test when slashed quotes contains single quote") {
     val code = "let foo = `'`;".stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
-    assert(foo.isInstanceOf[string])
-    assert(foo.asInstanceOf[string].getValue == "'")
+    assert(foo.isInstanceOf[MString])
+    assert(foo.asInstanceOf[MString].getValue == "'")
   }
 
   test("Test when slashed quotes contains two single quotes") {
     val code = "let foo = `''`;".stripMargin
     val context = runMainVisitor(code)
     val foo = context.getVar("foo")
-    assert(foo.isInstanceOf[string])
-    assert(foo.asInstanceOf[string].getValue == "''")
+    assert(foo.isInstanceOf[MString])
+    assert(foo.asInstanceOf[MString].getValue == "''")
   }
 
   test("Test set with interpolation") {
@@ -220,8 +220,8 @@ class StringInterpolationTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
 
     val foo = context.getVar("foo")
-    assert(foo.isInstanceOf[string])
-    assert(foo.asInstanceOf[string].getValue == "abc;123")
+    assert(foo.isInstanceOf[MString])
+    assert(foo.asInstanceOf[MString].getValue == "abc;123")
   }
 
   test("Test set with expression interpolation") {
@@ -233,8 +233,8 @@ class StringInterpolationTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
 
     val foo = context.getVar("foo")
-    assert(foo.isInstanceOf[string])
-    assert(foo.asInstanceOf[string].getValue == "abc;123")
+    assert(foo.isInstanceOf[MString])
+    assert(foo.asInstanceOf[MString].getValue == "abc;123")
   }
 
   test("Test set with deep expression interpolation") {
@@ -246,8 +246,8 @@ class StringInterpolationTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
 
     val foo = context.getVar("foo")
-    assert(foo.isInstanceOf[string])
-    assert(foo.asInstanceOf[string].getValue == "abc;123")
+    assert(foo.isInstanceOf[MString])
+    assert(foo.asInstanceOf[MString].getValue == "abc;123")
   }
 
   test("Test escaped symbols") {
@@ -265,26 +265,26 @@ class StringInterpolationTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
 
-    assert(context.getVar("v1").isInstanceOf[string])
-    assert(context.getVar("v1").asInstanceOf[string].getValue == "dfdgg\ndddd")
+    assert(context.getVar("v1").isInstanceOf[MString])
+    assert(context.getVar("v1").asInstanceOf[MString].getValue == "dfdgg\ndddd")
 
-    assert(context.getVar("v2").isInstanceOf[string])
-    assert(context.getVar("v2").asInstanceOf[string].getValue == "fgfhfh\t")
+    assert(context.getVar("v2").isInstanceOf[MString])
+    assert(context.getVar("v2").asInstanceOf[MString].getValue == "fgfhfh\t")
 
-    assert(context.getVar("v3").isInstanceOf[string])
-    assert(context.getVar("v3").asInstanceOf[string].getValue == "fghfhhgfhg\\n")
+    assert(context.getVar("v3").isInstanceOf[MString])
+    assert(context.getVar("v3").asInstanceOf[MString].getValue == "fghfhhgfhg\\n")
 
-    assert(context.getVar("v5").isInstanceOf[string])
-    assert(context.getVar("v5").asInstanceOf[string].getValue == "gfhfhfhghfhh\\t")
+    assert(context.getVar("v5").isInstanceOf[MString])
+    assert(context.getVar("v5").asInstanceOf[MString].getValue == "gfhfhfhghfhh\\t")
 
-    assert(context.getVar("v6").isInstanceOf[string])
-    assert(context.getVar("v6").asInstanceOf[string].getValue == "gfhfhfhghfhhnone")
+    assert(context.getVar("v6").isInstanceOf[MString])
+    assert(context.getVar("v6").asInstanceOf[MString].getValue == "gfhfhfhghfhhnone")
 
-    assert(context.getVar("v7").isInstanceOf[string])
-    assert(context.getVar("v7").asInstanceOf[string].getValue == "gfhfhfhghfhh$t")
+    assert(context.getVar("v7").isInstanceOf[MString])
+    assert(context.getVar("v7").asInstanceOf[MString].getValue == "gfhfhfhghfhh$t")
 
-    assert(context.getVar("v8").isInstanceOf[string])
-    assert(context.getVar("v8").asInstanceOf[string].getValue == "gfhfhfhghfhh\\")
+    assert(context.getVar("v8").isInstanceOf[MString])
+    assert(context.getVar("v8").asInstanceOf[MString].getValue == "gfhfhfhghfhh\\")
   }
 
   test("Test escaped symbols `") {
@@ -302,26 +302,26 @@ class StringInterpolationTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
 
-    assert(context.getVar("v1").isInstanceOf[string])
-    assert(context.getVar("v1").asInstanceOf[string].getValue == "dfdgg\ndddd")
+    assert(context.getVar("v1").isInstanceOf[MString])
+    assert(context.getVar("v1").asInstanceOf[MString].getValue == "dfdgg\ndddd")
 
-    assert(context.getVar("v2").isInstanceOf[string])
-    assert(context.getVar("v2").asInstanceOf[string].getValue == "fgfhfh\t")
+    assert(context.getVar("v2").isInstanceOf[MString])
+    assert(context.getVar("v2").asInstanceOf[MString].getValue == "fgfhfh\t")
 
-    assert(context.getVar("v3").isInstanceOf[string])
-    assert(context.getVar("v3").asInstanceOf[string].getValue == "fghfhhgfhg\\n")
+    assert(context.getVar("v3").isInstanceOf[MString])
+    assert(context.getVar("v3").asInstanceOf[MString].getValue == "fghfhhgfhg\\n")
 
-    assert(context.getVar("v5").isInstanceOf[string])
-    assert(context.getVar("v5").asInstanceOf[string].getValue == "gfhfhfhghfhh\\t")
+    assert(context.getVar("v5").isInstanceOf[MString])
+    assert(context.getVar("v5").asInstanceOf[MString].getValue == "gfhfhfhghfhh\\t")
 
-    assert(context.getVar("v6").isInstanceOf[string])
-    assert(context.getVar("v6").asInstanceOf[string].getValue == "gfhfhfhghfhhnone")
+    assert(context.getVar("v6").isInstanceOf[MString])
+    assert(context.getVar("v6").asInstanceOf[MString].getValue == "gfhfhfhghfhhnone")
 
-    assert(context.getVar("v7").isInstanceOf[string])
-    assert(context.getVar("v7").asInstanceOf[string].getValue == "gfhfhfhghfhh$t")
+    assert(context.getVar("v7").isInstanceOf[MString])
+    assert(context.getVar("v7").asInstanceOf[MString].getValue == "gfhfhfhghfhh$t")
 
-    assert(context.getVar("v8").isInstanceOf[string])
-    assert(context.getVar("v8").asInstanceOf[string].getValue == "gfhfhfhghfhh\\")
+    assert(context.getVar("v8").isInstanceOf[MString])
+    assert(context.getVar("v8").asInstanceOf[MString].getValue == "gfhfhfhghfhh\\")
   }
 
   test("Test escaped symbols '") {
@@ -339,25 +339,25 @@ class StringInterpolationTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
 
-    assert(context.getVar("v1").isInstanceOf[string])
-    assert(context.getVar("v1").asInstanceOf[string].getValue == "dfdgg\ndddd")
+    assert(context.getVar("v1").isInstanceOf[MString])
+    assert(context.getVar("v1").asInstanceOf[MString].getValue == "dfdgg\ndddd")
 
-    assert(context.getVar("v2").isInstanceOf[string])
-    assert(context.getVar("v2").asInstanceOf[string].getValue == "fgfhfh\t")
+    assert(context.getVar("v2").isInstanceOf[MString])
+    assert(context.getVar("v2").asInstanceOf[MString].getValue == "fgfhfh\t")
 
-    assert(context.getVar("v3").isInstanceOf[string])
-    assert(context.getVar("v3").asInstanceOf[string].getValue == "fghfhhgfhg\\n")
+    assert(context.getVar("v3").isInstanceOf[MString])
+    assert(context.getVar("v3").asInstanceOf[MString].getValue == "fghfhhgfhg\\n")
 
-    assert(context.getVar("v5").isInstanceOf[string])
-    assert(context.getVar("v5").asInstanceOf[string].getValue == "gfhfhfhghfhh\\t")
+    assert(context.getVar("v5").isInstanceOf[MString])
+    assert(context.getVar("v5").asInstanceOf[MString].getValue == "gfhfhfhghfhh\\t")
 
-    assert(context.getVar("v6").isInstanceOf[string])
-    assert(context.getVar("v6").asInstanceOf[string].getValue == "gfhfhfhghfhhnone")
+    assert(context.getVar("v6").isInstanceOf[MString])
+    assert(context.getVar("v6").asInstanceOf[MString].getValue == "gfhfhfhghfhhnone")
 
-    assert(context.getVar("v7").isInstanceOf[string])
-    assert(context.getVar("v7").asInstanceOf[string].getValue == "gfhfhfhghfhh$t")
+    assert(context.getVar("v7").isInstanceOf[MString])
+    assert(context.getVar("v7").asInstanceOf[MString].getValue == "gfhfhfhghfhh$t")
 
-    assert(context.getVar("v8").isInstanceOf[string])
-    assert(context.getVar("v8").asInstanceOf[string].getValue == "gfhfhfhghfhh\\")
+    assert(context.getVar("v8").isInstanceOf[MString])
+    assert(context.getVar("v8").asInstanceOf[MString].getValue == "gfhfhfhghfhh\\")
   }
 }

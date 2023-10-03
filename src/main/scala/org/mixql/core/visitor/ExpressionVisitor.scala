@@ -1,7 +1,7 @@
 package org.mixql.core.visitor
 
-import org.mixql.core.context.gtype._
-import org.mixql.core.function.SqlLambda
+import org.mixql.core.context.mtype._
+import org.mixql.core.function.MLambda
 import org.mixql.core.function.FunctionInvoker
 import org.antlr.v4.runtime.misc.Interval
 import org.mixql.core.generated.sql
@@ -9,10 +9,11 @@ import org.mixql.core.generated.sql
 import scala.util.{Failure, Success, Try}
 import scala.collection.JavaConverters._
 import org.mixql.core.context.ControlContext
+import org.mixql.core.context.mtype.MAsync
 
 trait ExpressionVisitor extends BaseVisitor {
 
-  def executeOther(stmt: String, engine: sql.Choose_engineContext): Try[Type] =
+  def executeOther(stmt: String, engine: sql.Choose_engineContext): Try[MType] =
     Try {
       if (engine) {
         // execute on custom engine
@@ -38,18 +39,18 @@ trait ExpressionVisitor extends BaseVisitor {
       }
     }
 
-  override def visitVar(ctx: sql.VarContext): Type = {
+  override def visitVar(ctx: sql.VarContext): MType = {
     val res = context.getVar(visit(ctx.ident).toString)
-    if (res.isInstanceOf[string])
-      new string(res.toString)
+    if (res.isInstanceOf[MString])
+      new MString(res.toString)
     else
       res
   }
 
-  override def visitExpr_concat(ctx: sql.Expr_concatContext): Type =
-    new string(visit(ctx.expr(0)).toString + visit(ctx.expr(1)).toString)
+  override def visitExpr_concat(ctx: sql.Expr_concatContext): MType =
+    new MString(visit(ctx.expr(0)).toString + visit(ctx.expr(1)).toString)
 
-  override def visitExpr_arithmetic_p1(ctx: sql.Expr_arithmetic_p1Context): Type = {
+  override def visitExpr_arithmetic_p1(ctx: sql.Expr_arithmetic_p1Context): MType = {
     val left = visit(ctx.expr(0))
     val right = visit(ctx.expr(1))
     if (ctx.T_DIV)
@@ -60,7 +61,7 @@ trait ExpressionVisitor extends BaseVisitor {
       throw new UnsupportedOperationException("unknown operator")
   }
 
-  override def visitExpr_arithmetic_p2(ctx: sql.Expr_arithmetic_p2Context): Type = {
+  override def visitExpr_arithmetic_p2(ctx: sql.Expr_arithmetic_p2Context): MType = {
     val left = visit(ctx.expr(0))
     val right = visit(ctx.expr(1))
     if (ctx.T_ADD)
@@ -71,7 +72,7 @@ trait ExpressionVisitor extends BaseVisitor {
       throw new UnsupportedOperationException("unknown operator")
   }
 
-  override def visitExpr_compare(ctx: sql.Expr_compareContext): Type = {
+  override def visitExpr_compare(ctx: sql.Expr_compareContext): MType = {
     val left = visit(ctx.expr(0))
     val right = visit(ctx.expr(1))
     if (ctx.compare_operator.T_EQUAL || ctx.compare_operator.T_EQUAL2)
@@ -90,7 +91,7 @@ trait ExpressionVisitor extends BaseVisitor {
       throw new UnsupportedOperationException("unknown compare operator")
   }
 
-  override def visitExpr_logical(ctx: sql.Expr_logicalContext): Type = {
+  override def visitExpr_logical(ctx: sql.Expr_logicalContext): MType = {
     val left = visit(ctx.expr(0))
     val right = visit(ctx.expr(1))
     if (ctx.logical_operator.T_OR)
@@ -101,9 +102,9 @@ trait ExpressionVisitor extends BaseVisitor {
       throw new UnsupportedOperationException("unknown operator")
   }
 
-  override def visitExpr_not(ctx: sql.Expr_notContext): Type = visit(ctx.expr).Not()
+  override def visitExpr_not(ctx: sql.Expr_notContext): MType = visit(ctx.expr).Not()
 
-  override def visitExpr_recurse(ctx: sql.Expr_recurseContext): Type =
+  override def visitExpr_recurse(ctx: sql.Expr_recurseContext): MType =
     if (ctx.expr)
       visit(ctx.expr)
     else if (ctx.other)
@@ -111,14 +112,14 @@ trait ExpressionVisitor extends BaseVisitor {
         case Success(value) => value
         case Failure(exception) =>
           if (context.errorSkip)
-            new Null()
+            MNull.get()
           else
             throw exception
       }
     else
       throw new UnsupportedOperationException("unknown operator")
 
-  override def visitExpr_case(ctx: sql.Expr_caseContext): Type = {
+  override def visitExpr_case(ctx: sql.Expr_caseContext): MType = {
     val switch =
       if (ctx.case_r.ex_switch)
         Some(visit(ctx.case_r.ex_switch))
@@ -135,39 +136,39 @@ trait ExpressionVisitor extends BaseVisitor {
     })
     if (ctx.case_r.ex_else)
       return visit(ctx.case_r.ex_else)
-    new Null() // TODO default result if no condition matched (mb exception?)
+    MNull.get() // TODO default result if no condition matched (mb exception?)
   }
 
-  override def visitExpr_index(ctx: sql.Expr_indexContext): Type = {
+  override def visitExpr_index(ctx: sql.Expr_indexContext): MType = {
     val col = visit(ctx.collection)
     col match {
-      case x: collection => x(visit(ctx.index))
-      case _             => throw new NoSuchMethodException("only collections supports access by index")
+      case x: MCollection => x(visit(ctx.index))
+      case _              => throw new NoSuchMethodException("only collections supports access by index")
     }
   }
 
-  override def visitExpr_lambda(ctx: sql.Expr_lambdaContext): Type = {
+  override def visitExpr_lambda(ctx: sql.Expr_lambdaContext): MType = {
     val pNames = ctx.lambda.ident.asScala.map(n => visit(n).toString).toList
-    new SqlLambda(pNames, ctx.lambda.block, this.tokenStream)
+    new MLambda(pNames, ctx.lambda.block, this.tokenStream)
   }
 
-  override def visitExpr_await(ctx: sql.Expr_awaitContext): Type = {
+  override def visitExpr_await(ctx: sql.Expr_awaitContext): MType = {
     val res =
       if (ctx.await.func)
         visit(ctx.await.func)
       else
         visit(ctx.await.`var`)
-    if (res.isInstanceOf[SqlAsync])
-      res.asInstanceOf[SqlAsync].await()
+    if (res.isInstanceOf[MAsync])
+      res.asInstanceOf[MAsync].await()
     else
       throw new IllegalCallerException("can await only async call")
   }
 
-  override def visitExpr_func(ctx: sql.Expr_funcContext): Type = {
+  override def visitExpr_func(ctx: sql.Expr_funcContext): MType = {
     visit(ctx.func)
   }
 
-  override def visitFunc(ctx: sql.FuncContext): Type = {
+  override def visitFunc(ctx: sql.FuncContext): MType = {
     val funcName = visit(ctx.ident).toString
     // TODO: add the implicit cast
     val args: Seq[Object] =
@@ -185,7 +186,7 @@ trait ExpressionVisitor extends BaseVisitor {
           Nil
       }).toMap
     if (ctx.T_ASYNC) {
-      new SqlAsync(
+      new MAsync(
         FunctionInvoker.invokeAsync(context.functions.toMap, funcName, List[Object](context), args.toList, kwargs)
       )
     } else {
@@ -195,14 +196,14 @@ trait ExpressionVisitor extends BaseVisitor {
     }
   }
 
-  override def visitExprSpecFuncCast(ctx: sql.ExprSpecFuncCastContext): Type = {
+  override def visitExprSpecFuncCast(ctx: sql.ExprSpecFuncCastContext): MType = {
     if (ctx.dtype.primitive_type)
       castPrimitive(visit(ctx.expr), ctx.dtype.primitive_type)
     else
       throw new UnsupportedOperationException("unknown type")
   }
 
-  def castPrimitive(value: Type, to: sql.Primitive_typeContext): Type = {
+  def castPrimitive(value: MType, to: sql.Primitive_typeContext): MType = {
     if (to.T_STRING)
       typeConversion.to_string(value)
     else if (to.T_INT)

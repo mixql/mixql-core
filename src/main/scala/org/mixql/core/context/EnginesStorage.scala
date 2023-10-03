@@ -3,7 +3,7 @@ package org.mixql.core.context
 import scala.reflect.ClassTag
 import scala.collection.mutable.{Map => MutMap}
 import org.mixql.core.engine.Engine
-import org.mixql.core.context.gtype._
+import org.mixql.core.context.mtype._
 
 object EnginesStorage {
 
@@ -57,25 +57,25 @@ final class EnginesStorage(e: MutMap[String, Engine] = MutMap[String, Engine](),
     enginesParams += engine.name -> prepareNewStorage()
   }
 
-  def setEngineParam(engineName: String, name: String, value: Type): Unit = {
+  def setEngineParam(engineName: String, name: String, value: MType): Unit = {
     if (!engines.contains(engineName))
       throw new NoSuchElementException(s"no engine with name: $engineName")
     enginesParams(engineName).setVar(name, value)
   }
 
-  def setEngineGlobalParam(engineName: String, name: String, value: Type): Unit = {
+  def setEngineGlobalParam(engineName: String, name: String, value: MType): Unit = {
     if (!engines.contains(engineName))
       throw new NoSuchElementException(s"no engine with name: $engineName")
     enginesParams(engineName).setGlobalVar(name, value)
   }
 
-  def getEngineParam(engineName: String, name: String): Type = {
+  def getEngineParam(engineName: String, name: String): MType = {
     if (!engines.contains(engineName))
       throw new NoSuchElementException(s"no engine with name: $engineName")
     enginesParams(engineName).getVar(name)
   }
 
-  def getEngineParams(engineName: String): MutMap[String, Type] = {
+  def getEngineParams(engineName: String): MutMap[String, MType] = {
     if (!engines.contains(engineName))
       throw new NoSuchElementException(s"no engine with name: $engineName")
     enginesParams(engineName).collect()

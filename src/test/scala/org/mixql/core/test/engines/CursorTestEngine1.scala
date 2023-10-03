@@ -1,7 +1,7 @@
 package org.mixql.core.test.engines
 
-import org.mixql.core.context.{EngineContext, gtype}
-import org.mixql.core.context.gtype.{Type, array, gInt}
+import org.mixql.core.context.EngineContext
+import org.mixql.core.context.mtype._
 import org.mixql.core.engine.Engine
 
 class CursorTestEngine1 extends Engine {
@@ -11,20 +11,21 @@ class CursorTestEngine1 extends Engine {
 
   val rand = new scala.util.Random
 
-  override def executeImpl(stmt: String, ctx: EngineContext): Type = {
+  override def executeImpl(stmt: String, ctx: EngineContext): MType = {
     query = stmt
-    new array(
-      Array[Type](
-        new gInt(rand.nextInt()),
-        new gInt(rand.nextInt()),
-        new gInt(rand.nextInt()),
-        new gInt(rand.nextInt()),
-        new gInt(rand.nextInt()),
-        new gInt(rand.nextInt()),
-        new gInt(rand.nextInt())
+    new MArray(
+      Array[MType](
+        new MInt(rand.nextInt()),
+        new MInt(rand.nextInt()),
+        new MInt(rand.nextInt()),
+        new MInt(rand.nextInt()),
+        new MInt(rand.nextInt()),
+        new MInt(rand.nextInt()),
+        new MInt(rand.nextInt())
       )
     )
   }
 
-  override def executeFuncImpl(name: String, ctx: EngineContext, kwargs: Map[String, Object], params: Type*): Type = ???
+  override def executeFuncImpl(name: String, ctx: EngineContext, kwargs: Map[String, Object], params: MType*): MType =
+    ???
 }

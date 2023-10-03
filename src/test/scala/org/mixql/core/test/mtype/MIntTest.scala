@@ -1,14 +1,14 @@
-package org.mixql.core.test.gtype
+package org.mixql.core.test.mtype
 
 import org.mixql.core.context.Context
-import org.mixql.core.context.gtype.{bool, gInt, string}
+import org.mixql.core.context.mtype._
 import org.mixql.core.engine.Engine
 import org.mixql.core.test.MainVisitorBaseTest
 import org.mixql.core.test.engines.StubEngine
 
 import scala.collection.mutable.{Map => MutMap}
 
-class GIntTest extends MainVisitorBaseTest {
+class MIntTest extends MainVisitorBaseTest {
 
   test("Test add for int") {
     Int.MaxValue
@@ -19,8 +19,8 @@ class GIntTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
 
     val res1 = context.getVar("res")
-    assert(res1.isInstanceOf[gInt])
-    assert(res1.asInstanceOf[gInt].getValue == 3)
+    assert(res1.isInstanceOf[MInt])
+    assert(res1.asInstanceOf[MInt].getValue == 3)
   }
 
   test("Test subtract for int") {
@@ -32,8 +32,8 @@ class GIntTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
 
     val res1 = context.getVar("res")
-    assert(res1.isInstanceOf[gInt])
-    assert(res1.asInstanceOf[gInt].getValue == -1)
+    assert(res1.isInstanceOf[MInt])
+    assert(res1.asInstanceOf[MInt].getValue == -1)
   }
 
   test("Test multiply for int") {
@@ -45,8 +45,8 @@ class GIntTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
 
     val res1 = context.getVar("res")
-    assert(res1.isInstanceOf[gInt])
-    assert(res1.asInstanceOf[gInt].getValue == 6)
+    assert(res1.isInstanceOf[MInt])
+    assert(res1.asInstanceOf[MInt].getValue == 6)
   }
 
   test("Test divide for int") {
@@ -58,8 +58,8 @@ class GIntTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
 
     val res1 = context.getVar("res")
-    assert(res1.isInstanceOf[gInt])
-    assert(res1.asInstanceOf[gInt].getValue == 2)
+    assert(res1.isInstanceOf[MInt])
+    assert(res1.asInstanceOf[MInt].getValue == 2)
   }
 
   test("Test non-integer division for int") {
@@ -71,8 +71,8 @@ class GIntTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
 
     val res1 = context.getVar("res")
-    assert(res1.isInstanceOf[gInt])
-    assert(res1.asInstanceOf[gInt].getValue == 3)
+    assert(res1.isInstanceOf[MInt])
+    assert(res1.asInstanceOf[MInt].getValue == 3)
   }
 
   test("Test > for int") {
@@ -84,8 +84,8 @@ class GIntTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
 
     val res1 = context.getVar("res")
-    assert(res1.isInstanceOf[bool])
-    assert(res1.asInstanceOf[bool].getValue == true)
+    assert(res1.isInstanceOf[MBool])
+    assert(res1.asInstanceOf[MBool].getValue == true)
   }
 
   test("Test >= for int") {
@@ -97,8 +97,8 @@ class GIntTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
 
     val res1 = context.getVar("res")
-    assert(res1.isInstanceOf[bool])
-    assert(res1.asInstanceOf[bool].getValue)
+    assert(res1.isInstanceOf[MBool])
+    assert(res1.asInstanceOf[MBool].getValue)
   }
 
   test("Test < for int") {
@@ -110,8 +110,8 @@ class GIntTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
 
     val res1 = context.getVar("res")
-    assert(res1.isInstanceOf[bool])
-    assert(!res1.asInstanceOf[bool].getValue)
+    assert(res1.isInstanceOf[MBool])
+    assert(!res1.asInstanceOf[MBool].getValue)
   }
 
   test("Test <= for int") {
@@ -123,8 +123,8 @@ class GIntTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
 
     val res1 = context.getVar("res")
-    assert(res1.isInstanceOf[bool])
-    assert(res1.asInstanceOf[bool].getValue)
+    assert(res1.isInstanceOf[MBool])
+    assert(res1.asInstanceOf[MBool].getValue)
   }
 
   test("Test == for int") {
@@ -136,8 +136,8 @@ class GIntTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
 
     val res1 = context.getVar("res")
-    assert(res1.isInstanceOf[bool])
-    assert(res1.asInstanceOf[bool].getValue)
+    assert(res1.isInstanceOf[MBool])
+    assert(res1.asInstanceOf[MBool].getValue)
   }
 
   test("Test == for int (false case)") {
@@ -149,8 +149,8 @@ class GIntTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
 
     val res1 = context.getVar("res")
-    assert(res1.isInstanceOf[bool])
-    assert(!res1.asInstanceOf[bool].getValue)
+    assert(res1.isInstanceOf[MBool])
+    assert(!res1.asInstanceOf[MBool].getValue)
   }
 
   test("Test != for int") {
@@ -162,8 +162,8 @@ class GIntTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
 
     val res1 = context.getVar("res")
-    assert(res1.isInstanceOf[bool])
-    assert(res1.asInstanceOf[bool].getValue)
+    assert(res1.isInstanceOf[MBool])
+    assert(res1.asInstanceOf[MBool].getValue)
   }
 
   test("Test != for int (false case)") {
@@ -175,8 +175,8 @@ class GIntTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
 
     val res1 = context.getVar("res")
-    assert(res1.isInstanceOf[bool])
-    assert(!res1.asInstanceOf[bool].getValue)
+    assert(res1.isInstanceOf[MBool])
+    assert(!res1.asInstanceOf[MBool].getValue)
   }
 
   test("Test int to string") {
@@ -188,8 +188,8 @@ class GIntTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
 
     val res1 = context.getVar("res")
-    assert(res1.isInstanceOf[string])
-    assert(res1.asInstanceOf[string].getValue == "100a")
+    assert(res1.isInstanceOf[MString])
+    assert(res1.asInstanceOf[MString].getValue == "100a")
   }
 
   test("Test cast int to string") {
@@ -201,8 +201,8 @@ class GIntTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
 
     val res1 = context.getVar("res")
-    assert(res1.isInstanceOf[string])
-    assert(res1.asInstanceOf[string].getValue == "1")
+    assert(res1.isInstanceOf[MString])
+    assert(res1.asInstanceOf[MString].getValue == "1")
   }
 
   test("Test maxInt") {
@@ -214,8 +214,8 @@ class GIntTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
 
     val res1 = context.getVar("res")
-    assert(res1.isInstanceOf[gInt])
-    assert(res1.asInstanceOf[gInt].getValue == 2147483647)
+    assert(res1.isInstanceOf[MInt])
+    assert(res1.asInstanceOf[MInt].getValue == 2147483647)
   }
 
   test("Test maxLong") {
@@ -227,8 +227,8 @@ class GIntTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
 
     val res1 = context.getVar("res")
-    assert(res1.isInstanceOf[gInt])
-    assert(res1.asInstanceOf[gInt].getValue == 9223372036854775807L)
+    assert(res1.isInstanceOf[MInt])
+    assert(res1.asInstanceOf[MInt].getValue == 9223372036854775807L)
   }
 
   ignore("Test big integer") {
@@ -240,8 +240,8 @@ class GIntTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
 
     val res1 = context.getVar("res")
-    assert(res1.isInstanceOf[string])
-    assert(res1.asInstanceOf[string].getValue == "10000000000000000000")
+    assert(res1.isInstanceOf[MString])
+    assert(res1.asInstanceOf[MString].getValue == "10000000000000000000")
   }
 
   test("Test getLong from function") {
@@ -259,8 +259,8 @@ class GIntTest extends MainVisitorBaseTest {
     context.addFunction("getint", getLong)
     runMainVisitor(code, context)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[gInt])
-    assert(res.asInstanceOf[gInt].getValue == 42)
+    assert(res.isInstanceOf[MInt])
+    assert(res.asInstanceOf[MInt].getValue == 42)
   }
 
   test("Test getInt from function") {
@@ -278,8 +278,8 @@ class GIntTest extends MainVisitorBaseTest {
     context.addFunction("getint", getInt)
     runMainVisitor(code, context)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[gInt])
-    assert(res.asInstanceOf[gInt].getValue == 42)
+    assert(res.isInstanceOf[MInt])
+    assert(res.asInstanceOf[MInt].getValue == 42)
   }
 
   test("Test getInt from function with int param") {
@@ -297,8 +297,8 @@ class GIntTest extends MainVisitorBaseTest {
     context.addFunction("getint", getInt)
     runMainVisitor(code, context)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[gInt])
-    assert(res.asInstanceOf[gInt].getValue == 1234)
+    assert(res.isInstanceOf[MInt])
+    assert(res.asInstanceOf[MInt].getValue == 1234)
   }
 
   test("Test getInt from function with long param") {
@@ -316,8 +316,8 @@ class GIntTest extends MainVisitorBaseTest {
     context.addFunction("getint", getInt)
     runMainVisitor(code, context)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[gInt])
-    assert(res.asInstanceOf[gInt].getValue == 123)
+    assert(res.isInstanceOf[MInt])
+    assert(res.asInstanceOf[MInt].getValue == 123)
   }
 
   test("Test getInt from function with mixed param") {
@@ -335,8 +335,8 @@ class GIntTest extends MainVisitorBaseTest {
     context.addFunction("getint", getInt)
     runMainVisitor(code, context)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[gInt])
-    assert(res.asInstanceOf[gInt].getValue == 100)
+    assert(res.isInstanceOf[MInt])
+    assert(res.asInstanceOf[MInt].getValue == 100)
   }
 
   test("Test getInt with long variable args length") {
@@ -352,8 +352,8 @@ class GIntTest extends MainVisitorBaseTest {
     context.addFunction("getint", variableArgIntFunc)
     runMainVisitor(code, context)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[gInt])
-    assert(res.asInstanceOf[gInt].getValue == 10)
+    assert(res.isInstanceOf[MInt])
+    assert(res.asInstanceOf[MInt].getValue == 10)
   }
 
   test("Test getInt with int variable args length") {
@@ -369,7 +369,7 @@ class GIntTest extends MainVisitorBaseTest {
     context.addFunction("getint", variableArgIntFunc)
     runMainVisitor(code, context)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[gInt])
-    assert(res.asInstanceOf[gInt].getValue == 10)
+    assert(res.isInstanceOf[MInt])
+    assert(res.asInstanceOf[MInt].getValue == 10)
   }
 }

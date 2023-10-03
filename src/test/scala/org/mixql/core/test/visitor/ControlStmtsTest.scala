@@ -1,7 +1,7 @@
 package org.mixql.core.test.visitor
 
 import org.mixql.core.test.MainVisitorBaseTest
-import org.mixql.core.context.gtype._
+import org.mixql.core.context.mtype._
 import org.mixql.core.engine.Engine
 import org.mixql.core.context.{Context, EngineContext}
 import org.mixql.core
@@ -25,8 +25,8 @@ class ControlStmtsTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[string])
-    assert(res.asInstanceOf[string].getValue == "if")
+    assert(res.isInstanceOf[MString])
+    assert(res.asInstanceOf[MString].getValue == "if")
   }
 
   test("Test if: elif") {
@@ -42,8 +42,8 @@ class ControlStmtsTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[string])
-    assert(res.asInstanceOf[string].getValue == "elif")
+    assert(res.isInstanceOf[MString])
+    assert(res.asInstanceOf[MString].getValue == "elif")
   }
 
   test("Test if: else") {
@@ -59,8 +59,8 @@ class ControlStmtsTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[string])
-    assert(res.asInstanceOf[string].getValue == "else")
+    assert(res.isInstanceOf[MString])
+    assert(res.asInstanceOf[MString].getValue == "else")
   }
 
   test("Test while") {
@@ -75,8 +75,8 @@ class ControlStmtsTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[string])
-    assert(res.asInstanceOf[string].getValue == "01234")
+    assert(res.isInstanceOf[MString])
+    assert(res.asInstanceOf[MString].getValue == "01234")
   }
 
   test("Test while, continue") {
@@ -92,11 +92,11 @@ class ControlStmtsTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[string])
-    assert(res.asInstanceOf[string].getValue == "")
+    assert(res.isInstanceOf[MString])
+    assert(res.asInstanceOf[MString].getValue == "")
     val x = context.getVar("x")
-    assert(x.isInstanceOf[gInt])
-    assert(x.asInstanceOf[gInt].getValue == 5)
+    assert(x.isInstanceOf[MInt])
+    assert(x.asInstanceOf[MInt].getValue == 5)
   }
 
   test("Test while break") {
@@ -112,8 +112,8 @@ class ControlStmtsTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("x")
-    assert(res.isInstanceOf[gInt])
-    assert(res.asInstanceOf[gInt].getValue == 1)
+    assert(res.isInstanceOf[MInt])
+    assert(res.asInstanceOf[MInt].getValue == 1)
   }
 
   test("Test for range") {
@@ -128,8 +128,8 @@ class ControlStmtsTest extends MainVisitorBaseTest {
     val i = context.getVar("i")
     assert(isNone(i))
     val res = context.getVar("res")
-    assert(res.isInstanceOf[string])
-    assert(res.asInstanceOf[string].getValue == "13579111315171920")
+    assert(res.isInstanceOf[MString])
+    assert(res.asInstanceOf[MString].getValue == "13579111315171920")
   }
 
   test("Test for range reverse") {
@@ -144,8 +144,8 @@ class ControlStmtsTest extends MainVisitorBaseTest {
     val i = context.getVar("i")
     assert(isNone(i))
     val res = context.getVar("res")
-    assert(res.isInstanceOf[string])
-    assert(res.asInstanceOf[string].getValue == "20181614121086421")
+    assert(res.isInstanceOf[MString])
+    assert(res.asInstanceOf[MString].getValue == "20181614121086421")
   }
 
   test("Test for range continue") {
@@ -161,11 +161,11 @@ class ControlStmtsTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val i = context.getVar("count")
-    assert(i.isInstanceOf[gInt])
-    assert(i.asInstanceOf[gInt].getValue == 11)
+    assert(i.isInstanceOf[MInt])
+    assert(i.asInstanceOf[MInt].getValue == 11)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[string])
-    assert(res.asInstanceOf[string].getValue == "")
+    assert(res.isInstanceOf[MString])
+    assert(res.asInstanceOf[MString].getValue == "")
   }
 
   test("Test for range break") {
@@ -181,11 +181,11 @@ class ControlStmtsTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val i = context.getVar("count")
-    assert(i.isInstanceOf[gInt])
-    assert(i.asInstanceOf[gInt].getValue == 1)
+    assert(i.isInstanceOf[MInt])
+    assert(i.asInstanceOf[MInt].getValue == 1)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[string])
-    assert(res.asInstanceOf[string].getValue == "")
+    assert(res.isInstanceOf[MString])
+    assert(res.asInstanceOf[MString].getValue == "")
   }
 
   test("Test for in cursor: array") {
@@ -200,8 +200,8 @@ class ControlStmtsTest extends MainVisitorBaseTest {
     val i = context.getVar("i")
     assert(isNone(i))
     val res = context.getVar("res")
-    assert(res.isInstanceOf[string])
-    assert(res.asInstanceOf[string].getValue == "135")
+    assert(res.isInstanceOf[MString])
+    assert(res.asInstanceOf[MString].getValue == "135")
   }
 
   test("Test for in cursor continue: array") {
@@ -217,11 +217,11 @@ class ControlStmtsTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val count = context.getVar("count")
-    assert(count.isInstanceOf[gInt])
-    assert(count.asInstanceOf[gInt].getValue == 3)
+    assert(count.isInstanceOf[MInt])
+    assert(count.asInstanceOf[MInt].getValue == 3)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[string])
-    assert(res.asInstanceOf[string].getValue == "")
+    assert(res.isInstanceOf[MString])
+    assert(res.asInstanceOf[MString].getValue == "")
   }
 
   test("Test for in cursor break: array") {
@@ -237,11 +237,11 @@ class ControlStmtsTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val count = context.getVar("count")
-    assert(count.isInstanceOf[gInt])
-    assert(count.asInstanceOf[gInt].getValue == 1)
+    assert(count.isInstanceOf[MInt])
+    assert(count.asInstanceOf[MInt].getValue == 1)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[string])
-    assert(res.asInstanceOf[string].getValue == "")
+    assert(res.isInstanceOf[MString])
+    assert(res.asInstanceOf[MString].getValue == "")
   }
 
   test("Test change engine") {
@@ -252,10 +252,12 @@ class ControlStmtsTest extends MainVisitorBaseTest {
     class Other extends Engine {
       override def name: String = "other"
 
-      override def executeImpl(stmt: String, ctx: EngineContext): Type = ???
+      override def executeImpl(stmt: String, ctx: EngineContext): MType = ???
 
-      override def executeFuncImpl(name: String, ctx: EngineContext, kwargs: Map[String, Object], params: Type*): Type =
-        ???
+      override def executeFuncImpl(name: String,
+                                   ctx: EngineContext,
+                                   kwargs: Map[String, Object],
+                                   params: MType*): MType = ???
 
     }
     val context = runMainVisitor(code, Context(MutMap("stub" -> new StubEngine, "stub1" -> new Other), "stub"))
@@ -296,9 +298,9 @@ class ControlStmtsTest extends MainVisitorBaseTest {
     class Other extends StubEngine {
       override def name: String = "stub"
 
-      override def executeImpl(stmt: String, ctx: EngineContext): Type = {
+      override def executeImpl(stmt: String, ctx: EngineContext): MType = {
         queue += stmt + " spark.execution.memory=" + ctx.getVar("spark.execution.memory").toString
-        new Null()
+        MNull.get()
       }
     }
 
@@ -316,10 +318,10 @@ class ControlStmtsTest extends MainVisitorBaseTest {
   test("Test run on other engine with params") {
     class StubEngineWithParam extends StubEngine {
       var sem = ""
-      override def executeImpl(stmt: String, ctx: EngineContext): Type = {
+      override def executeImpl(stmt: String, ctx: EngineContext): MType = {
         queue += stmt
         sem = ctx.context.getParams("stub1")("spark.execution.memory").toString
-        new Null()
+        MNull.get()
       }
     }
     val code =
@@ -373,17 +375,17 @@ class ControlStmtsTest extends MainVisitorBaseTest {
                 """.stripMargin
 
     class Other extends StubEngine {
-      override def executeImpl(stmt: String, ctx: EngineContext): Type = {
+      override def executeImpl(stmt: String, ctx: EngineContext): MType = {
         throw new NullPointerException("hello")
       }
     }
     val context = runMainVisitor(code, Context(MutMap("stub" -> new Other), "stub"))
     val res = context.getVar("res")
-    assert(res.isInstanceOf[string])
-    assert(res.asInstanceOf[string].getValue == "NullPointerException")
+    assert(res.isInstanceOf[MString])
+    assert(res.asInstanceOf[MString].getValue == "NullPointerException")
     val res_msg = context.getVar("res_msg")
-    assert(res_msg.isInstanceOf[string])
-    assert(res_msg.asInstanceOf[string].getValue == "hello")
+    assert(res_msg.isInstanceOf[MString])
+    assert(res_msg.asInstanceOf[MString].getValue == "hello")
 
     assert(isNone(context.getVar("ex")))
   }
@@ -400,11 +402,11 @@ class ControlStmtsTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[string])
-    assert(res.asInstanceOf[string].getValue == "gg")
+    assert(res.isInstanceOf[MString])
+    assert(res.asInstanceOf[MString].getValue == "gg")
     val res_msg = context.getVar("res_msg")
-    assert(res_msg.isInstanceOf[string])
-    assert(res_msg.asInstanceOf[string].getValue == "wp")
+    assert(res_msg.isInstanceOf[MString])
+    assert(res_msg.asInstanceOf[MString].getValue == "wp")
 
     assert(isNone(context.getVar("ex")))
   }
@@ -419,8 +421,8 @@ class ControlStmtsTest extends MainVisitorBaseTest {
         |$x + $y;
                 """.stripMargin
     val res = core.run(code, Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub"))
-    assert(res.isInstanceOf[gInt])
-    assert(res.asInstanceOf[gInt].getValue == 1)
+    assert(res.isInstanceOf[MInt])
+    assert(res.asInstanceOf[MInt].getValue == 1)
   }
 
   test("Test multiple assigment") {
@@ -430,11 +432,11 @@ class ControlStmtsTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res1 = context.getVar("res1")
-    assert(res1.isInstanceOf[gInt])
-    assert(res1.asInstanceOf[gInt].getValue == 1)
+    assert(res1.isInstanceOf[MInt])
+    assert(res1.asInstanceOf[MInt].getValue == 1)
     val res2 = context.getVar("res2")
-    assert(res2.isInstanceOf[gInt])
-    assert(res2.asInstanceOf[gInt].getValue == 2)
+    assert(res2.isInstanceOf[MInt])
+    assert(res2.asInstanceOf[MInt].getValue == 2)
   }
 
   test("Test multiple assigment: unpack array") {
@@ -444,11 +446,11 @@ class ControlStmtsTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res1 = context.getVar("res1")
-    assert(res1.isInstanceOf[gInt])
-    assert(res1.asInstanceOf[gInt].getValue == 1)
+    assert(res1.isInstanceOf[MInt])
+    assert(res1.asInstanceOf[MInt].getValue == 1)
     val res2 = context.getVar("res2")
-    assert(res2.isInstanceOf[gInt])
-    assert(res2.asInstanceOf[gInt].getValue == 2)
+    assert(res2.isInstanceOf[MInt])
+    assert(res2.asInstanceOf[MInt].getValue == 2)
   }
 
   test("Test multiple assigment: foreach") {
@@ -462,7 +464,7 @@ class ControlStmtsTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[gInt])
-    assert(res.asInstanceOf[gInt].getValue == 21)
+    assert(res.isInstanceOf[MInt])
+    assert(res.asInstanceOf[MInt].getValue == 21)
   }
 }

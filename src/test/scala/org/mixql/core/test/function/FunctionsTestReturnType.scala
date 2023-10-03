@@ -1,7 +1,7 @@
 package org.mixql.core.test.function
 
 import org.mixql.core.context.Context
-import org.mixql.core.context.gtype.{array, cursor, gInt, none}
+import org.mixql.core.context.mtype._
 import org.mixql.core.engine.Engine
 import org.mixql.core.logger.logInfo
 import org.mixql.core.test.MainVisitorBaseTest
@@ -14,19 +14,19 @@ class FunctionsTestReturnType extends MainVisitorBaseTest {
   object SimpleFuncs {
 
     val simple_func_return_none = {
-      new ((Context) => none) {
+      new ((Context) => MNone) {
 
-        override def apply(ctx: Context): none = {
-          new none()
+        override def apply(ctx: Context): MNone = {
+          MNone.get()
         }
       }
 
     }
 
     val simple_func_return_cursor = {
-      new ((Context) => cursor) {
+      new ((Context) => MCursorBase) {
 
-        override def apply(ctx: Context): cursor = {
+        override def apply(ctx: Context): MCursorBase = {
           new CursorTest3()
         }
       }
@@ -34,7 +34,7 @@ class FunctionsTestReturnType extends MainVisitorBaseTest {
     }
   }
 
-  val functions: collection.mutable.Map[String, Any] = collection.mutable.Map(
+  val functions: mutable.Map[String, Any] = mutable.Map(
     "simple_func_return_none" -> SimpleFuncs.simple_func_return_none,
     "simple_func_return_cursor" -> SimpleFuncs.simple_func_return_cursor
   )
@@ -52,7 +52,7 @@ class FunctionsTestReturnType extends MainVisitorBaseTest {
     )
 
     val foo = context.getVar("foo")
-    assert(foo.isInstanceOf[none])
+    assert(foo.isInstanceOf[MNone])
   }
 
   test("Test simple function that return mixql type cursor") {
@@ -85,14 +85,14 @@ class FunctionsTestReturnType extends MainVisitorBaseTest {
     )
 
     val arrRAW = context.getVar("arr")
-    assert(arrRAW.isInstanceOf[array])
+    assert(arrRAW.isInstanceOf[MArray])
 
-    val arr = arrRAW.asInstanceOf[array]
+    val arr = arrRAW.asInstanceOf[MArray]
 
     assert(arr.size().getValue == 10)
 
     arr.getArr.foreach(value => {
-      assert(value.isInstanceOf[gInt])
+      assert(value.isInstanceOf[MInt])
     })
 
   }

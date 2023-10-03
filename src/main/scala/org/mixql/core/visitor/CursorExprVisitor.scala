@@ -3,14 +3,14 @@ package org.mixql.core.visitor
 import org.mixql.core.context.Context
 import org.antlr.v4.runtime.TokenStream
 import org.mixql.core.generated.sql
-import org.mixql.core.context.gtype.Type
+import org.mixql.core.context.mtype._
 import scala.collection.JavaConverters._
 
 import scala.util.Try
 
 class CursorExprVisitor(ctx: Context, tokens: TokenStream) extends MainVisitor(ctx, tokens) {
 
-  override def executeOther(stmt: String, engine: sql.Choose_engineContext): Try[Type] =
+  override def executeOther(stmt: String, engine: sql.Choose_engineContext): Try[MType] =
     Try {
       if (engine) {
         // execute on custom engine

@@ -1,6 +1,6 @@
 package org.mixql.core.test.visitor
 
-import org.mixql.core.context.gtype._
+import org.mixql.core.context.mtype._
 import org.mixql.core.test.MainVisitorBaseTest
 import org.mixql.core.test.engines.StubEngine
 import org.mixql.core.context.Context
@@ -18,8 +18,8 @@ class ExpressionTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[string])
-    assert(res.asInstanceOf[string].getValue == "")
+    assert(res.isInstanceOf[MString])
+    assert(res.asInstanceOf[MString].getValue == "")
   }
 
   test("Test arithmetic expression") {
@@ -31,8 +31,8 @@ class ExpressionTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[gDouble])
-    assert(res.asInstanceOf[gDouble].getValue == 0.5)
+    assert(res.isInstanceOf[MDouble])
+    assert(res.asInstanceOf[MDouble].getValue == 0.5)
   }
 
   test("Test bool expression") {
@@ -44,12 +44,12 @@ class ExpressionTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[bool])
-    assert(res.asInstanceOf[bool].getValue == false)
+    assert(res.isInstanceOf[MBool])
+    assert(res.asInstanceOf[MBool].getValue == false)
 
     val res1 = context.getVar("res1")
-    assert(res1.isInstanceOf[bool])
-    assert(res1.asInstanceOf[bool].getValue == true)
+    assert(res1.isInstanceOf[MBool])
+    assert(res1.asInstanceOf[MBool].getValue == true)
   }
 
   test("Test string expression") {
@@ -59,8 +59,8 @@ class ExpressionTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[string])
-    assert(res.asInstanceOf[string].getValue == "one2true")
+    assert(res.isInstanceOf[MString])
+    assert(res.asInstanceOf[MString].getValue == "one2true")
   }
 
   test("Test case then expression") {
@@ -70,8 +70,8 @@ class ExpressionTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[gDouble])
-    assert(res.asInstanceOf[gDouble].getValue == -1.5)
+    assert(res.isInstanceOf[MDouble])
+    assert(res.asInstanceOf[MDouble].getValue == -1.5)
   }
 
   test("Test case else expression") {
@@ -82,8 +82,8 @@ class ExpressionTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[string])
-    assert(res.asInstanceOf[string].getValue == "false")
+    assert(res.isInstanceOf[MString])
+    assert(res.asInstanceOf[MString].getValue == "false")
   }
 
   test("Test case switch expression") {
@@ -94,8 +94,8 @@ class ExpressionTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[bool])
-    assert(res.asInstanceOf[bool].getValue == true)
+    assert(res.isInstanceOf[MBool])
+    assert(res.asInstanceOf[MBool].getValue == true)
   }
 
   test("Test some java code in expression bracketed") {
@@ -129,8 +129,8 @@ class ExpressionTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[gDouble])
-    assert(res.asInstanceOf[gDouble].getValue == 8.5)
+    assert(res.isInstanceOf[MDouble])
+    assert(res.asInstanceOf[MDouble].getValue == 8.5)
   }
 
   test("Test int + string") {
@@ -142,8 +142,8 @@ class ExpressionTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[string])
-    assert(res.asInstanceOf[string].getValue == "57.5")
+    assert(res.isInstanceOf[MString])
+    assert(res.asInstanceOf[MString].getValue == "57.5")
   }
 
   test("Test double + string") {
@@ -155,8 +155,8 @@ class ExpressionTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[string])
-    assert(res.asInstanceOf[string].getValue == "5.5gg")
+    assert(res.isInstanceOf[MString])
+    assert(res.asInstanceOf[MString].getValue == "5.5gg")
   }
 
   test("Test bool + string") {
@@ -168,8 +168,8 @@ class ExpressionTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[string])
-    assert(res.asInstanceOf[string].getValue == "truegg")
+    assert(res.isInstanceOf[MString])
+    assert(res.asInstanceOf[MString].getValue == "truegg")
   }
 
   test("Test cast to bool") {
@@ -184,14 +184,14 @@ class ExpressionTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res1 = context.getVar("res1")
-    assert(res1.isInstanceOf[bool])
-    assert(res1.asInstanceOf[bool].getValue == true)
+    assert(res1.isInstanceOf[MBool])
+    assert(res1.asInstanceOf[MBool].getValue == true)
     val res2 = context.getVar("res2")
-    assert(res2.isInstanceOf[bool])
-    assert(res2.asInstanceOf[bool].getValue == false)
+    assert(res2.isInstanceOf[MBool])
+    assert(res2.asInstanceOf[MBool].getValue == false)
     val res3 = context.getVar("res3")
-    assert(res3.isInstanceOf[bool])
-    assert(res3.asInstanceOf[bool].getValue == true)
+    assert(res3.isInstanceOf[MBool])
+    assert(res3.asInstanceOf[MBool].getValue == true)
   }
 
   test("Test cast to int") {
@@ -206,14 +206,14 @@ class ExpressionTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res1 = context.getVar("res1")
-    assert(res1.isInstanceOf[gInt])
-    assert(res1.asInstanceOf[gInt].getValue == 1)
+    assert(res1.isInstanceOf[MInt])
+    assert(res1.asInstanceOf[MInt].getValue == 1)
     val res2 = context.getVar("res2")
-    assert(res2.isInstanceOf[gInt])
-    assert(res2.asInstanceOf[gInt].getValue == 12)
+    assert(res2.isInstanceOf[MInt])
+    assert(res2.asInstanceOf[MInt].getValue == 12)
     val res3 = context.getVar("res3")
-    assert(res3.isInstanceOf[gInt])
-    assert(res3.asInstanceOf[gInt].getValue == 1)
+    assert(res3.isInstanceOf[MInt])
+    assert(res3.asInstanceOf[MInt].getValue == 1)
   }
 
   test("Test cast to double") {
@@ -228,14 +228,14 @@ class ExpressionTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res1 = context.getVar("res1")
-    assert(res1.isInstanceOf[gDouble])
-    assert(res1.asInstanceOf[gDouble].getValue == 1.0)
+    assert(res1.isInstanceOf[MDouble])
+    assert(res1.asInstanceOf[MDouble].getValue == 1.0)
     val res2 = context.getVar("res2")
-    assert(res2.isInstanceOf[gDouble])
-    assert(res2.asInstanceOf[gDouble].getValue == 17.9)
+    assert(res2.isInstanceOf[MDouble])
+    assert(res2.asInstanceOf[MDouble].getValue == 17.9)
     val res3 = context.getVar("res3")
-    assert(res3.isInstanceOf[gDouble])
-    assert(res3.asInstanceOf[gDouble].getValue == 11.0)
+    assert(res3.isInstanceOf[MDouble])
+    assert(res3.asInstanceOf[MDouble].getValue == 11.0)
   }
 
   test("Test cast to string") {
@@ -250,14 +250,14 @@ class ExpressionTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res1 = context.getVar("res1")
-    assert(res1.isInstanceOf[string])
-    assert(res1.asInstanceOf[string].getValue == "true")
+    assert(res1.isInstanceOf[MString])
+    assert(res1.asInstanceOf[MString].getValue == "true")
     val res2 = context.getVar("res2")
-    assert(res2.isInstanceOf[string])
-    assert(res2.asInstanceOf[string].getValue == "17.9")
+    assert(res2.isInstanceOf[MString])
+    assert(res2.asInstanceOf[MString].getValue == "17.9")
     val res3 = context.getVar("res3")
-    assert(res3.isInstanceOf[string])
-    assert(res3.asInstanceOf[string].getValue == "11")
+    assert(res3.isInstanceOf[MString])
+    assert(res3.asInstanceOf[MString].getValue == "11")
   }
 
   test("Test array literal") {
@@ -267,11 +267,11 @@ class ExpressionTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[array])
-    val arr = res.asInstanceOf[array]
-    assert(arr.apply(new gInt(0)).Equal(new bool(true)).asInstanceOf[bool].getValue)
-    assert(arr.apply(new gInt(1)).Equal(new string("gg")).asInstanceOf[bool].getValue)
-    assert(arr.apply(new gInt(2)).Equal(new gInt(12)).asInstanceOf[bool].getValue)
+    assert(res.isInstanceOf[MArray])
+    val arr = res.asInstanceOf[MArray]
+    assert(arr.apply(new MInt(0)).Equal(new MBool(true)).asInstanceOf[MBool].getValue)
+    assert(arr.apply(new MInt(1)).Equal(new MString("gg")).asInstanceOf[MBool].getValue)
+    assert(arr.apply(new MInt(2)).Equal(new MInt(12)).asInstanceOf[MBool].getValue)
   }
 
   test("Test array get/set by index") {
@@ -284,13 +284,13 @@ class ExpressionTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res1 = context.getVar("res1")
-    assert(res1.isInstanceOf[bool])
-    assert(res1.asInstanceOf[bool].Equal(new bool(true)).asInstanceOf[bool].getValue)
+    assert(res1.isInstanceOf[MBool])
+    assert(res1.asInstanceOf[MBool].Equal(new MBool(true)).asInstanceOf[MBool].getValue)
     val res2 = context.getVar("res2")
-    assert(res2.isInstanceOf[bool])
+    assert(res2.isInstanceOf[MBool])
     assert(
       (
-        res2.asInstanceOf[bool].Equal(new bool(false)).asInstanceOf[bool].getValue
+        res2.asInstanceOf[MBool].Equal(new MBool(false)).asInstanceOf[MBool].getValue
       )
     )
   }
@@ -305,12 +305,12 @@ class ExpressionTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[array])
-    val arr = res.asInstanceOf[array]
+    assert(res.isInstanceOf[MArray])
+    val arr = res.asInstanceOf[MArray]
     logDebug("arr size: " + arr.size)
-    assert(arr.size.Equal(new gInt(5)).asInstanceOf[bool].getValue)
-    assert(arr(new gInt(0)).Equal(new gInt(1)).asInstanceOf[bool].getValue)
-    assert(arr(new gInt(4)).Equal(new string("last")).asInstanceOf[bool].getValue)
+    assert(arr.size.Equal(new MInt(5)).asInstanceOf[MBool].getValue)
+    assert(arr(new MInt(0)).Equal(new MInt(1)).asInstanceOf[MBool].getValue)
+    assert(arr(new MInt(4)).Equal(new MString("last")).asInstanceOf[MBool].getValue)
   }
 
   test("Test concat 2 arrays") {
@@ -322,11 +322,11 @@ class ExpressionTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[array])
-    val arr = res.asInstanceOf[array]
-    assert(arr.size.Equal(new gInt(2)).asInstanceOf[bool].getValue)
-    assert(arr(new gInt(0)).Equal(new bool(true)).asInstanceOf[bool].getValue)
-    assert(arr(new gInt(1)).Equal(new bool(false)).asInstanceOf[bool].getValue)
+    assert(res.isInstanceOf[MArray])
+    val arr = res.asInstanceOf[MArray]
+    assert(arr.size.Equal(new MInt(2)).asInstanceOf[MBool].getValue)
+    assert(arr(new MInt(0)).Equal(new MBool(true)).asInstanceOf[MBool].getValue)
+    assert(arr(new MInt(1)).Equal(new MBool(false)).asInstanceOf[MBool].getValue)
   }
 
   test("Test index priority") {
@@ -339,14 +339,14 @@ class ExpressionTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res1 = context.getVar("res1")
-    assert(res1.isInstanceOf[array])
-    val arr = res1.asInstanceOf[array]
-    assert(arr.size.Equal(new gInt(2)).asInstanceOf[bool].getValue)
-    assert(arr(new gInt(0)).Equal(new gInt(1)).asInstanceOf[bool].getValue)
-    assert(arr(new gInt(1)).Equal(new gInt(2)).asInstanceOf[bool].getValue)
+    assert(res1.isInstanceOf[MArray])
+    val arr = res1.asInstanceOf[MArray]
+    assert(arr.size.Equal(new MInt(2)).asInstanceOf[MBool].getValue)
+    assert(arr(new MInt(0)).Equal(new MInt(1)).asInstanceOf[MBool].getValue)
+    assert(arr(new MInt(1)).Equal(new MInt(2)).asInstanceOf[MBool].getValue)
     val res2 = context.getVar("res2")
-    assert(res2.isInstanceOf[gInt])
-    assert(res2.asInstanceOf[gInt].getValue == 1)
+    assert(res2.isInstanceOf[MInt])
+    assert(res2.asInstanceOf[MInt].getValue == 1)
   }
 
   test("Test call lambda") {
@@ -357,8 +357,8 @@ class ExpressionTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[gInt])
-    val i = res.asInstanceOf[gInt]
+    assert(res.isInstanceOf[MInt])
+    val i = res.asInstanceOf[MInt]
     assert(i.getValue == 6)
   }
 
@@ -375,8 +375,8 @@ class ExpressionTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res2 = context.getVar("res")
-    assert(res2.isInstanceOf[bool])
-    assert(res2.asInstanceOf[bool].Equal(new bool(false)).asInstanceOf[bool].getValue)
+    assert(res2.isInstanceOf[MBool])
+    assert(res2.asInstanceOf[MBool].Equal(new MBool(false)).asInstanceOf[MBool].getValue)
   }
 
   test("Test map literal") {
@@ -387,11 +387,11 @@ class ExpressionTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[map])
-    val mapa = res.asInstanceOf[map]
+    assert(res.isInstanceOf[MMap])
+    val mapa = res.asInstanceOf[MMap]
     assert(mapa.size.getValue == 2)
-    assert(mapa(new gInt(1)).Equal(new gInt(1)).asInstanceOf[bool].getValue)
-    assert(mapa(new string("1")).Equal(new gInt(2)).asInstanceOf[bool].getValue)
+    assert(mapa(new MInt(1)).Equal(new MInt(1)).asInstanceOf[MBool].getValue)
+    assert(mapa(new MString("1")).Equal(new MInt(2)).asInstanceOf[MBool].getValue)
   }
 
   test("Test map get/set by index") {
@@ -405,11 +405,11 @@ class ExpressionTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res1 = context.getVar("res1")
-    assert(res1.isInstanceOf[gInt])
-    assert(res1.asInstanceOf[gInt].Equal(new gInt(1)).asInstanceOf[bool].getValue)
+    assert(res1.isInstanceOf[MInt])
+    assert(res1.asInstanceOf[MInt].Equal(new MInt(1)).asInstanceOf[MBool].getValue)
     val res2 = context.getVar("res2")
-    assert(res2.isInstanceOf[bool])
-    assert(res2.asInstanceOf[bool].Equal(new bool(false)).asInstanceOf[bool].getValue)
+    assert(res2.isInstanceOf[MBool])
+    assert(res2.asInstanceOf[MBool].Equal(new MBool(false)).asInstanceOf[MBool].getValue)
   }
 
   test("Test map pack/unpack in lambda") {
@@ -426,8 +426,8 @@ class ExpressionTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res2 = context.getVar("res")
-    assert(res2.isInstanceOf[bool])
-    assert(res2.asInstanceOf[bool].Equal(new bool(false)).asInstanceOf[bool].getValue)
+    assert(res2.isInstanceOf[MBool])
+    assert(res2.asInstanceOf[MBool].Equal(new MBool(false)).asInstanceOf[MBool].getValue)
   }
 
   test("Test call engine specific function") {
@@ -437,8 +437,8 @@ class ExpressionTest extends MainVisitorBaseTest {
                 """.stripMargin
     val context = runMainVisitor(code)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[gInt])
-    assert(res.asInstanceOf[gInt].getValue == 42)
+    assert(res.isInstanceOf[MInt])
+    assert(res.asInstanceOf[MInt].getValue == 42)
   }
 
   test("Test call function uses context") {
@@ -452,14 +452,14 @@ class ExpressionTest extends MainVisitorBaseTest {
       new ((String, Long, Context) => Long) {
         override def apply(str: String, num: Long, context: Context): Long = {
           val a = context.getVar("a")
-          a.asInstanceOf[gInt].getValue + num
+          a.asInstanceOf[MInt].getValue + num
         }
       }
     context.addFunction("testcontext", testContext)
     runMainVisitor(code, context)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[gInt])
-    assert(res.asInstanceOf[gInt].getValue == 42)
+    assert(res.isInstanceOf[MInt])
+    assert(res.asInstanceOf[MInt].getValue == 42)
   }
 
   test("Test call function params by names") {
@@ -473,13 +473,13 @@ class ExpressionTest extends MainVisitorBaseTest {
       new ((String, Long, Context) => Long) {
         override def apply(str: String, num: Long, context: Context): Long = {
           val a = context.getVar("a")
-          a.asInstanceOf[gInt].getValue + num
+          a.asInstanceOf[MInt].getValue + num
         }
       }
     context.addFunction("testcontext", testContext)
     runMainVisitor(code, context)
     val res = context.getVar("res")
-    assert(res.isInstanceOf[gInt])
-    assert(res.asInstanceOf[gInt].getValue == 42)
+    assert(res.isInstanceOf[MInt])
+    assert(res.asInstanceOf[MInt].getValue == 42)
   }
 }

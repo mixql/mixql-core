@@ -1,9 +1,10 @@
-package org.mixql.core.context.gtype;
+package org.mixql.core.context.mtype;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class string extends Type {
+public class MString extends MType {
+
     String value;
 
     public String getValue() {
@@ -16,11 +17,11 @@ public class string extends Type {
         return quote;
     }
 
-    public string(String value) {
+    public MString(String value) {
         this.value = value;
     }
 
-    public string(String value, String quote) {
+    public MString(String value, String quote) {
         this.value = value;
         this.quote = quote;
     }
@@ -47,8 +48,8 @@ public class string extends Type {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof string) {
-            int res = ((string) obj).value.compareTo(value);
+        if (obj instanceof MString) {
+            int res = ((MString) obj).value.compareTo(value);
             if (res == 0)
                 return true;
             else
@@ -65,34 +66,34 @@ public class string extends Type {
     }
 
     @Override
-    public Type Add(Type other) {
-        if (other instanceof string) {
-            string otherStr = (string) other;
+    public MType Add(MType other) {
+        if (other instanceof MString) {
+            MString otherStr = (MString) other;
             String q = otherStr.quote;
             if (quote != "") q = quote;
-            return new string(value + otherStr.value, q);
+            return new MString(value + otherStr.value, q);
         }
 
-        if (other instanceof array) {
-            Type[] _t = ((array) other).getArr();
-            ArrayList<Type> t = new ArrayList<>(Arrays.asList(_t));
+        if (other instanceof MArray) {
+            MType[] _t = ((MArray) other).getArr();
+            ArrayList<MType> t = new ArrayList<>(Arrays.asList(_t));
             t.add(0, this);
-            return (new array(t.toArray(_t)));
+            return (new MArray(t.toArray(_t)));
         }
 
-        return new string(value + other.toString(), quote);
+        return new MString(value + other.toString(), quote);
     }
 
     @Override
     // TODO attention do we need type check?
-    public Type Equal(Type other) {
-        return new bool(this.equals(other));
+    public MType Equal(MType other) {
+        return new MBool(this.equals(other));
     }
 
 
     // TODO attention do we need type check?
     @Override
-    public Type NotEqual(Type other) {
-        return new bool(value != other.toString());
+    public MType NotEqual(MType other) {
+        return new MBool(value != other.toString());
     }
 }
