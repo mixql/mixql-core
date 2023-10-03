@@ -16,7 +16,7 @@ trait ControlStmtsVisitor extends BaseVisitor {
   def toUserSqlException(e: Throwable): MException = {
     if (e.isInstanceOf[MException])
       return e.asInstanceOf[MException]
-    return new MException(e.getClass.getSimpleName, e.getMessage)
+    return new MException(e)
   }
 
   override def visitTry_catch_stmt(ctx: sql.Try_catch_stmtContext): MType = {
@@ -41,7 +41,7 @@ trait ControlStmtsVisitor extends BaseVisitor {
         if (controlState == ControlContext.RETURN)
           return block
     }
-    new MNull()
+    MNull.get()
   }
 
   override def visitIf_stmt(ctx: sql.If_stmtContext): MType = {
@@ -57,14 +57,14 @@ trait ControlStmtsVisitor extends BaseVisitor {
       if (ctx.else_block)
         visit(ctx.else_block.block)
       else
-        new MNull()
+        MNull.get()
     }
   }
 
   // TODO maybe better realisation using for?
   override def visitFor_range_stmt(ctx: sql.For_range_stmtContext): MType = {
     // super.visitFor_range_stmt(ctx)
-    var result: MType = new MNull
+    var result: MType = MNull.get
     val i_name = visit(ctx.ident).toString
     val old = context.getVar(i_name)
     var i =
@@ -125,11 +125,11 @@ trait ControlStmtsVisitor extends BaseVisitor {
       execFetchBlockInFor(fetchRes, ctx)
       fetchRes = cursor.fetch()
     }
-    new MNull
+    MNull.get()
   }
 
   def execFetchBlockInFor(inRes: MType, ctx: sql.For_cursor_stmtContext): MType = {
-    var result: MType = new MNull
+    var result: MType = MNull.get()
     ctx.ident.size match {
       case 1 =>
         val cursorName = visit(ctx.ident(0)).toString
@@ -156,7 +156,7 @@ trait ControlStmtsVisitor extends BaseVisitor {
   }
 
   def execBlockInFor(inRes: MCollection, ctx: sql.For_cursor_stmtContext): MType = {
-    var result: MType = new MNull
+    var result: MType = MNull.get()
     inRes match {
       case c: MArray =>
         ctx.ident.size match {
@@ -269,6 +269,6 @@ trait ControlStmtsVisitor extends BaseVisitor {
         condition = visit(ctx.expr)
       }
     }
-    new MNull()
+    MNull.get()
   }
 }

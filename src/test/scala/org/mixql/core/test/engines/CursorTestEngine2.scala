@@ -17,7 +17,7 @@ class CursorTestEngine2 extends Engine {
     throw new Exception("execute was triggered instead of executeCursor")
   }
 
-  override def getCursorImpl(stmt: String, ctx: EngineContext): cursor = {
+  override def getCursorImpl(stmt: String, ctx: EngineContext): MCursorBase = {
     query = stmt
     new CursorTest2(this, stmt: String)
   }
@@ -26,7 +26,7 @@ class CursorTestEngine2 extends Engine {
     ???
 }
 
-class CursorTest2(engine: CursorTestEngine2, stmt: String) extends cursor {
+class CursorTest2(engine: CursorTestEngine2, stmt: String) extends MCursorBase {
 
   val countToFetch = 10;
   var currentCount = 0;
@@ -52,6 +52,6 @@ class CursorTest2(engine: CursorTestEngine2, stmt: String) extends cursor {
       currentCount = currentCount + 1;
       new MInt(stream.nextInt())
     } else
-      new MNone()
+      MNone.get()
   }
 }

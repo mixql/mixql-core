@@ -64,9 +64,9 @@ trait LiteralVisitor extends BaseVisitor {
     else
       throw new IllegalArgumentException("unknown bool literal")
 
-  override def visitLiteral_null(ctx: sql.Literal_nullContext): MType = new MNull()
+  override def visitLiteral_null(ctx: sql.Literal_nullContext): MType = MNull.get()
 
-  override def visitLiteral_none(ctx: sql.Literal_noneContext): MType = new MNone()
+  override def visitLiteral_none(ctx: sql.Literal_noneContext): MType = MNone.get()
 
   override def visitLiteral_current_date(ctx: sql.Literal_current_dateContext): MType = {
     new MString(LocalDate.now().toString)

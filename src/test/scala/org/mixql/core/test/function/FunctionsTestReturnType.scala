@@ -17,16 +17,16 @@ class FunctionsTestReturnType extends MainVisitorBaseTest {
       new ((Context) => MNone) {
 
         override def apply(ctx: Context): MNone = {
-          new MNone()
+          MNone.get()
         }
       }
 
     }
 
     val simple_func_return_cursor = {
-      new ((Context) => cursor) {
+      new ((Context) => MCursorBase) {
 
-        override def apply(ctx: Context): cursor = {
+        override def apply(ctx: Context): MCursorBase = {
           new CursorTest3()
         }
       }

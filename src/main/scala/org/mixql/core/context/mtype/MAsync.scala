@@ -13,11 +13,10 @@ final class MAsync(val fut: Future[Any]) extends MType {
     try {
       pack(Await.result(fut, Duration.Inf))
     } catch {
-      case e: MException => e
-      case e: InvocationTargetException =>
-        new MException(e.getCause.getClass.getSimpleName, e.getCause.getMessage)
-      case e: ExecutionException => new MException(e.getCause.getClass.getSimpleName, e.getCause.getMessage)
-      case e: Throwable          => new MException(e.getClass.getSimpleName, e.getMessage)
+      case e: MException                => e
+      case e: InvocationTargetException => new MException(e.getCause)
+      case e: ExecutionException        => new MException(e.getCause)
+      case e: Throwable                 => new MException(e)
     }
   }
 }

@@ -15,6 +15,14 @@ import scala.annotation.meta.param
 
 object Context {
 
+  /** names of mixql params
+    */
+  private object const {
+    val executionEngine = "mixql.execution.engine"
+    val variablesInit = "mixql.variables.init"
+    val errorSkip = "mixql.error.skip"
+  }
+
   val defaultFunctions: MutMap[String, Any] = MutMap[String, Any](
     "ascii" -> StringFunction.ascii,
     "base64" -> StringFunction.base64,
@@ -59,15 +67,15 @@ object Context {
             variablesInit: MutMap[String, MType] = MutMap[String, MType]()): Context = {
     val eng = EnginesStorage(engines += "interpolator" -> new Interpolator)
     val vars = VariablesStorage(initVariables(variablesInit))
-    vars.setVar("mixql.execution.engine", new MString(defaultEngine))
+    vars.setVar(const.executionEngine, new MString(defaultEngine))
     new Context(eng, vars, defaultFunctions ++ functionsInit, true)
   }
 
   private def initVariables(variablesInit: MutMap[String, MType]): MutMap[String, MType] = {
     val config = ConfigFactory.load()
     val mixqlParams = initMixqlParams(config)
-    if (config.hasPath("mixql.variables.init")) {
-      val confVars = parseConfig(config.getObject("mixql.variables.init"))
+    if (config.hasPath(const.variablesInit)) {
+      val confVars = parseConfig(config.getObject(const.variablesInit))
       mixqlParams ++= confVars
     }
     mixqlParams ++= variablesInit
@@ -77,11 +85,11 @@ object Context {
   private def initMixqlParams(config: Config): MutMap[String, MType] = {
     val result: MutMap[String, MType] = MutMap[String, MType]()
 
-    val errorSkip = config.getBoolean("mixql.error.skip")
-    result += "mixql.error.skip" -> new MBool(errorSkip)
+    val errorSkip = config.getBoolean(const.errorSkip)
+    result += const.errorSkip -> new MBool(errorSkip)
 
-    val currentEngineAllias = config.getString("mixql.execution.engine")
-    result += "mixql.execution.engine" -> new MString(currentEngineAllias)
+    val currentEngineAllias = config.getString(const.executionEngine)
+    result += const.executionEngine -> new MString(currentEngineAllias)
 
     result
   }
@@ -110,12 +118,14 @@ class Context(eng: EnginesStorage,
               private var isMainThread: Boolean = false)
     extends java.lang.AutoCloseable {
 
+  import Context.const
+
   /** current engine name
     *
     * @return
     *   mixql.execution.engine param value
     */
-  def currentEngineAllias: String = getVar("mixql.execution.engine").toString
+  def currentEngineAllias: String = getVar(const.executionEngine).toString
 
   /** current engine name
     *
@@ -132,7 +142,7 @@ class Context(eng: EnginesStorage,
     *   mixql.error.skip param value
     */
   def errorSkip: Boolean =
-    getVar("mixql.error.skip") match {
+    getVar(const.errorSkip) match {
       case t: MBool => t.getValue
       case _: MType => throw new Exception("something wrong mixql.error.skip must be bool")
     }
@@ -170,7 +180,7 @@ class Context(eng: EnginesStorage,
       case None        => throw new NoSuchElementException(s"no engine with name: $name")
       case Some(value) =>
     }
-    variables.setVar("mixql.execution.engine", new MString(name))
+    variables.setVar(const.executionEngine, new MString(name))
   }
 
   /** Set current engine by name that registered in this context. Throws
@@ -188,7 +198,7 @@ class Context(eng: EnginesStorage,
       case Some(value) =>
     }
     params.foreach(p => engines.setEngineParam(name, p._1, p._2))
-    variables.setVar("mixql.execution.engine", new MString(name))
+    variables.setVar(const.executionEngine, new MString(name))
   }
 
   /** register engine by this name. If there was other engine with this name it

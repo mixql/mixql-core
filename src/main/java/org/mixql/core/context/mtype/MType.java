@@ -1,6 +1,7 @@
 package org.mixql.core.context.mtype;
 
 public abstract class MType extends Exception {
+
     // +
     public MType Add(MType other) {
         throw new UnsupportedOperationException(

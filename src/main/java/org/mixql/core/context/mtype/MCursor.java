@@ -5,7 +5,7 @@ import org.mixql.core.context.Context;
 import org.mixql.core.generated.sql;
 import org.mixql.core.visitor.CursorExprVisitor;
 
-public class MCursor extends cursor {
+public class MCursor extends MCursorBase {
 //    Context gCtx = null;
 //    TokenStream tokens = null;
 
@@ -24,8 +24,8 @@ public class MCursor extends cursor {
             return new MBool(true);
         } else {
             source = exprVisitor.visit(ctx);
-            if (source instanceof cursor) {
-                return ((cursor) source).open();
+            if (source instanceof MCursorBase) {
+                return ((MCursorBase) source).open();
             }
             return new MBool(true);
         }
@@ -33,8 +33,8 @@ public class MCursor extends cursor {
 
     @Override
     public MBool close() {
-        if (source instanceof cursor) {
-            return ((cursor) source).close();
+        if (source instanceof MCursorBase) {
+            return ((MCursorBase) source).close();
         }
         return new MBool(true);
     }
@@ -48,15 +48,15 @@ public class MCursor extends cursor {
     public MType fetch() throws Exception {
         if (!openWasTriggered)
             throw new Exception("Can not fetch from cursor, when open was not called");
-        if (source instanceof cursor) {
-            return ((cursor) source).fetch();
+        if (source instanceof MCursorBase) {
+            return ((MCursorBase) source).fetch();
         }
 
         if (source instanceof MArray) {
             MArray arr = (MArray) source;
             MInt arr_size = arr.size();
             if (arr_size.value == 0)
-                return new MNone();
+                return MNone.get();
 
             if (arr_index == -1) {
                 arr_index = 0;
@@ -67,7 +67,7 @@ public class MCursor extends cursor {
                 return elem;
             }
 
-            return new MNone();
+            return MNone.get();
         }
 
         if (source instanceof MMap) {
@@ -80,7 +80,7 @@ public class MCursor extends cursor {
             }
 
             if (mSize == 0)
-                return new MNone();
+                return MNone.get();
 
             if (keySetIndex == -1) {
                 keySetIndex = 0;
@@ -91,7 +91,7 @@ public class MCursor extends cursor {
                         new MType[]{keySet[keySetIndex], m.apply(keySet[keySetIndex++])}
                 );
             }
-            return new MNone();
+            return MNone.get();
         }
 
         throw new Exception("Expexted source of type array or map for cursor, not type: " +

@@ -49,7 +49,7 @@ final class VariablesStorage(variablesInit: MutMap[String, MType] = MutMap[Strin
       curr_storage = curr_storage.parent
       result = curr_storage.scope.get(name)
     }
-    result.getOrElse(new MNone())
+    result.getOrElse(MNone.get())
   }
 
   def setVar(name: String, value: MType): Unit = {

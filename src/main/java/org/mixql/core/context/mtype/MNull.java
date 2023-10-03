@@ -4,6 +4,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class MNull extends MType {
+
+    private MNull() {}
+
+    private static MNull value = new MNull();
+
+    public static MNull get() {
+        return value;
+    }
+
     @Override
     public String toString() {
         return "null";

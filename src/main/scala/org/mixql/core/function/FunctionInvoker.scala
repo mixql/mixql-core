@@ -160,11 +160,11 @@ object FunctionInvoker {
                 if (ptype.getName == ctx.getClass.getName || ptype == ctx.getClass) {
                   lb += ctx
                   addedArg = true
-                  throw new BrakeException
+                  throw new BreakException
                 }
               )
             } catch {
-              case _: BrakeException =>
+              case _: BreakException =>
               case e: Exception      => throw e
             }
           }

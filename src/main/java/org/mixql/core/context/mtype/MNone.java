@@ -2,6 +2,14 @@ package org.mixql.core.context.mtype;
 
 public class MNone extends MType {
 
+    private MNone() {}
+
+    private static MNone value = new MNone();
+
+    public static MNone get() {
+        return value;
+    }
+
     @Override
     public String toString() {
         return "none";

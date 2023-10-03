@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class MString extends MType {
+
     String value;
 
     public String getValue() {

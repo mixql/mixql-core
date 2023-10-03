@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MMap extends MCollection {
+
     Map<MType, MType> m = new HashMap<>();
 
     public Map<MType, MType> getMap() {
@@ -39,7 +40,7 @@ public class MMap extends MCollection {
             } catch (Exception e) {
             }
         }
-        return new MNull();
+        return MNull.get();
     }
 
     @Override

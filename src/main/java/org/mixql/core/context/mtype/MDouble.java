@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class MDouble extends MType {
+
     double value;
 
     public double getValue(){
         return value;
     }
-
 
     public MDouble(double value) {
         this.value = value;

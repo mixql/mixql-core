@@ -43,8 +43,8 @@ package object mtype {
     def to_bool(a: MType): MBool = {
       a match {
         case value: MBool => value
-        case t: MDouble  => t.getValue != 0
-        case t: MInt     => t.getValue != 0
+        case t: MDouble   => t.getValue != 0
+        case t: MInt      => t.getValue != 0
         case t: MString =>
           if (t.getValue.toLowerCase == "true")
             true
@@ -58,7 +58,7 @@ package object mtype {
             )
           }
         case _: MNull => throw new NullPointerException("cannot convert null to bool")
-        case value   => throw new ClassCastException(s"cannot convert ${value.getClass.getSimpleName} to bool")
+        case value    => throw new ClassCastException(s"cannot convert ${value.getClass.getSimpleName} to bool")
       }
     }
 
@@ -71,8 +71,8 @@ package object mtype {
             0
         case t: MDouble  => new MInt(t.getValue.toInt)
         case value: MInt => value
-        case t: MString   => new MInt(t.getValue.toInt)
-        case _: MNull     => throw new NullPointerException("cannot convert null to int")
+        case t: MString  => new MInt(t.getValue.toInt)
+        case _: MNull    => throw new NullPointerException("cannot convert null to int")
         case value       => throw new ClassCastException(s"cannot convert ${value.getClass.getSimpleName} to int")
       }
     }
@@ -86,8 +86,8 @@ package object mtype {
             0
         case value: MDouble => value
         case t: MInt        => t.getValue.toDouble
-        case t: MString      => t.getValue.toDouble
-        case _: MNull        => throw new NullPointerException("cannot convert null to double")
+        case t: MString     => t.getValue.toDouble
+        case _: MNull       => throw new NullPointerException("cannot convert null to double")
         case value          => throw new ClassCastException(s"cannot convert ${value.getClass.getSimpleName} to double")
       }
     }
@@ -96,19 +96,19 @@ package object mtype {
   def isNull(a: MType): Boolean =
     a match {
       case _: MNull => true
-      case _       => false
+      case _        => false
     }
 
   def isNone(a: MType): Boolean =
     a match {
       case _: MNone => true
-      case _       => false
+      case _        => false
     }
 
   def pack(a: Any): MType = {
     a match {
-      case p: MType       => p
-      case null          => new MNull()
+      case p: MType      => p
+      case null          => MNull.get()
       case p: String     => new MString(p)
       case p: Int        => new MInt(p)
       case p: Long       => new MInt(p)
@@ -127,15 +127,15 @@ package object mtype {
     import scala.collection.JavaConverters._
     a match {
       case e: MException => e
-      case _: MNull             => null
-      case t: MString           => t.getValue
-      case t: MInt             => t.getValue
-      case t: MDouble          => t.getValue
-      case t: MBool             => t.getValue
-      case t: MArray            => t.getArr.map(unpack)
-      case t: MMap              => t.getMap.asScala.map(kv => unpack(kv._1) -> unpack(kv._2)).toMap
-      case v: MLambda        => v
-      case a: MAsync         => a.fut
+      case _: MNull      => null
+      case t: MString    => t.getValue
+      case t: MInt       => t.getValue
+      case t: MDouble    => t.getValue
+      case t: MBool      => t.getValue
+      case t: MArray     => t.getArr.map(unpack)
+      case t: MMap       => t.getMap.asScala.map(kv => unpack(kv._1) -> unpack(kv._2)).toMap
+      case v: MLambda    => v
+      case a: MAsync     => a.fut
     }
   }
 }

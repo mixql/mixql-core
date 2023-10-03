@@ -14,7 +14,7 @@ class StubEngine extends Engine {
 
   override def executeImpl(stmt: String, ctx: EngineContext): MType = {
     queue += stmt
-    new MNull()
+    MNull.get()
   }
 
   override def executeFuncImpl(name: String, ctx: EngineContext, kwargs: Map[String, Object], params: MType*): MType = {

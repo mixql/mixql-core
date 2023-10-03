@@ -31,7 +31,7 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
   override def visitProgram(ctx: sql.ProgramContext): MType = visit(ctx.block)
 
   override def visitBlock(ctx: sql.BlockContext): MType = {
-    var res: MType = new MNull()
+    var res: MType = MNull.get()
     ctx.statment.asScala.foreach(stmt => {
       res = visit(stmt)
       if (controlState == ControlContext.CONTINUE) {
@@ -60,14 +60,14 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
           case collection: MCollection => execBlockInFor(collection, ctx)
           case _ =>
             logWarn("\"visitFor_cursor_stmt\": cursor must be collection. Ignore executing of for block")
-            new MNull()
+            MNull.get()
           //            throw new IllegalArgumentException("cursor must be collection")
         }
       }
     }
   }
 
-  override def visitEmpty_stmt(x: sql.Empty_stmtContext): MType = new MNull()
+  override def visitEmpty_stmt(x: sql.Empty_stmtContext): MType = MNull.get()
 
   override def visitReturn_stmt(ctx: sql.Return_stmtContext): MType = {
     val res = visit(ctx.expr)
@@ -76,13 +76,13 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
   }
 
   override def visitBreak_stmt(ctx: sql.Break_stmtContext): MType = {
-    val res = new MNull
+    val res = MNull.get()
     controlState = ControlContext.BREAK
     res
   }
 
   override def visitContinue_stmt(ctx: sql.Continue_stmtContext): MType = {
-    val res = new MNull
+    val res = MNull.get()
     controlState = ControlContext.CONTINUE
     res
   }
@@ -117,7 +117,7 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
     } else {
       context.setCurrentEngine(engine_name)
     }
-    new MNull()
+    MNull.get()
   }
 
   override def visitAssigment_default(ctx: sql.Assigment_defaultContext): MType = {
@@ -129,14 +129,14 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
       logDebug("visitAssigment_default: value: " + value)
       context.setVar(visit(ctx.ident).toString, value)
     }
-    new MNull()
+    MNull.get()
   }
 
   override def visitOpen_cursor_stmt(ctx: Open_cursor_stmtContext): MBool = {
     val cursor_name = visit(ctx.ident).toString
     val cursor = context.getVar(cursor_name)
     cursor match {
-      case cursor1: cursor => cursor1.open()
+      case cursor: MCursorBase => cursor.open()
       case _ =>
         throw new Exception(
           "You can only open cursor, not other type: " +
@@ -149,9 +149,9 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
     val cursor_name = visit(ctx.ident).toString
     val cursor = context.getVar(cursor_name)
     cursor match {
-      case cursor1: cursor =>
-        val res = cursor1.close()
-        if (res.getValue) { context.setVar(cursor_name, new MNull()) }
+      case cursor: MCursorBase =>
+        val res = cursor.close()
+        if (res.getValue) { context.setVar(cursor_name, MNull.get()) }
         res
       case _ =>
         throw new Exception(
@@ -165,8 +165,8 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
     val cursor_name = visit(ctx.ident).toString
     val cursor = context.getVar(cursor_name)
     cursor match {
-      case cursor1: cursor =>
-        val res = cursor1.fetch()
+      case cursor: MCursorBase =>
+        val res = cursor.fetch()
         logDebug("visitExpr_fetch_cursor: returning from fetch " + res)
         res
       case _ =>
@@ -182,7 +182,7 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
       case x: MCollection => x.update(visit(ctx.index), visit(ctx.value))
       case _              => throw new NoSuchMethodException("only collections supports access by index")
     }
-    new MNull()
+    MNull.get()
   }
 
   override def visitAssigment_multiple(ctx: sql.Assigment_multipleContext): MType = {
@@ -202,12 +202,12 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
           case _ => throw new IllegalArgumentException("cannot unpack non array expression")
         }
     }
-    new MNull()
+    MNull.get()
   }
 
   override def visitPrint_stmt(ctx: sql.Print_stmtContext): MType = {
     println("[USER PRINT]: " + visit(ctx.expr).toString)
-    new MNull()
+    MNull.get()
   }
 
   override def visitOther_stmt(ctx: sql.Other_stmtContext): MType = {
@@ -215,7 +215,7 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
       case Success(value) => value
       case Failure(exception) =>
         if (context.errorSkip)
-          new MNull()
+          MNull.get()
         else
           throw exception
     }

@@ -39,7 +39,7 @@ abstract class Engine {
     * @return
     *   the result of execution as cursor
     */
-  final def getCursor(stmt: String, ctx: EngineContext): cursor = {
+  final def getCursor(stmt: String, ctx: EngineContext): MCursorBase = {
     if (!engineStarted)
       logInfo(s"Engine $name was triggered by execute request expecting cursor")
 
@@ -79,7 +79,7 @@ abstract class Engine {
 
   def executeImpl(stmt: String, ctx: EngineContext): MType
 
-  def getCursorImpl(stmt: String, ctx: EngineContext): cursor = {
+  def getCursorImpl(stmt: String, ctx: EngineContext): MCursorBase = {
     import org.mixql.core.logger
     logger.logWarn(
       s"getCursor was not defined in engine $name" +

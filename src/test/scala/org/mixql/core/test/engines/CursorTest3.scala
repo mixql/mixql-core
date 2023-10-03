@@ -5,7 +5,7 @@ import org.mixql.core.logger.logInfo
 
 import scala.util.Random
 
-class CursorTest3() extends cursor {
+class CursorTest3() extends MCursorBase {
 
   val countToFetch = 10;
   var currentCount = 0;
@@ -31,6 +31,6 @@ class CursorTest3() extends cursor {
       currentCount = currentCount + 1;
       new MInt(stream.nextInt())
     } else
-      new MNone()
+      MNone.get()
   }
 }

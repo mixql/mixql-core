@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class MBool extends MType {
+
     boolean value;
 
     public boolean getValue(){

@@ -300,7 +300,7 @@ class ControlStmtsTest extends MainVisitorBaseTest {
 
       override def executeImpl(stmt: String, ctx: EngineContext): MType = {
         queue += stmt + " spark.execution.memory=" + ctx.getVar("spark.execution.memory").toString
-        new MNull()
+        MNull.get()
       }
     }
 
@@ -321,7 +321,7 @@ class ControlStmtsTest extends MainVisitorBaseTest {
       override def executeImpl(stmt: String, ctx: EngineContext): MType = {
         queue += stmt
         sem = ctx.context.getParams("stub1")("spark.execution.memory").toString
-        new MNull()
+        MNull.get()
       }
     }
     val code =

@@ -88,7 +88,7 @@ trait BaseVisitor extends sqlBaseVisitor[MType] {
     }
   }
 
-  override def defaultResult(): MType = new MNull()
+  override def defaultResult(): MType = MNull.get()
 
   override def aggregateResult(aggregate: MType, nextResult: MType): MType = nextResult
 }

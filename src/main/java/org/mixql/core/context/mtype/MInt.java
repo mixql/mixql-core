@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class MInt extends MType {
+
     long value;
 
     public long getValue() {
@@ -21,7 +22,6 @@ public class MInt extends MType {
     public MInt(String value) {
         this.value = Long.parseLong(value);
     }
-
 
     @Override
     public String toString() {

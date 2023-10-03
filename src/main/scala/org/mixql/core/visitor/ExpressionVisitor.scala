@@ -112,7 +112,7 @@ trait ExpressionVisitor extends BaseVisitor {
         case Success(value) => value
         case Failure(exception) =>
           if (context.errorSkip)
-            new MNull()
+            MNull.get()
           else
             throw exception
       }
@@ -136,7 +136,7 @@ trait ExpressionVisitor extends BaseVisitor {
     })
     if (ctx.case_r.ex_else)
       return visit(ctx.case_r.ex_else)
-    new MNull() // TODO default result if no condition matched (mb exception?)
+    MNull.get() // TODO default result if no condition matched (mb exception?)
   }
 
   override def visitExpr_index(ctx: sql.Expr_indexContext): MType = {

@@ -23,7 +23,7 @@ object ConfigHelp {
 
   private def convertConfigValue(value: Object): MType = {
     if (value == null)
-      new MNull()
+      MNull.get()
     else if (value.isInstanceOf[Boolean])
       new MBool(value.asInstanceOf[Boolean])
     else if (value.isInstanceOf[String])

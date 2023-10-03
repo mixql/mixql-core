@@ -17,7 +17,7 @@ class ContextTest extends AnyFunSuite {
 
     override def executeImpl(stmt: String, ctx: EngineContext): MType = {
       query = stmt
-      new MNull()
+      MNull.get()
     }
 
     override def executeFuncImpl(name: String, ctx: EngineContext, kwargs: Map[String, Object], params: MType*): MType =
@@ -63,7 +63,7 @@ class ContextTest extends AnyFunSuite {
 
   test("Test add null var to context") {
     val context = Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
-    context.setVar("a", new MNull)
+    context.setVar("a", MNull.get())
     assert(isNull(context.getVar("a")))
   }
 
@@ -78,7 +78,7 @@ class ContextTest extends AnyFunSuite {
     context.setVar("a", new MString("value"))
     assert(context.getVar("a").isInstanceOf[MString])
     assert(context.getVar("a").asInstanceOf[MString].getValue == "value")
-    context.setVar("a", new MNull)
+    context.setVar("a", MNull.get())
     assert(isNull(context.getVar("a")))
   }
 
