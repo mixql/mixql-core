@@ -161,6 +161,34 @@ class LambdaTest extends MainVisitorBaseTest {
     assert(end.asInstanceOf[MInt].getValue == 12)
   }
 
+  test("Test set global var in lambda") {
+    val code =
+      """
+        |let res1 = 10;
+        |let res2 = [10];
+        |let test_ret = (x) -> begin
+        |  let global res1 = 20;
+        |  let global res2[0] = 25;
+        |  let global a1, a2 = [1, 2];
+        |  return 1;
+        |end;
+        |let gg = test_ret(1);
+                """.stripMargin
+    val context = runMainVisitor(code)
+    val res1 = context.getVar("res1")
+    assert(res1.isInstanceOf[MInt])
+    assert(res1.asInstanceOf[MInt].getValue == 20)
+    val res2 = context.getVar("res2")
+    assert(res2.isInstanceOf[MArray])
+    assert(res2.asInstanceOf[MArray].apply(new MInt(0)) == new MInt(25))
+    val a1 = context.getVar("a1")
+    assert(a1.isInstanceOf[MInt])
+    assert(a1.asInstanceOf[MInt].getValue == 1)
+    val a2 = context.getVar("a2")
+    assert(a2.isInstanceOf[MInt])
+    assert(a2.asInstanceOf[MInt].getValue == 2)
+  }
+
   test("Test lambda as param of lambda") {
     val code =
       """

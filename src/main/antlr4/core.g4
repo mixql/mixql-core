@@ -35,9 +35,9 @@ engine_params:
 print_stmt: T_PRINT T_OPEN_P expr T_CLOSE_P T_SEMICOLON;
 
 assigment_stmt:
-       T_LET ident T_COLON? T_EQUAL (T_CURSOR T_IS)? expr T_SEMICOLON                                       #assigment_default
-     | T_LET ident T_OPEN_SB index=expr T_CLOSE_SB T_COLON? T_EQUAL value=expr T_SEMICOLON #assigment_by_index
-     | T_LET ident (T_COMMA ident)* T_COLON? T_EQUAL expr (T_COMMA expr)* T_SEMICOLON      #assigment_multiple
+       T_LET T_GLOBAL? ident T_COLON? T_EQUAL (T_CURSOR T_IS)? expr T_SEMICOLON                      #assigment_default
+     | T_LET T_GLOBAL? ident T_OPEN_SB index=expr T_CLOSE_SB T_COLON? T_EQUAL value=expr T_SEMICOLON #assigment_by_index
+     | T_LET T_GLOBAL? ident (T_COMMA ident)* T_COLON? T_EQUAL expr (T_COMMA expr)* T_SEMICOLON      #assigment_multiple
      ;
 
 open_cursor_stmt:
@@ -347,7 +347,6 @@ non_reserved_words :                      // Tokens that are not reserved words 
      | T_FULL
      | T_FUNCTION
      | T_GET
-     | T_GLOBAL
      | T_GO
      | T_GRANT
      | T_GROUP

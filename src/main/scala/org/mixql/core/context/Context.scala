@@ -307,16 +307,26 @@ class Context(eng: EnginesStorage,
     }
   }
 
-  /** set variable value. if key starts with some engines name then this engines
-    * param updates by value
+  /** set variable value.
     *
     * @param key
-    *   the variable or engine param name
+    *   the name of variable or param
     * @param value
     *   the value of variable or param
     */
   def setVar(key: String, value: MType): Unit = {
     variables.setVar(key, value)
+  }
+
+  /** set global variable value.
+    *
+    * @param key
+    *   the name of variable or param
+    * @param value
+    *   the value of variable or param
+    */
+  def setGlobalVar(key: String, value: MType): Unit = {
+    variables.setGlobalVar(key, value)
   }
 
   /** get the variable value by name
@@ -328,6 +338,17 @@ class Context(eng: EnginesStorage,
     */
   def getVar(key: String): MType = {
     variables.getVar(key)
+  }
+
+  /** get the variable value by name
+    *
+    * @param key
+    *   variable name
+    * @return
+    *   variable value
+    */
+  def getGlobalVar(key: String): MType = {
+    variables.getGlobalVar(key)
   }
 
   /** get the param value by name for engine, if no param found var with this

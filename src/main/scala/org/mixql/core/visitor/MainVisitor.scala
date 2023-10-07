@@ -12,6 +12,7 @@ import scala.collection.mutable.{Map => MutMap}
 import scala.util.{Failure, Success}
 import scala.collection.JavaConverters._
 import org.mixql.core.exception.MException
+import scala.collection.mutable.Buffer
 
 /** it is not thread safe. if you need new multithread run new visitor for each
   *
@@ -120,18 +121,6 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
     MNull.get()
   }
 
-  override def visitAssigment_default(ctx: sql.Assigment_defaultContext): MType = {
-    if (ctx.T_CURSOR() != null && ctx.T_IS() != null) {
-      val cursor = new MCursor(context, tokenStream, ctx.expr())
-      context.setVar(visit(ctx.ident).toString, cursor)
-    } else {
-      val value = visit(ctx.expr)
-      logDebug("visitAssigment_default: value: " + value)
-      context.setVar(visit(ctx.ident).toString, value)
-    }
-    MNull.get()
-  }
-
   override def visitOpen_cursor_stmt(ctx: Open_cursor_stmtContext): MBool = {
     val cursor_name = visit(ctx.ident).toString
     val cursor = context.getVar(cursor_name)
@@ -177,8 +166,31 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
     }
   }
 
+  override def visitAssigment_default(ctx: sql.Assigment_defaultContext): MType = {
+    val value: MType =
+      if (ctx.T_CURSOR() != null && ctx.T_IS() != null) {
+        val value = new MCursor(context, tokenStream, ctx.expr())
+        logDebug("assign cursor")
+        value
+      } else {
+        val value = visit(ctx.expr)
+        logDebug("assign value: " + value)
+        value
+      }
+    if (ctx.T_GLOBAL)
+      context.setGlobalVar(visit(ctx.ident).toString, value)
+    else
+      context.setVar(visit(ctx.ident).toString, value)
+    MNull.get()
+  }
+
   override def visitAssigment_by_index(ctx: sql.Assigment_by_indexContext): MType = {
-    context.getVar(visit(ctx.ident).toString) match {
+    val coll =
+      if (ctx.T_GLOBAL)
+        context.getGlobalVar(visit(ctx.ident).toString)
+      else
+        context.getVar(visit(ctx.ident).toString)
+    coll match {
       case x: MCollection => x.update(visit(ctx.index), visit(ctx.value))
       case _              => throw new NoSuchMethodException("only collections supports access by index")
     }
@@ -186,22 +198,24 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
   }
 
   override def visitAssigment_multiple(ctx: sql.Assigment_multipleContext): MType = {
-    if (ctx.expr.size > 1) {
-      if (ctx.ident.size > ctx.expr.size)
-        throw new IndexOutOfBoundsException("not enought argument for multiple assigment")
-      ctx.ident.asScala.zip(ctx.expr.asScala)
-        .foreach(variable => context.setVar(visit(variable._1).toString, visit(variable._2)))
-    } else {
-      val res =
+    val varsToSet: Buffer[(sql.IdentContext, MType)] =
+      if (ctx.expr.size > 1) {
+        if (ctx.ident.size > ctx.expr.size)
+          throw new IndexOutOfBoundsException("not enought argument for multiple assigment")
+        ctx.ident.asScala.zip(ctx.expr.asScala).map(x => x._1 -> visit(x._2))
+      } else {
         visit(ctx.expr(0)) match {
           case arr: MArray =>
             if (ctx.ident.size > arr.size.getValue)
               throw new IndexOutOfBoundsException("not enought argument for multiple assigment")
             ctx.ident.asScala.zip(arr.getArr)
-              .foreach(variable => context.setVar(visit(variable._1).toString, variable._2))
           case _ => throw new IllegalArgumentException("cannot unpack non array expression")
         }
-    }
+      }
+    if (ctx.T_GLOBAL)
+      varsToSet.foreach(variable => context.setGlobalVar(visit(variable._1).toString, variable._2))
+    else
+      varsToSet.foreach(variable => context.setVar(visit(variable._1).toString, variable._2))
     MNull.get()
   }
 
