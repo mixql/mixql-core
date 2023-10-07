@@ -82,6 +82,39 @@ class ContextTest extends AnyFunSuite {
     assert(isNull(context.getVar("a")))
   }
 
+  test("Test context scope") {
+    val context = Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
+    context.setVar("a", new MString("value1"))
+    assert(context.getVar("a").isInstanceOf[MString])
+    assert(context.getVar("a").asInstanceOf[MString].getValue == "value1")
+    context.pushScope()
+    context.setVar("a", new MString("value2"))
+    assert(context.getVar("a").isInstanceOf[MString])
+    assert(context.getVar("a").asInstanceOf[MString].getValue == "value2")
+    context.popScope()
+    assert(context.getVar("a").isInstanceOf[MString])
+    assert(context.getVar("a").asInstanceOf[MString].getValue == "value1")
+  }
+
+  test("Test global vars") {
+    val context = Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
+    context.setVar("a", new MInt(10))
+    context.pushScope()
+    context.setVar("a", new MInt(20))
+    assert(context.getVar("a").isInstanceOf[MInt])
+    assert(context.getVar("a").asInstanceOf[MInt].getValue == 20)
+    assert(context.getGlobalVar("a").isInstanceOf[MInt])
+    assert(context.getGlobalVar("a").asInstanceOf[MInt].getValue == 10)
+    context.setGlobalVar("a", new MInt(15))
+    assert(context.getGlobalVar("a").isInstanceOf[MInt])
+    assert(context.getGlobalVar("a").asInstanceOf[MInt].getValue == 15)
+    context.popScope()
+    assert(context.getVar("a").isInstanceOf[MInt])
+    assert(context.getVar("a").asInstanceOf[MInt].getValue == 15)
+    assert(context.getGlobalVar("a").isInstanceOf[MInt])
+    assert(context.getGlobalVar("a").asInstanceOf[MInt].getValue == 15)
+  }
+
   test("Test add engine to context") {
     val context = Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub")
     context.addEngine(new MyEngine())

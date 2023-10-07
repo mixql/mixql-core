@@ -52,6 +52,10 @@ final class VariablesStorage(variablesInit: MutMap[String, MType] = MutMap[Strin
     result.getOrElse(MNone.get())
   }
 
+  def getGlobalVar(name: String): MType = {
+    current.root.scope.getOrElse(name, MNone.get())
+  }
+
   def setVar(name: String, value: MType): Unit = {
     value match {
       case _: MNone => current.scope.remove(name)
