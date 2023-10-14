@@ -129,6 +129,7 @@ package object mtype {
     a match {
       case e: MException => e
       case _: MNull      => null
+      case _: MNone      => null 
       case t: MString    => t.getValue
       case t: MInt       => t.getValue
       case t: MDouble    => t.getValue
