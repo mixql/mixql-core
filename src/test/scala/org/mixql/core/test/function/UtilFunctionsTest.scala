@@ -118,7 +118,7 @@ class UtilFunctionsTest extends MainVisitorBaseTest {
     val lambda: Any =
       new (() => Int) {
         def apply(): Int = {
-          Thread.sleep(10)
+          Thread.sleep(1000)
           3
         }
       }
