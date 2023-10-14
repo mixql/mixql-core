@@ -46,11 +46,13 @@ object Context {
     "toUpperCase" -> StringFunction.toUpperCase,
     "trim" -> StringFunction.trim,
     "is_error" -> UtilFunction.is_error,
-    "await" -> UtilFunction.await
+    "await" -> UtilFunction.await,
+    "await_all" -> UtilFunction.await_all,
+    "await_any" -> UtilFunction.await_any
   ).map(t => t._1.toLowerCase -> t._2)
 
-  /** the entry point to gsql api. Context stores registered engines, variables
-    * and functions
+  /** Create the entry point to mixql api. Context stores registered engines,
+    * variables and functions
     *
     * @param engines
     *   map engineName -> engine

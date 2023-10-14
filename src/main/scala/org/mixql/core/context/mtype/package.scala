@@ -114,6 +114,7 @@ package object mtype {
       case p: Long       => new MInt(p)
       case p: Double     => new MDouble(p)
       case p: Boolean    => new MBool(p)
+      case p: Seq[Any]   => new MArray(p.map(pack).toArray)
       case p: Array[Any] => new MArray(p.map(pack))
       case p: Map[Any, Any] =>
         import scala.collection.JavaConverters._

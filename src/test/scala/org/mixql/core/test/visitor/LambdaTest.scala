@@ -388,4 +388,33 @@ class LambdaTest extends MainVisitorBaseTest {
     assert(res1.isInstanceOf[MInt])
     assert(res1.asInstanceOf[MInt].getValue == 1)
   }
+
+  test("Test async construction") {
+    val code =
+      """
+        |let asnc = async
+        |  return 1;
+        |end async;
+        |let res = await $asnc;
+                """.stripMargin
+    val context = runMainVisitor(code)
+    val async_call = context.getVar("asnc")
+    assert(async_call.isInstanceOf[MAsync])
+    val res = context.getVar("res")
+    assert(res.isInstanceOf[MInt])
+    assert(res.asInstanceOf[MInt].getValue == 1)
+  }
+
+  test("Test await async construction") {
+    val code =
+      """
+        |let res = await async
+        |  return 1;
+        |end async;
+                """.stripMargin
+    val context = runMainVisitor(code)
+    val res = context.getVar("res")
+    assert(res.isInstanceOf[MInt])
+    assert(res.asInstanceOf[MInt].getValue == 1)
+  }
 }

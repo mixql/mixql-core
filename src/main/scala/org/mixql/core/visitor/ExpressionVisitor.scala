@@ -8,6 +8,8 @@ import org.mixql.core.generated.sql
 
 import scala.util.{Failure, Success, Try}
 import scala.collection.JavaConverters._
+import scala.concurrent.{Future, ExecutionContext}
+import ExecutionContext.Implicits.global
 import org.mixql.core.context.ControlContext
 import org.mixql.core.context.mtype.MAsync
 
@@ -152,12 +154,25 @@ trait ExpressionVisitor extends BaseVisitor {
     new MLambda(pNames, ctx.lambda.block, this.tokenStream)
   }
 
+  override def visitExpr_async(ctx: sql.Expr_asyncContext): MType = {
+    visit(ctx.async)
+  }
+
+  override def visitAsync(ctx: sql.AsyncContext): MType = {
+    val fut: Future[Any] = Future[Any] {
+      new MLambda(Nil, ctx.block, this.tokenStream)(context)
+    }
+    new MAsync(fut)
+  }
+
   override def visitExpr_await(ctx: sql.Expr_awaitContext): MType = {
     val res =
       if (ctx.await.func)
         visit(ctx.await.func)
-      else
+      else if (ctx.await.`var`)
         visit(ctx.await.`var`)
+      else
+        visit(ctx.await.async)
     if (res.isInstanceOf[MAsync])
       res.asInstanceOf[MAsync].await()
     else
