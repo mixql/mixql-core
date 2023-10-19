@@ -46,7 +46,8 @@ object Context {
     "toUpperCase" -> StringFunction.toUpperCase,
     "trim" -> StringFunction.trim,
     "is_error" -> UtilFunction.is_error,
-    "await" -> UtilFunction.await
+    "await" -> UtilFunction.await,
+    "closeEngine" -> UtilFunction.closeEngine
   ).map(t => t._1.toLowerCase -> t._2)
 
   /** the entry point to gsql api. Context stores registered engines, variables
