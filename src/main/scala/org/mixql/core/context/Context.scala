@@ -48,7 +48,8 @@ object Context {
     "is_error" -> UtilFunction.is_error,
     "await" -> UtilFunction.await,
     "await_all" -> UtilFunction.await_all,
-    "await_any" -> UtilFunction.await_any
+    "await_any" -> UtilFunction.await_any,
+    "closeEngine" -> UtilFunction.closeEngine
   ).map(t => t._1.toLowerCase -> t._2)
 
   /** Create the entry point to mixql api. Context stores registered engines,
