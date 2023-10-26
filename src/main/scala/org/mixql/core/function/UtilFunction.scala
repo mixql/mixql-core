@@ -62,7 +62,9 @@ object UtilFunction {
           value.map(f => new MAsync(f).await()).head
         }
         new MAsync(Future.firstCompletedOf(Seq(firstNotError, firstWhenAllCompleted))).await()
- 
+      }
+    }
+
   val closeEngine =
     new ((Context, String) => MNone) {
 

@@ -156,4 +156,52 @@ class UtilFunctionsTest extends MainVisitorBaseTest {
     assert(res.isInstanceOf[MException])
     assert(res.asInstanceOf[MException].getMessage == "wp")
   }
+
+  test("Test closeEngine current") {
+    val code =
+      """
+        |closeEngine();
+                """.stripMargin
+    class Other extends Engine with AutoCloseable {
+      var closed = false
+      override def name: String = "other"
+
+      override def executeImpl(stmt: String, ctx: EngineContext): MType = ???
+
+      override def executeFuncImpl(name: String,
+                                   ctx: EngineContext,
+                                   kwargs: Map[String, Object],
+                                   params: MType*): MType = ???
+
+      override def close(): Unit = { closed = true }
+    }
+    val engine = new Other
+    val context = runMainVisitor(code, Context(MutMap("stub" -> engine), "stub"))
+
+    assert(engine.closed)
+  }
+
+  test("Test closeEngine by name") {
+    val code =
+      """
+        |closeEngine("stub");
+                """.stripMargin
+    class Other extends Engine with AutoCloseable {
+      var closed = false
+      override def name: String = "other"
+
+      override def executeImpl(stmt: String, ctx: EngineContext): MType = ???
+
+      override def executeFuncImpl(name: String,
+                                   ctx: EngineContext,
+                                   kwargs: Map[String, Object],
+                                   params: MType*): MType = ???
+
+      override def close(): Unit = { closed = true }
+    }
+    val engine = new Other
+    val context = runMainVisitor(code, Context(MutMap("stub" -> engine), "stub"))
+
+    assert(engine.closed)
+  }
 }
