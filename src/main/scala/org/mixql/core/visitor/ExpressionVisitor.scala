@@ -161,7 +161,7 @@ trait ExpressionVisitor extends BaseVisitor {
     if (res.isInstanceOf[MAsync])
       res.asInstanceOf[MAsync].await()
     else
-      throw new IllegalCallerException("can await only async call")
+      throw new IllegalArgumentException("can await only async call")
   }
 
   override def visitExpr_func(ctx: sql.Expr_funcContext): MType = {
