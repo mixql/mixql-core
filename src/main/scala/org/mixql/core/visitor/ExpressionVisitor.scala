@@ -159,8 +159,9 @@ trait ExpressionVisitor extends BaseVisitor {
   }
 
   override def visitAsync(ctx: sql.AsyncContext): MType = {
+    val c = context.fork()
     val fut: Future[Any] = Future[Any] {
-      new MLambda(Nil, ctx.block, this.tokenStream)(context)
+      new MLambda(Nil, ctx.block, this.tokenStream)(c)
     }
     new MAsync(fut)
   }
