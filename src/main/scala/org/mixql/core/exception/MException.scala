@@ -13,4 +13,6 @@ class MException(e_type: String, message: String, val e: Throwable = null) exten
   update(new MString("message"), new MString(message))
 
   override def getCause(): Throwable = e
+
+  override def getMessage(): String = message
 }

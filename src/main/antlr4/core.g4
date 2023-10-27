@@ -89,6 +89,7 @@ expr: // TODO other expressions if needed
      | await                                                     #expr_await
      | spec_func                                                 #expr_spec_func // TODO what functions to add?
      | func                                                      #expr_func
+     | async                                                     #expr_async
      | var                                                       #expr_var
      | literal                                                   #expr_literal
      ;
@@ -96,6 +97,7 @@ expr: // TODO other expressions if needed
 await:
        T_AWAIT func
      | T_AWAIT var
+     | T_AWAIT async
      ;
 
 logical_operator:
@@ -145,6 +147,8 @@ arg:
 lambda:
      T_OPEN_P ident? (T_COMMA ident)* T_CLOSE_P T_LABMDA T_BEGIN block T_END
      ;
+
+async: T_ASYNC block T_END T_ASYNC;
 
 var: T_DOLLAR ident;
 
