@@ -85,15 +85,12 @@ public class MString extends MType {
     }
 
     @Override
-    // TODO attention do we need type check?
     public MType Equal(MType other) {
-        return new MBool(this.equals(other));
+        return MBool.get(this.equals(other));
     }
 
-
-    // TODO attention do we need type check?
     @Override
     public MType NotEqual(MType other) {
-        return new MBool(value != other.toString());
+        return this.Equal(other).Not();
     }
 }

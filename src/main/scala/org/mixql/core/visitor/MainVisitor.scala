@@ -47,15 +47,15 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
 
   override def visitFor_cursor_stmt(ctx: sql.For_cursor_stmtContext): MType = {
 
-    if (ctx.T_CURSOR != null) {
+    if (ctx.T_CURSOR) {
       val anonymousCursor = new MCursor(this.ctx, tokens, ctx.expr)
-      execForInGcursor(anonymousCursor, ctx)
+      execForInMcursor(anonymousCursor, ctx)
       anonymousCursor.close()
     } else {
       val exprRes = visit(ctx.expr)
       if (exprRes.isInstanceOf[MCursor]) {
         val cursor = exprRes.asInstanceOf[MCursor]
-        execForInGcursor(cursor, ctx)
+        execForInMcursor(cursor, ctx)
       } else {
         exprRes match {
           case collection: MCollection => execBlockInFor(collection, ctx)
@@ -68,7 +68,7 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
     }
   }
 
-  override def visitEmpty_stmt(x: sql.Empty_stmtContext): MType = MNull.get()
+  override def visitEmpty_stmt(x: sql.Empty_stmtContext): MType = MNone.get()
 
   override def visitReturn_stmt(ctx: sql.Return_stmtContext): MType = {
     val res = visit(ctx.expr)
@@ -77,15 +77,13 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
   }
 
   override def visitBreak_stmt(ctx: sql.Break_stmtContext): MType = {
-    val res = MNull.get()
     controlState = ControlContext.BREAK
-    res
+    MNone.get()
   }
 
   override def visitContinue_stmt(ctx: sql.Continue_stmtContext): MType = {
-    val res = MNull.get()
     controlState = ControlContext.CONTINUE
-    res
+    MNone.get()
   }
 
   override def visitRaise_stmt(ctx: sql.Raise_stmtContext): MType = {
@@ -118,7 +116,7 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
     } else {
       context.setCurrentEngine(engine_name)
     }
-    MNull.get()
+    MNone.get()
   }
 
   override def visitOpen_cursor_stmt(ctx: Open_cursor_stmtContext): MBool = {
@@ -168,7 +166,7 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
 
   override def visitAssigment_default(ctx: sql.Assigment_defaultContext): MType = {
     val value: MType =
-      if (ctx.T_CURSOR() != null && ctx.T_IS() != null) {
+      if (ctx.T_CURSOR() && ctx.T_IS()) {
         val value = new MCursor(context, tokenStream, ctx.expr())
         logDebug("assign cursor")
         value
@@ -181,7 +179,7 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
       context.setGlobalVar(visit(ctx.ident).toString, value)
     else
       context.setVar(visit(ctx.ident).toString, value)
-    MNull.get()
+    MNone.get()
   }
 
   override def visitAssigment_by_index(ctx: sql.Assigment_by_indexContext): MType = {
@@ -194,7 +192,7 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
       case x: MCollection => x.update(visit(ctx.index), visit(ctx.value))
       case _              => throw new NoSuchMethodException("only collections supports access by index")
     }
-    MNull.get()
+    MNone.get()
   }
 
   override def visitAssigment_multiple(ctx: sql.Assigment_multipleContext): MType = {
@@ -216,12 +214,12 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
       varsToSet.foreach(variable => context.setGlobalVar(visit(variable._1).toString, variable._2))
     else
       varsToSet.foreach(variable => context.setVar(visit(variable._1).toString, variable._2))
-    MNull.get()
+    MNone.get()
   }
 
   override def visitPrint_stmt(ctx: sql.Print_stmtContext): MType = {
     println("[USER PRINT]: " + visit(ctx.expr).toString)
-    MNull.get()
+    MNone.get()
   }
 
   override def visitOther_stmt(ctx: sql.Other_stmtContext): MType = {

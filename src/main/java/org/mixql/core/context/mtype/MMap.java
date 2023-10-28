@@ -18,17 +18,14 @@ public class MMap extends MCollection {
     @Override
     public MType Equal(MType other) {
         if (other instanceof MMap) {
-            return new MBool(m.equals(((MMap) other).m));
+            return MBool.get(m.equals(((MMap) other).m));
         }
-        return new MBool(false);
+        return MBool.False();
     }
 
     @Override
     public MType NotEqual(MType other) {
-        if (other instanceof MMap) {
-            return new MBool(!m.equals(((MMap) other).m));
-        }
-        return new MBool(true);
+        return Equal(other).Not();
     }
 
     @Override

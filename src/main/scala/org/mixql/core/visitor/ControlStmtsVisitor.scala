@@ -41,7 +41,7 @@ trait ControlStmtsVisitor extends BaseVisitor {
         if (controlState == ControlContext.RETURN)
           return block
     }
-    MNull.get()
+    MNone.get()
   }
 
   override def visitIf_stmt(ctx: sql.If_stmtContext): MType = {
@@ -57,14 +57,13 @@ trait ControlStmtsVisitor extends BaseVisitor {
       if (ctx.else_block)
         visit(ctx.else_block.block)
       else
-        MNull.get()
+        MNone.get()
     }
   }
 
   // TODO maybe better realisation using for?
   override def visitFor_range_stmt(ctx: sql.For_range_stmtContext): MType = {
     // super.visitFor_range_stmt(ctx)
-    var result: MType = MNull.get
     val i_name = visit(ctx.ident).toString
     val old = context.getVar(i_name)
     var i =
@@ -110,10 +109,10 @@ trait ControlStmtsVisitor extends BaseVisitor {
       visit(ctx.block)
     }
     context.setVar(i_name, old)
-    result
+    MNone.get()
   }
 
-  def execForInGcursor(cursor: MCursor, ctx: sql.For_cursor_stmtContext): MType = {
+  def execForInMcursor(cursor: MCursor, ctx: sql.For_cursor_stmtContext): MType = {
     cursor.open()
 
     var fetchRes = cursor.fetch()
@@ -125,7 +124,7 @@ trait ControlStmtsVisitor extends BaseVisitor {
       execFetchBlockInFor(fetchRes, ctx)
       fetchRes = cursor.fetch()
     }
-    MNull.get()
+    MNone.get()
   }
 
   def execFetchBlockInFor(inRes: MType, ctx: sql.For_cursor_stmtContext): MType = {
@@ -269,6 +268,6 @@ trait ControlStmtsVisitor extends BaseVisitor {
         condition = visit(ctx.expr)
       }
     }
-    MNull.get()
+    MNone.get()
   }
 }

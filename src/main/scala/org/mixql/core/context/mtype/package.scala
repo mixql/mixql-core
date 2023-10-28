@@ -20,7 +20,7 @@ package object mtype {
 
     implicit def to_double(a: MDouble): Double = a.getValue
 
-    implicit def from_bool(a: Boolean): MBool = new MBool(a)
+    implicit def from_bool(a: Boolean): MBool = MBool.get(a)
 
     implicit def to_bool(a: MBool): Boolean = a.getValue
 
@@ -113,7 +113,7 @@ package object mtype {
       case p: Int        => new MInt(p)
       case p: Long       => new MInt(p)
       case p: Double     => new MDouble(p)
-      case p: Boolean    => new MBool(p)
+      case p: Boolean    => MBool.get(p)
       case p: Seq[Any]   => new MArray(p.map(pack).toArray)
       case p: Array[Any] => new MArray(p.map(pack))
       case p: Map[Any, Any] =>

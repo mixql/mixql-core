@@ -89,7 +89,7 @@ object Context {
     val result: MutMap[String, MType] = MutMap[String, MType]()
 
     val errorSkip = config.getBoolean(const.errorSkip)
-    result += const.errorSkip -> new MBool(errorSkip)
+    result += const.errorSkip -> MBool.get(errorSkip)
 
     val currentEngineAllias = config.getString(const.executionEngine)
     result += const.executionEngine -> new MString(currentEngineAllias)
