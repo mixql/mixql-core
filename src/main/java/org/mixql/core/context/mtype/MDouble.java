@@ -84,10 +84,10 @@ public class MDouble extends MType {
     @Override
     public MType MoreThen(MType other) {
         if (other instanceof MInt) {
-            return new MBool(value > ((MInt) other).value);
+            return MBool.get(value > ((MInt) other).value);
         }
         if (other instanceof MDouble) {
-            return new MBool(value > ((MDouble) other).value);
+            return MBool.get(value > ((MDouble) other).value);
         }
         return super.MoreThen(other);
     }
@@ -95,10 +95,10 @@ public class MDouble extends MType {
     @Override
     public MType MoreEqualThen(MType other) {
         if (other instanceof MInt) {
-            return new MBool(value >= ((MInt) other).value);
+            return MBool.get(value >= ((MInt) other).value);
         }
         if (other instanceof MDouble) {
-            return new MBool(value >= ((MDouble) other).value);
+            return MBool.get(value >= ((MDouble) other).value);
         }
         return super.MoreEqualThen(other);
     }
@@ -106,10 +106,10 @@ public class MDouble extends MType {
     @Override
     public MType LessThen(MType other) {
         if (other instanceof MInt) {
-            return new MBool(value < ((MInt) other).value);
+            return MBool.get(value < ((MInt) other).value);
         }
         if (other instanceof MDouble) {
-            return new MBool(value < ((MDouble) other).value);
+            return MBool.get(value < ((MDouble) other).value);
         }
         return super.LessThen(other);
     }
@@ -117,10 +117,10 @@ public class MDouble extends MType {
     @Override
     public MType LessEqualThen(MType other) {
         if (other instanceof MInt) {
-            return new MBool(value <= ((MInt) other).value);
+            return MBool.get(value <= ((MInt) other).value);
         }
         if (other instanceof MDouble) {
-            return new MBool(value <= ((MDouble) other).value);
+            return MBool.get(value <= ((MDouble) other).value);
         }
         return super.LessEqualThen(other);
     }
@@ -128,34 +128,22 @@ public class MDouble extends MType {
     @Override
     public MType Equal(MType other) {
         if (other instanceof MInt) {
-            return new MBool(value == ((MInt) other).value);
+            return MBool.get(value == ((MInt) other).value);
         }
         if (other instanceof MDouble) {
-            return new MBool(value == ((MDouble) other).value);
+            return MBool.get(value == ((MDouble) other).value);
         }
         if (other instanceof MNull) {
-            return new MBool(false);
+            return MBool.False();
         }
         if (other instanceof MNone) {
-            return new MBool(false);
+            return MBool.False();
         }
         return super.Equal(other);
     }
 
     @Override
     public MType NotEqual(MType other) {
-        if (other instanceof MInt) {
-            return new MBool(value != ((MInt) other).value);
-        }
-        if (other instanceof MDouble) {
-            return new MBool(value != ((MDouble) other).value);
-        }
-        if (other instanceof MNull) {
-            return new MBool(true);
-        }
-        if (other instanceof MNone) {
-            return new MBool(true);
-        }
-        return super.NotEqual(other);
+        return Equal(other).Not();
     }
 }

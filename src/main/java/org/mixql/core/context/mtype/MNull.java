@@ -32,17 +32,14 @@ public class MNull extends MType {
     @Override
     public MType Equal(MType other) {
         if (other instanceof MNull) {
-            return new MBool(true);
+            return MBool.True();
         }
-        return new MBool(false);
+        return MBool.False();
     }
 
     @Override
     public MType NotEqual(MType other) {
-        if (other instanceof MNull) {
-            return new MBool(false);
-        }
-        return new MBool(true);
+        return Equal(other).Not();
     }
 
     @Override

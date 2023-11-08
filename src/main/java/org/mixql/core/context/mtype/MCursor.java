@@ -21,13 +21,13 @@ public class MCursor extends MCursorBase {
     public MBool open() {
         openWasTriggered = true;
         if (source != null) {
-            return new MBool(true);
+            return MBool.True();
         } else {
             source = exprVisitor.visit(ctx);
             if (source instanceof MCursorBase) {
                 return ((MCursorBase) source).open();
             }
-            return new MBool(true);
+            return MBool.True();
         }
     }
 
@@ -36,7 +36,7 @@ public class MCursor extends MCursorBase {
         if (source instanceof MCursorBase) {
             return ((MCursorBase) source).close();
         }
-        return new MBool(true);
+        return MBool.True();
     }
 
     Integer arr_index = -1;

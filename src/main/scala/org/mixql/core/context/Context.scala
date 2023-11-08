@@ -58,7 +58,7 @@ object Context {
     * @param engines
     *   map engineName -> engine
     * @param defaultEngine
-    *   name of current engine
+    *   name of current engine, if null will be got value from config
     * @param function
     *   map functionName -> function
     * @param variables
@@ -70,7 +70,8 @@ object Context {
             variablesInit: MutMap[String, MType] = MutMap[String, MType]()): Context = {
     val eng = EnginesStorage(engines += "interpolator" -> new Interpolator)
     val vars = VariablesStorage(initVariables(variablesInit))
-    vars.setVar(const.executionEngine, new MString(defaultEngine))
+    if (defaultEngine != null)
+      vars.setVar(const.executionEngine, new MString(defaultEngine))
     new Context(eng, vars, defaultFunctions ++ functionsInit, true)
   }
 
@@ -89,7 +90,7 @@ object Context {
     val result: MutMap[String, MType] = MutMap[String, MType]()
 
     val errorSkip = config.getBoolean(const.errorSkip)
-    result += const.errorSkip -> new MBool(errorSkip)
+    result += const.errorSkip -> MBool.get(errorSkip)
 
     val currentEngineAllias = config.getString(const.executionEngine)
     result += const.executionEngine -> new MString(currentEngineAllias)

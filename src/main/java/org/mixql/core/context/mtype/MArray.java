@@ -56,18 +56,14 @@ public class MArray extends MCollection {
     public MType Equal(MType other) {
         if (other instanceof MArray) {
             MType[] otherArr = ((MArray) other).getArr();
-            return new MBool(Arrays.equals(getArr(), otherArr));
+            return MBool.get(Arrays.equals(getArr(), otherArr));
         }
-        return new MBool(false);
+        return MBool.False();
     }
 
     @Override
     public MType NotEqual(MType other) {
-        if (other instanceof MArray) {
-            MType[] otherArr = ((MArray) other).getArr();
-            return new MBool(!Arrays.equals(getArr(), otherArr));
-        }
-        return new MBool(true);
+        return Equal(other).Not();
     }
 
     @Override

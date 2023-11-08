@@ -25,7 +25,7 @@ object ConfigHelp {
     if (value == null)
       MNull.get()
     else if (value.isInstanceOf[Boolean])
-      new MBool(value.asInstanceOf[Boolean])
+      MBool.get(value.asInstanceOf[Boolean])
     else if (value.isInstanceOf[String])
       new MString(value.asInstanceOf[String])
     else if (value.isInstanceOf[Integer])

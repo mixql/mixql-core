@@ -18,17 +18,14 @@ public class MNone extends MType {
     @Override
     public MType Equal(MType other) {
         if (other instanceof MNone) {
-            return new MBool(true);
+            return MBool.True();
         }
-        return new MBool(false);
+        return MBool.False();
     }
 
     @Override
     public MType NotEqual(MType other) {
-        if (other instanceof MNone) {
-            return new MBool(false);
-        }
-        return new MBool(true);
+        return Equal(other).Not();
     }
 
     @Override

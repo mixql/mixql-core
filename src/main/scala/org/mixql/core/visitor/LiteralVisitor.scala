@@ -58,9 +58,9 @@ trait LiteralVisitor extends BaseVisitor {
 
   override def visitLiteral_bool(ctx: sql.Literal_boolContext): MType =
     if (ctx.bool_literal.T_FALSE)
-      new MBool(false)
+      MBool.False
     else if (ctx.bool_literal.T_TRUE)
-      new MBool(true)
+      MBool.True
     else
       throw new IllegalArgumentException("unknown bool literal")
 

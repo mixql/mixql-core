@@ -14,7 +14,7 @@ class CursorTest3() extends MCursorBase {
 
   override def close(): MBool = {
     logInfo("close was triggered in CursorTest3")
-    new MBool(true)
+    MBool.True
   }
 
   override def open(): MBool = {
@@ -22,7 +22,7 @@ class CursorTest3() extends MCursorBase {
     if (stream == null)
       stream = new scala.util.Random
 
-    new MBool(true)
+    MBool.True
   }
 
   override def fetch(): MType = {

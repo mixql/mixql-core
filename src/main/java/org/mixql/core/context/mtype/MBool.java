@@ -7,12 +7,30 @@ public class MBool extends MType {
 
     boolean value;
 
-    public boolean getValue(){
-        return value;
+    private static MBool _true = new MBool(true);
+    private static MBool _false = new MBool(false);
+
+    static public MBool get(boolean value) {
+        if (value)
+            return True();
+        else
+            return False();
     }
 
-    public MBool(boolean value) {
+    static public MBool True() {
+        return _true;
+    }
+
+    static public MBool False() {
+        return _false;
+    }
+
+    private MBool(boolean value) {
         this.value = value;
+    }
+
+    public boolean getValue(){
+        return value;
     }
 
     @Override
@@ -39,7 +57,7 @@ public class MBool extends MType {
 
     @Override
     public MType Not() {
-        return new MBool(!value);
+        return get(!value);
     }
 
     @Override
@@ -62,35 +80,20 @@ public class MBool extends MType {
     @Override
     public MType Equal(MType other) {
         if (other instanceof MBool) {
-            return new MBool(this.equals(other));
+            return get(this.equals(other));
         }
-        if (other instanceof MNull) {
-            return new MBool(false);
-        }
-        if (other instanceof MNone) {
-            return new MBool(false);
-        }
-        return super.Equal(other);
+        return False();
     }
 
     @Override
     public MType NotEqual(MType other) {
-        if (other instanceof MBool) {
-            return new MBool(value != ((MBool) other).value);
-        }
-        if (other instanceof MNull) {
-            return new MBool(true);
-        }
-        if (other instanceof MNone) {
-            return new MBool(true);
-        }
-        return super.NotEqual(other);
+        return Equal(other).Not();
     }
 
     @Override
     public MType Or(MType other) {
         if (other instanceof MBool) {
-            return new MBool(value || ((MBool) other).value);
+            return get(value || ((MBool) other).value);
         }
         return super.Or(other);
     }
@@ -98,7 +101,7 @@ public class MBool extends MType {
     @Override
     public MType And(MType other) {
         if (other instanceof MBool) {
-            return new MBool(value && ((MBool) other).value);
+            return get(value && ((MBool) other).value);
         }
         return super.And(other);
     }

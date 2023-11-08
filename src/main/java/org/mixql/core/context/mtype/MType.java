@@ -17,7 +17,7 @@ public abstract class MType extends Exception {
     public MType Subtract(MType other) {
         throw new UnsupportedOperationException(
                 String.format(
-                        "type error: %s + %s is unsupported",
+                        "type error: %s - %s is unsupported",
                         this.getClass().getSimpleName(), other.getClass().getSimpleName()
                 )
         );
@@ -27,7 +27,7 @@ public abstract class MType extends Exception {
     public MType Multiply(MType other) {
         throw new UnsupportedOperationException(
                 String.format(
-                        "type error: %s + %s is unsupported",
+                        "type error: %s * %s is unsupported",
                         this.getClass().getSimpleName(), other.getClass().getSimpleName()
                 )
         );
@@ -37,7 +37,7 @@ public abstract class MType extends Exception {
     public MType Divide(MType other) {
         throw new UnsupportedOperationException(
                 String.format(
-                        "type error: %s + %s is unsupported",
+                        "type error: %s / %s is unsupported",
                         this.getClass().getSimpleName(), other.getClass().getSimpleName()
                 )
         );
@@ -47,7 +47,7 @@ public abstract class MType extends Exception {
     public MType Or(MType other) {
         throw new UnsupportedOperationException(
                 String.format(
-                        "type error: %s + %s is unsupported",
+                        "type error: %s or %s is unsupported",
                         this.getClass().getSimpleName(), other.getClass().getSimpleName()
                 )
         );
@@ -57,7 +57,7 @@ public abstract class MType extends Exception {
     public MType And(MType other) {
         throw new UnsupportedOperationException(
                 String.format(
-                        "type error: %s + %s is unsupported",
+                        "type error: %s and %s is unsupported",
                         this.getClass().getSimpleName(), other.getClass().getSimpleName()
                 )
         );
@@ -67,7 +67,7 @@ public abstract class MType extends Exception {
     public MType LessThen(MType other) {
         throw new UnsupportedOperationException(
                 String.format(
-                        "type error: %s + %s is unsupported",
+                        "type error: %s < %s is unsupported",
                         this.getClass().getSimpleName(), other.getClass().getSimpleName()
                 )
         );
@@ -77,7 +77,7 @@ public abstract class MType extends Exception {
     public MType LessEqualThen(MType other) {
         throw new UnsupportedOperationException(
                 String.format(
-                        "type error: %s + %s is unsupported",
+                        "type error: %s <= %s is unsupported",
                         this.getClass().getSimpleName(), other.getClass().getSimpleName()
                 )
         );
@@ -87,7 +87,7 @@ public abstract class MType extends Exception {
     public MType MoreThen(MType other) {
         throw new UnsupportedOperationException(
                 String.format(
-                        "type error: %s + %s is unsupported",
+                        "type error: %s > %s is unsupported",
                         this.getClass().getSimpleName(), other.getClass().getSimpleName()
                 )
         );
@@ -97,7 +97,7 @@ public abstract class MType extends Exception {
     public MType MoreEqualThen(MType other) {
         throw new UnsupportedOperationException(
                 String.format(
-                        "type error: %s + %s is unsupported",
+                        "type error: %s >= %s is unsupported",
                         this.getClass().getSimpleName(), other.getClass().getSimpleName()
                 )
         );
@@ -107,7 +107,7 @@ public abstract class MType extends Exception {
     public MType Equal(MType other) {
         throw new UnsupportedOperationException(
                 String.format(
-                        "type error: %s + %s is unsupported",
+                        "type error: %s == %s is unsupported",
                         this.getClass().getSimpleName(), other.getClass().getSimpleName()
                 )
         );
@@ -117,13 +117,13 @@ public abstract class MType extends Exception {
     public MType NotEqual(MType other) {
         throw new UnsupportedOperationException(
                 String.format(
-                        "type error: %s + %s is unsupported",
+                        "type error: %s != %s is unsupported",
                         this.getClass().getSimpleName(), other.getClass().getSimpleName()
                 )
         );
     }
 
-    // !=
+    // !
     public MType Not() {
         throw new UnsupportedOperationException(
                 String.format(

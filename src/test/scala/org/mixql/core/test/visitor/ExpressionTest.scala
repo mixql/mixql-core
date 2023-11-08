@@ -269,7 +269,7 @@ class ExpressionTest extends MainVisitorBaseTest {
     val res = context.getVar("res")
     assert(res.isInstanceOf[MArray])
     val arr = res.asInstanceOf[MArray]
-    assert(arr.apply(new MInt(0)).Equal(new MBool(true)).asInstanceOf[MBool].getValue)
+    assert(arr.apply(new MInt(0)).Equal(MBool.True).asInstanceOf[MBool].getValue)
     assert(arr.apply(new MInt(1)).Equal(new MString("gg")).asInstanceOf[MBool].getValue)
     assert(arr.apply(new MInt(2)).Equal(new MInt(12)).asInstanceOf[MBool].getValue)
   }
@@ -285,12 +285,12 @@ class ExpressionTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
     val res1 = context.getVar("res1")
     assert(res1.isInstanceOf[MBool])
-    assert(res1.asInstanceOf[MBool].Equal(new MBool(true)).asInstanceOf[MBool].getValue)
+    assert(res1.asInstanceOf[MBool].Equal(MBool.True).asInstanceOf[MBool].getValue)
     val res2 = context.getVar("res2")
     assert(res2.isInstanceOf[MBool])
     assert(
       (
-        res2.asInstanceOf[MBool].Equal(new MBool(false)).asInstanceOf[MBool].getValue
+        res2.asInstanceOf[MBool].Equal(MBool.False).asInstanceOf[MBool].getValue
       )
     )
   }
@@ -325,8 +325,8 @@ class ExpressionTest extends MainVisitorBaseTest {
     assert(res.isInstanceOf[MArray])
     val arr = res.asInstanceOf[MArray]
     assert(arr.size.Equal(new MInt(2)).asInstanceOf[MBool].getValue)
-    assert(arr(new MInt(0)).Equal(new MBool(true)).asInstanceOf[MBool].getValue)
-    assert(arr(new MInt(1)).Equal(new MBool(false)).asInstanceOf[MBool].getValue)
+    assert(arr(new MInt(0)).Equal(MBool.True).asInstanceOf[MBool].getValue)
+    assert(arr(new MInt(1)).Equal(MBool.False).asInstanceOf[MBool].getValue)
   }
 
   test("Test index priority") {
@@ -376,7 +376,7 @@ class ExpressionTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
     val res2 = context.getVar("res")
     assert(res2.isInstanceOf[MBool])
-    assert(res2.asInstanceOf[MBool].Equal(new MBool(false)).asInstanceOf[MBool].getValue)
+    assert(res2.asInstanceOf[MBool].Equal(MBool.False).asInstanceOf[MBool].getValue)
   }
 
   test("Test map literal") {
@@ -409,7 +409,7 @@ class ExpressionTest extends MainVisitorBaseTest {
     assert(res1.asInstanceOf[MInt].Equal(new MInt(1)).asInstanceOf[MBool].getValue)
     val res2 = context.getVar("res2")
     assert(res2.isInstanceOf[MBool])
-    assert(res2.asInstanceOf[MBool].Equal(new MBool(false)).asInstanceOf[MBool].getValue)
+    assert(res2.asInstanceOf[MBool].Equal(MBool.False).asInstanceOf[MBool].getValue)
   }
 
   test("Test map pack/unpack in lambda") {
@@ -427,7 +427,7 @@ class ExpressionTest extends MainVisitorBaseTest {
     val context = runMainVisitor(code)
     val res2 = context.getVar("res")
     assert(res2.isInstanceOf[MBool])
-    assert(res2.asInstanceOf[MBool].Equal(new MBool(false)).asInstanceOf[MBool].getValue)
+    assert(res2.asInstanceOf[MBool].Equal(MBool.False).asInstanceOf[MBool].getValue)
   }
 
   test("Test call engine specific function") {
