@@ -34,7 +34,7 @@ class FunctionsTestReturnType extends MainVisitorBaseTest {
     }
   }
 
-  val functions: mutable.Map[String, Any] = mutable.Map(
+  val functions: mutable.Map[String, Object] = mutable.Map(
     "simple_func_return_none" -> SimpleFuncs.simple_func_return_none,
     "simple_func_return_cursor" -> SimpleFuncs.simple_func_return_cursor
   )

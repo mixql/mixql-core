@@ -41,13 +41,13 @@ class UtilFunctionsTest extends MainVisitorBaseTest {
         |let ex = await async lambda();
         |let res = is_error($ex);
         |""".stripMargin
-    val lambda: Any =
+    val lambda: Object =
       new (() => Int) {
         def apply(): Int = throw new Exception("await")
       }
     val context = runMainVisitor(
       code,
-      Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub", MutMap[String, Any]("lambda" -> lambda))
+      Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub", MutMap[String, Object]("lambda" -> lambda))
     )
 
     val res = context.getVar("res")
@@ -115,7 +115,7 @@ class UtilFunctionsTest extends MainVisitorBaseTest {
         |let res = await_any($async1, $async2, $async3);
         |""".stripMargin
 
-    val lambda: Any =
+    val lambda: Object =
       new (() => Int) {
         def apply(): Int = {
           Thread.sleep(1000)
@@ -124,7 +124,7 @@ class UtilFunctionsTest extends MainVisitorBaseTest {
       }
     val context = runMainVisitor(
       code,
-      Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub", MutMap[String, Any]("lambda" -> lambda))
+      Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub", MutMap[String, Object]("lambda" -> lambda))
     )
 
     val res = context.getVar("res")

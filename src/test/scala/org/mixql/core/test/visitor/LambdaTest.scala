@@ -259,13 +259,13 @@ class LambdaTest extends MainVisitorBaseTest {
         |  let exc_m = $exc["message"];
         |end
                 """.stripMargin
-    val lambda: Any =
+    val lambda: Object =
       new (() => Int) {
         def apply(): Int = throw new Exception("await")
       }
     val context = runMainVisitor(
       code,
-      Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub", MutMap[String, Any]("lambda" -> lambda))
+      Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub", MutMap[String, Object]("lambda" -> lambda))
     )
     val exc_t = context.getVar("exc_t")
     assert(exc_t.isInstanceOf[MString])
@@ -335,13 +335,13 @@ class LambdaTest extends MainVisitorBaseTest {
         |let exc_t = $exc["type"];
         |let exc_m = $exc["message"];
                 """.stripMargin
-    val lambda: Any =
+    val lambda: Object =
       new (() => Int) {
         def apply(): Int = throw new Exception("await")
       }
     val context = runMainVisitor(
       code,
-      Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub", MutMap[String, Any]("lambda" -> lambda))
+      Context(MutMap[String, Engine]("stub" -> new StubEngine), "stub", MutMap[String, Object]("lambda" -> lambda))
     )
     val exc_t = context.getVar("exc_t")
     assert(exc_t.isInstanceOf[MString])

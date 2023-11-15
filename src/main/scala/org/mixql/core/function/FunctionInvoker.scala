@@ -12,7 +12,7 @@ import ExecutionContext.Implicits.global
 
 object FunctionInvoker {
 
-  def invokeAsync(functions: Map[String, Any],
+  def invokeAsync(functions: Map[String, Object],
                   funcName: String,
                   _contexts: List[Object], // To support not only mixql-core context
                   args: List[Any] = Nil,
@@ -28,7 +28,7 @@ object FunctionInvoker {
     }
   }
 
-  def invoke(functions: Map[String, Any],
+  def invoke(functions: Map[String, Object],
              funcName: String,
              _contexts: List[Object], // To support not only mixql-core context
              args: List[Any] = Nil,

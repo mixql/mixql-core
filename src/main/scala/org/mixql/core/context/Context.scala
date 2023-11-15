@@ -23,7 +23,7 @@ object Context {
     val errorSkip = "mixql.error.skip"
   }
 
-  val defaultFunctions: MutMap[String, Any] = MutMap[String, Any](
+  val defaultFunctions: MutMap[String, Object] = MutMap[String, Object](
     "ascii" -> StringFunction.ascii,
     "base64" -> StringFunction.base64,
     "concat" -> StringFunction.concat,
@@ -66,7 +66,7 @@ object Context {
     */
   def apply(engines: MutMap[String, Engine],
             defaultEngine: String,
-            functionsInit: MutMap[String, Any] = MutMap[String, Any](),
+            functionsInit: MutMap[String, Object] = MutMap[String, Object](),
             variablesInit: MutMap[String, MType] = MutMap[String, MType]()): Context = {
     val eng = EnginesStorage(engines += "interpolator" -> new Interpolator)
     val vars = VariablesStorage(initVariables(variablesInit))
@@ -118,7 +118,7 @@ object Context {
 
 class Context(eng: EnginesStorage,
               vars: VariablesStorage,
-              func: MutMap[String, Any],
+              func: MutMap[String, Object],
               private var isMainThread: Boolean = false)
     extends java.lang.AutoCloseable {
 
@@ -414,7 +414,7 @@ class Context(eng: EnginesStorage,
     *   of funtion
     * @param function
     */
-  def addFunction(name: String, function: Any): Unit = {
+  def addFunction(name: String, function: Object): Unit = {
     functions += name -> function
   }
 
@@ -432,5 +432,5 @@ class Context(eng: EnginesStorage,
 
   def engineNames = engines.engineNames
 
-  val functions: MutMap[String, Any] = func
+  val functions: MutMap[String, Object] = func
 }

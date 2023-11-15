@@ -16,17 +16,17 @@ class CustomTestContext {
 
 class FunctionInvokerTest extends AnyFunSuite {
 
-  val length: Any =
+  val length: Object =
     new (String => Int) {
       def apply(str: String): Int = str.length
     }
 
-  val lengthCustomContext: Any =
+  val lengthCustomContext: Object =
     new ((CustomTestContext, String) => Int) {
       def apply(ctx: CustomTestContext, str: String): Int = str.length + ctx.length
     }
 
-  val lengthMixQlCoreContext: Any =
+  val lengthMixQlCoreContext: Object =
     new ((Context, String) => Int) {
       def apply(ctx: Context, str: String): Int = str.length + ctx.getVar("a").asInstanceOf[MInt].getValue.toInt
     }
@@ -117,7 +117,7 @@ class FunctionInvokerTest extends AnyFunSuite {
       def apply(f: Double): Double = f - 1
     }
 
-  val functions: Map[String, Any] = Map.apply(
+  val functions: Map[String, Object] = Map[String, Object](
     "length" -> length,
     "length_of_custom_context" ->
       lengthCustomContext,
