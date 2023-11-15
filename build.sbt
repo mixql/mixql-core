@@ -35,11 +35,10 @@ lazy val mixQLCore = (project in file(".")).enablePlugins(Antlr4Plugin).settings
       Some("releases" at nexus + "content/repositories/releases/")
   },
   libraryDependencies ++= Seq(
-    "org.antlr"      % "antlr4-runtime" % "4.8-1",
-    "com.typesafe"   % "config"         % "1.4.2",
-    },
-    "org.apache.logging.log4j" % "log4j-api"  % "2.19.0",
-    "org.apache.logging.log4j" % "log4j-core" % "2.19.0",
+    "org.antlr"                % "antlr4-runtime" % "4.8-1",
+    "com.typesafe"             % "config"         % "1.4.2",
+    "org.apache.logging.log4j" % "log4j-api"      % "2.19.0",
+    "org.apache.logging.log4j" % "log4j-core"     % "2.19.0",
     // "org.ow2.asm"              % "asm"        % "9.3",
     // "org.ow2.asm"              % "asm-tree"   % "9.3",
     "org.scalatest" %% "scalatest" % {
@@ -72,7 +71,7 @@ lazy val mixQLCore = (project in file(".")).enablePlugins(Antlr4Plugin).settings
   }
 )
 val Scala3 = "3.1.3"
-val Scala213 = "2.13.8"
+val Scala213 = "2.13.12"
 val Scala212 = "2.12.17"
 val ScalaVersions = Seq(Scala212, Scala213, Scala3)
 
