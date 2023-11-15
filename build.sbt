@@ -37,12 +37,6 @@ lazy val mixQLCore = (project in file(".")).enablePlugins(Antlr4Plugin).settings
   libraryDependencies ++= Seq(
     "org.antlr"      % "antlr4-runtime" % "4.8-1",
     "com.typesafe"   % "config"         % "1.4.2",
-    "org.scala-lang" % "scala-reflect" % {
-      CrossVersion.partialVersion(scalaVersion.value) match {
-        case Some((2, 13)) => scalaVersion.value
-        case Some((2, 12)) => scalaVersion.value
-        case Some((3, _))  => "2.13.8"
-      }
     },
     "org.apache.logging.log4j" % "log4j-api"  % "2.19.0",
     "org.apache.logging.log4j" % "log4j-core" % "2.19.0",
