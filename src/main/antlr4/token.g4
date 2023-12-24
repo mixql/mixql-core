@@ -105,6 +105,7 @@ T_ELIF            : E L I F | E L S E I F;
 T_ENABLE          : E N A B L E ;
 T_END             : E N D ;
 T_ENGINE          : E N G I N E ;
+T_ERROR           : E R R O R;
 T_ESCAPED         : E S C A P E D ;
 T_EXCEPT          : E X C E P T ;
 T_EXPLODE         : E X P L O D E ;

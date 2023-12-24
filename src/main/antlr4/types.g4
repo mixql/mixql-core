@@ -6,6 +6,21 @@ options { tokenVocab=token; }
 expr:;//core.g4
 ident:;//core.g4
 
+type_name:
+       T_NONE
+     | T_NULL
+     | T_BOOL
+     | T_INT
+     | T_DOUBLE
+     | T_STRING
+     | T_ERROR
+     | T_ARRAY
+     | T_MAP
+     | T_CURSOR
+     | T_LABMDA
+     | T_ASYNC
+     ;
+
 dtype:
        primitive_type
 //     | array_type

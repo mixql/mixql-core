@@ -82,6 +82,7 @@ expr: // TODO other expressions if needed
      | expr compare_operator expr                                #expr_compare
      | expr logical_operator expr                                #expr_logical
      | T_NOT expr                                                #expr_not
+     | expr T_IS T_NOT? type_name                                #expr_is_type
      | expr T_PIPE expr                                          #expr_concat
 //     | T_INTERVAL expr interval_item                             #expr_interval // TODO do we need it? if need its literal
      | case_r                                                    #expr_case 

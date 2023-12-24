@@ -12,6 +12,7 @@ import scala.concurrent.{Future, ExecutionContext}
 import ExecutionContext.Implicits.global
 import org.mixql.core.context.ControlContext
 import org.mixql.core.context.mtype.MAsync
+import org.mixql.core.exception.MException
 
 trait ExpressionVisitor extends BaseVisitor {
 
@@ -105,6 +106,28 @@ trait ExpressionVisitor extends BaseVisitor {
   }
 
   override def visitExpr_not(ctx: sql.Expr_notContext): MType = visit(ctx.expr).Not()
+
+  override def visitExpr_is_type(ctx: sql.Expr_is_typeContext): MType = {
+    val res =
+      visit(ctx.expr) match {
+        case _: MNone      => MBool.get(ctx.type_name.T_NONE)
+        case _: MNull      => MBool.get(ctx.type_name.T_NULL)
+        case _: MBool      => MBool.get(ctx.type_name.T_BOOL)
+        case _: MInt       => MBool.get(ctx.type_name.T_INT)
+        case _: MDouble    => MBool.get(ctx.type_name.T_DOUBLE)
+        case _: MString    => MBool.get(ctx.type_name.T_STRING)
+        case _: MException => MBool.get(ctx.type_name.T_ERROR)
+        case _: MArray     => MBool.get(ctx.type_name.T_ARRAY)
+        case _: MMap       => MBool.get(ctx.type_name.T_MAP)
+        case _: MCursor    => MBool.get(ctx.type_name.T_CURSOR)
+        case _: MLambda    => MBool.get(ctx.type_name.T_LABMDA)
+        case _: MAsync     => MBool.get(ctx.type_name.T_ASYNC)
+      }
+    if (ctx.T_NOT)
+      res.Not()
+    else
+      res
+  }
 
   override def visitExpr_recurse(ctx: sql.Expr_recurseContext): MType =
     if (ctx.expr)
