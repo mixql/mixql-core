@@ -402,7 +402,7 @@ class Context(eng: EnginesStorage,
   def interpolate(stmt: String): String = {
     val prev = currentEngineAllias
     setCurrentEngine("interpolator")
-    val res = core.run(stmt + ";", this)
+    val res = core.run("return " + """"""" + stmt + """"""" + ";", this)
     setCurrentEngine(prev)
     res.toString
   }

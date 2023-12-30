@@ -352,7 +352,7 @@ class ExpressionTest extends MainVisitorBaseTest {
   test("Test call lambda") {
     val code =
       """
-        |let mysumm = (x, y, z) -> begin $x + $y + $z; end;
+        |let mysumm = (x, y, z) -> begin return $x + $y + $z; end;
         |let res = mysumm(1, 2, 3);
                 """.stripMargin
     val context = runMainVisitor(code)

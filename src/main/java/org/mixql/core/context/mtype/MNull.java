@@ -38,11 +38,6 @@ public class MNull extends MType {
     }
 
     @Override
-    public MType NotEqual(MType other) {
-        return Equal(other).Not();
-    }
-
-    @Override
     public boolean equals(Object obj) {
         if (obj instanceof MNull)
             return true;

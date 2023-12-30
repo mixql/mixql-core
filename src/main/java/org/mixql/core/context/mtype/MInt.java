@@ -154,9 +154,4 @@ public class MInt extends MType {
         }
         return MBool.False();
     }
-
-    @Override
-    public MType NotEqual(MType other) {
-        return Equal(other).Not();
-    }
 }

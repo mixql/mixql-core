@@ -62,11 +62,6 @@ public class MArray extends MCollection {
     }
 
     @Override
-    public MType NotEqual(MType other) {
-        return Equal(other).Not();
-    }
-
-    @Override
     public MInt size() {
         return new MInt(arr.size());
     }

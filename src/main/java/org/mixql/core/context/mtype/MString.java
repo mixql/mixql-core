@@ -88,9 +88,4 @@ public class MString extends MType {
     public MType Equal(MType other) {
         return MBool.get(this.equals(other));
     }
-
-    @Override
-    public MType NotEqual(MType other) {
-        return this.Equal(other).Not();
-    }
 }

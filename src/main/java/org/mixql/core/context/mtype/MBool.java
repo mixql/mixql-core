@@ -86,11 +86,6 @@ public class MBool extends MType {
     }
 
     @Override
-    public MType NotEqual(MType other) {
-        return Equal(other).Not();
-    }
-
-    @Override
     public MType Or(MType other) {
         if (other instanceof MBool) {
             return get(value || ((MBool) other).value);

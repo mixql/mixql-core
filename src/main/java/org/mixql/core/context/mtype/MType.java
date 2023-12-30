@@ -105,22 +105,12 @@ public abstract class MType extends Exception {
 
     // ==
     public MType Equal(MType other) {
-        throw new UnsupportedOperationException(
-                String.format(
-                        "type error: %s == %s is unsupported",
-                        this.getClass().getSimpleName(), other.getClass().getSimpleName()
-                )
-        );
+        return MBool.get(this == other);
     }
 
     // !=
     public MType NotEqual(MType other) {
-        throw new UnsupportedOperationException(
-                String.format(
-                        "type error: %s != %s is unsupported",
-                        this.getClass().getSimpleName(), other.getClass().getSimpleName()
-                )
-        );
+        return Equal(other).Not();
     }
 
     // !

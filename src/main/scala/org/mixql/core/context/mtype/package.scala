@@ -109,7 +109,7 @@ package object mtype {
     a match {
       case p: MType      => p
       case null          => MNull.get()
-      case Unit          => MNone.get()
+      case ()            => MNone.get()
       case p: String     => new MString(p)
       case p: Int        => new MInt(p)
       case p: Long       => new MInt(p)
@@ -130,7 +130,7 @@ package object mtype {
     a match {
       case e: MException => e
       case _: MNull      => null
-      case _: MNone      => Unit
+      case _: MNone      => ()
       case t: MString    => t.getValue
       case t: MInt       => t.getValue
       case t: MDouble    => t.getValue

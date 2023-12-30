@@ -24,11 +24,6 @@ public class MMap extends MCollection {
     }
 
     @Override
-    public MType NotEqual(MType other) {
-        return Equal(other).Not();
-    }
-
-    @Override
     public MType apply(MType index) {
         for (Map.Entry<MType, MType> entry : m.entrySet()) {
             try {

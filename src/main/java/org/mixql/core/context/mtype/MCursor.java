@@ -6,7 +6,7 @@ import org.mixql.core.generated.sql;
 import org.mixql.core.visitor.CursorExprVisitor;
 
 public class MCursor extends MCursorBase {
-//    Context gCtx = null;
+//    Context mCtx = null;
 //    TokenStream tokens = null;
 
     sql.ExprContext ctx = null;
@@ -103,8 +103,8 @@ public class MCursor extends MCursorBase {
         this.source = source;
     }
 
-    public MCursor(Context gCtx, TokenStream tokens, sql.ExprContext ctx) {
+    public MCursor(Context mCtx, TokenStream tokens, sql.ExprContext ctx) {
         this.ctx = ctx;
-        this.exprVisitor = new CursorExprVisitor(gCtx, tokens);
+        this.exprVisitor = new CursorExprVisitor(mCtx, tokens);
     }
 }

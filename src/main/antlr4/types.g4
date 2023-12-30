@@ -17,7 +17,7 @@ type_name:
      | T_ARRAY
      | T_MAP
      | T_CURSOR
-     | T_LABMDA
+     | T_FUNCTION
      | T_ASYNC
      ;
 

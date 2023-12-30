@@ -120,7 +120,7 @@ trait ExpressionVisitor extends BaseVisitor {
         case _: MArray     => MBool.get(ctx.type_name.T_ARRAY)
         case _: MMap       => MBool.get(ctx.type_name.T_MAP)
         case _: MCursor    => MBool.get(ctx.type_name.T_CURSOR)
-        case _: MLambda    => MBool.get(ctx.type_name.T_LABMDA)
+        case _: MLambda    => MBool.get(ctx.type_name.T_FUNCTION)
         case _: MAsync     => MBool.get(ctx.type_name.T_ASYNC)
       }
     if (ctx.T_NOT)
