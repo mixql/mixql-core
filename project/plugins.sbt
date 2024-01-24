@@ -6,7 +6,7 @@ resolvers ++= Seq(
 )
 
 addSbtPlugin("org.jetbrains.scala" % "sbt-ide-settings" % "1.1.1")
-addSbtPlugin("org.scoverage"       % "sbt-scoverage"    % "2.0.8")
+addSbtPlugin("org.scoverage"       % "sbt-scoverage"    % "2.0.9")
 addSbtPlugin("org.mixql"           % "sbt-antlr4"       % "0.8.7")
 addSbtPlugin("org.scalameta"       % "sbt-scalafmt"     % "2.4.6")
 addSbtPlugin("org.xerial.sbt"      % "sbt-sonatype"     % "3.9.15")

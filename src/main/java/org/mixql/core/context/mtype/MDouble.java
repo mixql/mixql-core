@@ -133,17 +133,6 @@ public class MDouble extends MType {
         if (other instanceof MDouble) {
             return MBool.get(value == ((MDouble) other).value);
         }
-        if (other instanceof MNull) {
-            return MBool.False();
-        }
-        if (other instanceof MNone) {
-            return MBool.False();
-        }
-        return super.Equal(other);
-    }
-
-    @Override
-    public MType NotEqual(MType other) {
-        return Equal(other).Not();
+        return MBool.False();
     }
 }

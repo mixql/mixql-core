@@ -24,11 +24,6 @@ public class MNone extends MType {
     }
 
     @Override
-    public MType NotEqual(MType other) {
-        return Equal(other).Not();
-    }
-
-    @Override
     public boolean equals(Object obj) {
         if (obj instanceof MNone)
             return true;

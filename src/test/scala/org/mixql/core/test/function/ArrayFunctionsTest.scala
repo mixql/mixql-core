@@ -21,7 +21,7 @@ class ArrayFunctionsTest extends MainVisitorBaseTest {
   test("Test sort") {
     val code =
       """
-        |let res = sort([3,2,1], (x, y) -> begin $x < $y; end);
+        |let res = sort([3,2,1], (x, y) -> begin return $x < $y; end);
         |""".stripMargin
 
     val context = runMainVisitor(code)

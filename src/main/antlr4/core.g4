@@ -74,24 +74,25 @@ expr_stmt:
      
 expr: // TODO other expressions if needed
        lambda                                                    #expr_lambda
-     | T_FETCH ident                                             #expr_fetch_cursor
      | T_OPEN_P (expr | other (T_ON choose_engine)?) T_CLOSE_P   #expr_recurse
+     | literal                                                   #expr_literal
+     | var                                                       #expr_var
+     | async                                                     #expr_async
+     | spec_func                                                 #expr_spec_func // TODO what functions to add?
+     | func                                                      #expr_func
+     | await                                                     #expr_await
+     | case_r                                                    #expr_case 
+     | T_FETCH ident                                             #expr_fetch_cursor
      | collection=expr T_OPEN_SB index=expr T_CLOSE_SB           #expr_index
+     | T_NOT expr                                                #expr_not
+     | expr T_IS T_NOT? type_name                                #expr_is_type
      | expr (T_MUL | T_DIV) expr                                 #expr_arithmetic_p1 // first priority
      | expr (T_SUB | T_ADD) expr                                 #expr_arithmetic_p2 // second pririty
      | expr compare_operator expr                                #expr_compare
      | expr logical_operator expr                                #expr_logical
-     | T_NOT expr                                                #expr_not
      | expr T_PIPE expr                                          #expr_concat
 //     | T_INTERVAL expr interval_item                             #expr_interval // TODO do we need it? if need its literal
-     | case_r                                                    #expr_case 
 //     | ident T_PERCENT (T_ISOPEN | T_FOUND | T_NOTFOUND)         #expr_found // TODO do we need it?
-     | await                                                     #expr_await
-     | spec_func                                                 #expr_spec_func // TODO what functions to add?
-     | func                                                      #expr_func
-     | async                                                     #expr_async
-     | var                                                       #expr_var
-     | literal                                                   #expr_literal
      ;
 
 await:

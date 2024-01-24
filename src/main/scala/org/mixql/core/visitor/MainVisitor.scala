@@ -42,7 +42,7 @@ class MainVisitor(ctx: Context, tokens: TokenStream)
       if (controlState != ControlContext.NONE)
         return res
     })
-    res
+    MNone.get()
   }
 
   override def visitFor_cursor_stmt(ctx: sql.For_cursor_stmtContext): MType = {
